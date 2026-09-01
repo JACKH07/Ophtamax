@@ -1,0 +1,68 @@
+<?php
+
+        
+        // require_once("requires/cnx.php");
+        //VIDER LA TABLE TEMP DE TRIE
+        $REQ_RESETTABLETEMP = $pdo->prepare("TRUNCATE TABLE consult_temp");
+        $REQ_RESETTABLETEMP -> execute();
+
+        //LISTE DES PCONSULTATIONS
+        $REQ_LISTE_CONSULT2 = $pdo -> prepare("SELECT * FROM consultation ORDER BY nom_prenoms_pat ASC");
+        $REQ_LISTE_CONSULT2 -> execute();
+
+        while ($CONS = $REQ_LISTE_CONSULT2->fetch()) { 
+
+            
+            $id_patient = $CONS['id_patient'];
+            $id_cons = $CONS['id'];
+            $np_pat = $CONS['nom_prenoms_pat'];
+            $diagn = $CONS['diagnostic'];
+            $date_consult = $CONS['datecons'];
+
+            $REQ_SELECT_PATIENT1 = $pdo -> prepare("SELECT * FROM patient WHERE id = ?");
+            $PARAM = array($id_patient);
+            $REQ_SELECT_PATIENT1 ->execute($PARAM);
+            $datenais="";
+            $contact="";
+            // echo  $id_patient;
+            // Echo  $np_pat;
+                while ($PAT1 = $REQ_SELECT_PATIENT1->fetch()) { 
+
+                    //$id_cons = $PAT1['id'];
+                    //$datenais="";
+                    
+                    // if (!($PAT1['date_nais'])){
+                    //   $datenais="";
+                    // }
+                    // else{
+                        $datenais= $PAT1['date_nais'];
+                    // }
+
+                    // if (!($PAT1['contact'])){
+                    //   $contact="";
+                    // }
+                    // else{
+                        $contact= $PAT1['contact'];
+                    // }
+ 
+
+                }
+            
+            
+            //AJOUT DANS LA TABLE TEMPORAIRE CONSULTATION
+            // require_once("requires/cnx.php");
+            
+            
+                $REQ_INSERT_TEMP_CONSULT = $pdo->prepare("INSERT INTO consult_temp (id_consult,id_patient,np_patient,contact_patient,date_nais,diagn,date_cons) VALUE (?,?,?,?,?,?,?)");
+                $PARAM = array($id_cons,$id_patient,$np_pat,$contact,$datenais,$diagn,$date_consult);
+                $REQ_INSERT_TEMP_CONSULT -> execute($PARAM);
+            
+
+        }
+
+            
+            
+            $REQ_LISTE_CONSULT = $pdo -> prepare("SELECT * FROM consult_temp ORDER BY date_cons DESC Limit 25");
+        // $PARAM1 = array($NOM1);
+            $REQ_LISTE_CONSULT -> execute();
+   ?> -->
