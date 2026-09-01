@@ -38,6 +38,18 @@ const MOCK_USERS: Record<string, { password: string; user: User }> = {
       fonction: 'Ophtalmologiste',
     },
   },
+  nkahydara: {
+    password: 'test',
+    user: {
+      id: '6',
+      nom: 'KAHYDARA',
+      prenoms: 'KAHYDARA',
+      login_user: 'nkahydara',
+      email: 'krotoum49@gmail.com',
+      id_role: 'ASS',
+      fonction: 'Assistante',
+    },
+  },
   assistant: {
     password: 'assistant',
     user: {
