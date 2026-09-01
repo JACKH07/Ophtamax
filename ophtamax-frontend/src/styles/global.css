@@ -1,0 +1,133 @@
+@import 'tailwindcss';
+
+/* ─── Design tokens Stitch / Ophtamax ─── */
+@theme {
+  --color-primary: #00626a;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #0e7c86;
+  --color-on-primary-container: #ddfbff;
+  --color-primary-fixed: #98f0fb;
+  --color-primary-fixed-dim: #7cd4df;
+  --color-on-primary-fixed: #001f23;
+  --color-on-primary-fixed-variant: #004f56;
+
+  --color-secondary: #505f76;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d0e1fb;
+  --color-on-secondary-container: #54647a;
+  --color-secondary-fixed: #d3e4fe;
+  --color-secondary-fixed-dim: #b7c8e1;
+  --color-on-secondary-fixed: #0b1c30;
+  --color-on-secondary-fixed-variant: #38485d;
+
+  --color-tertiary: #85481b;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #a26031;
+  --color-on-tertiary-container: #fff3ee;
+  --color-tertiary-fixed: #ffdbc7;
+  --color-tertiary-fixed-dim: #ffb688;
+  --color-on-tertiary-fixed: #311300;
+  --color-on-tertiary-fixed-variant: #6f380b;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-background: #f7fafa;
+  --color-on-background: #181c1d;
+  --color-surface: #f7fafa;
+  --color-on-surface: #181c1d;
+  --color-surface-bright: #f7fafa;
+  --color-surface-dim: #d7dbdb;
+  --color-surface-variant: #dfe3e3;
+  --color-on-surface-variant: #3e494a;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f4f4;
+  --color-surface-container: #ebeeef;
+  --color-surface-container-high: #e5e9e9;
+  --color-surface-container-highest: #dfe3e3;
+  --color-surface-tint: #006972;
+  --color-inverse-surface: #2d3132;
+  --color-inverse-on-surface: #eef1f2;
+  --color-inverse-primary: #7cd4df;
+
+  --color-outline: #6e797a;
+  --color-outline-variant: #bdc9ca;
+
+  --spacing-sidebar-width: 260px;
+  --spacing-margin-page: 32px;
+  --spacing-gutter: 24px;
+  --spacing-stack-sm: 8px;
+  --spacing-stack-md: 16px;
+  --spacing-stack-lg: 24px;
+  --spacing-container-max-width: 1440px;
+
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --text-display-lg: 32px;
+  --text-display-lg--line-height: 40px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 600;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--letter-spacing: -0.01em;
+  --text-headline-md--font-weight: 600;
+
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-headline-sm--font-weight: 600;
+
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+
+  --text-body-md: 14px;
+  --text-body-md--line-height: 20px;
+
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 18px;
+
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
+
+  --text-label-sm: 11px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--font-weight: 500;
+
+  --background-image-eye-pattern: url("data:image/svg+xml;utf8,<svg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'><path d='M30 20C18 20 8 30 8 30s10 10 22 10 22-10 22-10-10-10-22-10zm0 16c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z' fill='%2300626a' fill-opacity='0.03' fill-rule='evenodd'/></svg>");
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    user-select: none;
+  }
+
+  .material-symbols-outlined.filled {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}

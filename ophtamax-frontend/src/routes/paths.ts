@@ -1,0 +1,13 @@
+export const PATHS = {
+  login: '/login',
+  dashboard: '/dashboard',
+  patients: '/patients',
+  agenda: '/agenda',
+  consultations: '/consultations',
+  ordonnances: '/ordonnances',
+  facturation: '/facturation',
+  statistiques: '/statistiques',
+  parametres: '/parametres',
+  utilisateurs: '/utilisateurs',
+  forbidden: '/403',
+} as const
