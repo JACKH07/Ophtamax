@@ -26,6 +26,7 @@ export interface Consultation {
   id: string
   id_patient: string
   patient_name: string
+  dossier_numero: string
   datecons: string
   diagnostic: string
   motif: string
@@ -33,16 +34,23 @@ export interface Consultation {
   examen_og: ExamenOeil
   ordonnance: string
   prescription: string
+  conduite_a_tenir: string
+  prochain_rdv_date: string
+  prochain_rdv_delai: string
   statut: 'brouillon' | 'terminee'
 }
 
 export interface ExamenOeil {
-  avl: string
+  vl_sans: string
+  vl_avec: string
+  vp_sans: string
+  vp_avec: string
   sphere: string
   cylindre: string
   axe: string
   addition: string
   pio: string
+  segment_anterieur: string
   fond_oeil: string
 }
 

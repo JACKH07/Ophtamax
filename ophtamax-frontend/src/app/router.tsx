@@ -24,6 +24,7 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Connexion isolée : ne bloque plus les autres pages en mode démo */}
         <Route path={PATHS.login} element={<LoginPage />} />
         <Route path={PATHS.forbidden} element={<ForbiddenPage />} />
 
@@ -46,6 +47,7 @@ export function AppRouter() {
             <Route element={<RoleGuard pathPrefix={PATHS.consultations} />}>
               <Route path={PATHS.consultations} element={<ConsultationsListPage />} />
               <Route path={`${PATHS.consultations}/nouvelle`} element={<ConsultationFormPage />} />
+              <Route path={`${PATHS.consultations}/:id/modifier`} element={<ConsultationFormPage />} />
               <Route path={`${PATHS.consultations}/:id`} element={<ConsultationDetailPage />} />
             </Route>
 

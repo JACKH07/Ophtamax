@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { USE_MOCK } from '@/api/endpoints'
 import type { RoleCode } from '@/api/types/auth'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PATHS } from '@/routes/paths'
@@ -24,20 +25,23 @@ const NAV_ITEMS: NavItem[] = [
 ]
 
 function canSeeNav(role: RoleCode, path: string): boolean {
+  if (USE_MOCK) return true
   const allowed = ROUTE_ACCESS[path]
   return allowed ? allowed.includes(role) : true
 }
 
 export function Sidebar() {
   const user = useAuthStore((s) => s.user)
-  const role = user?.id_role ?? 'SEC'
+  const role = user?.id_role ?? 'ADMIN'
   const visibleItems = NAV_ITEMS.filter((item) => canSeeNav(role, item.path))
 
   const displayName = user
     ? user.id_role === 'OPHT'
       ? `Dr ${user.nom}`
       : `${user.prenoms} ${user.nom}`
-    : ''
+    : 'Mode démo'
+
+  const displayRole = user?.fonction ?? 'Sans connexion BDD'
 
   return (
     <nav className="fixed left-0 top-0 z-20 flex h-full w-sidebar-width flex-col border-r border-outline-variant bg-surface-container-lowest px-4 py-6 shadow-sm">
@@ -50,6 +54,14 @@ export function Sidebar() {
           <p className="text-label-sm text-secondary">Management Platform</p>
         </div>
       </div>
+
+      <NavLink
+        to={`${PATHS.consultations}/nouvelle`}
+        className="mb-4 flex items-center justify-center gap-2 rounded-lg bg-primary-container px-4 py-3 text-label-md font-semibold text-on-primary-container shadow-sm transition-colors hover:bg-primary hover:text-on-primary"
+      >
+        <MaterialIcon name="add" className="text-[18px]" />
+        Nouvelle Consultation
+      </NavLink>
 
       <ul className="flex flex-1 flex-col gap-1">
         {visibleItems.map((item) => (
@@ -71,21 +83,28 @@ export function Sidebar() {
         ))}
       </ul>
 
-      {user && (
-        <div className="mt-auto border-t border-outline-variant px-2 pt-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-primary/10 text-label-md font-semibold text-primary">
-              {user.prenoms.charAt(0)}{user.nom.charAt(0)}
-            </div>
-            <div className="flex min-w-0 flex-col">
-              <span className="truncate text-label-md font-semibold tracking-wide text-on-surface">
-                {displayName}
-              </span>
-              <span className="truncate text-label-sm text-secondary">{user.fonction}</span>
-            </div>
+      <div className="mt-auto border-t border-outline-variant px-2 pt-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-primary/10 text-label-md font-semibold text-primary">
+            {user ? `${user.prenoms.charAt(0)}${user.nom.charAt(0)}` : 'D'}
+          </div>
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate text-label-md font-semibold tracking-wide text-on-surface">
+              {displayName}
+            </span>
+            <span className="truncate text-label-sm text-secondary">{displayRole}</span>
           </div>
         </div>
-      )}
+        {USE_MOCK && (
+          <NavLink
+            to={PATHS.login}
+            className="mt-3 flex items-center gap-2 text-label-sm text-secondary hover:text-primary"
+          >
+            <MaterialIcon name="login" className="text-[16px]" />
+            Page connexion
+          </NavLink>
+        )}
+      </div>
     </nav>
   )
 }

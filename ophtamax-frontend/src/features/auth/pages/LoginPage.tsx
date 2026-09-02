@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '@/api/client'
 import { USE_MOCK } from '@/api/endpoints'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
@@ -10,9 +10,13 @@ import { loginSchema, type LoginFormData } from '@/features/auth/schemas/loginSc
 import { login } from '@/features/auth/services/authService'
 import { PATHS } from '@/routes/paths'
 
+/**
+ * Page de connexion isolée : en mode démo (sans BDD),
+ * elle n'empêche plus d'accéder aux autres pages.
+ */
 export function LoginPage() {
   const navigate = useNavigate()
-  const { setAuth, isAuthenticated } = useAuth()
+  const { setAuth } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -26,13 +30,12 @@ export function LoginPage() {
     defaultValues: { remember: false },
   })
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(PATHS.dashboard, { replace: true })
-    }
-  }, [isAuthenticated, navigate])
-
   const onSubmit = async (data: LoginFormData) => {
+    if (!USE_MOCK) {
+      setError('Base de données / API non connectée. Activez VITE_USE_MOCK=true pour la démo.')
+      return
+    }
+
     setError(null)
     setIsSubmitting(true)
     try {
@@ -60,6 +63,22 @@ export function LoginPage() {
             <h1 className="mb-1 text-headline-md font-semibold text-primary">Ophtamax</h1>
             <p className="text-body-sm text-on-surface-variant">Management Platform</p>
           </div>
+
+          {USE_MOCK && (
+            <div className="mb-6 w-full rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-body-sm text-on-surface-variant">
+              <p className="font-semibold text-primary">Mode démo — BDD non connectée</p>
+              <p className="mt-1">
+                Les pages de l&apos;application sont accessibles sans connexion.
+              </p>
+              <Link
+                to={PATHS.dashboard}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-label-md font-semibold tracking-wide text-on-primary hover:bg-on-primary-fixed-variant"
+              >
+                Accéder à l&apos;application
+                <MaterialIcon name="arrow_forward" className="text-[18px]" />
+              </Link>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
             <div className="flex w-full flex-col gap-1">
@@ -114,25 +133,6 @@ export function LoginPage() {
               )}
             </div>
 
-            <div className="flex w-full items-center justify-between pt-1">
-              <label className="flex cursor-pointer items-center">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 cursor-pointer rounded border-outline-variant bg-surface-container-lowest text-primary focus:ring-primary"
-                  {...register('remember')}
-                />
-                <span className="ml-2 block cursor-pointer text-body-sm text-on-surface-variant">
-                  Se souvenir de moi
-                </span>
-              </label>
-              <button
-                type="button"
-                className="text-label-md font-semibold tracking-wide text-primary transition-colors hover:text-primary-fixed-dim"
-              >
-                Mot de passe oublié ?
-              </button>
-            </div>
-
             {error && (
               <div className="rounded-lg bg-error-container px-4 py-3 text-body-sm text-on-error-container">
                 {error}
@@ -141,14 +141,14 @@ export function LoginPage() {
 
             {USE_MOCK && !error && (
               <div className="rounded-lg bg-surface-container-low px-4 py-3 text-body-sm text-on-surface-variant">
-                <p className="font-semibold text-on-surface">Mode démo</p>
-                <p className="mt-1">admin / admin · opht / opht · secretaire / secretaire</p>
+                <p className="font-semibold text-on-surface">Comptes démo (optionnel)</p>
+                <p className="mt-1">opht / opht · admin / admin</p>
               </div>
             )}
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !USE_MOCK}
               className="mt-4 flex w-full items-center justify-center rounded-lg border border-transparent bg-primary px-4 py-3 text-label-md font-semibold tracking-wide text-on-primary shadow-sm transition-all hover:bg-on-primary-fixed-variant focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-[0.98] disabled:opacity-60"
             >
               {isSubmitting ? 'Connexion...' : 'Se connecter'}

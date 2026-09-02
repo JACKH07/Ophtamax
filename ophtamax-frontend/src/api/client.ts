@@ -1,5 +1,5 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
-import { API_BASE_URL } from './endpoints'
+import { API_BASE_URL, USE_MOCK } from './endpoints'
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -31,7 +31,7 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !USE_MOCK) {
       sessionStorage.removeItem('ophtamax_token')
       authToken = null
       if (!window.location.pathname.includes('/login')) {

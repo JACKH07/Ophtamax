@@ -10,14 +10,28 @@ import type {
 } from '@/api/types/entities'
 
 const emptyOeil = (): ExamenOeil => ({
-  avl: '',
-  sphere: '',
-  cylindre: '',
-  axe: '',
+  vl_sans: '',
+  vl_avec: '',
+  vp_sans: '',
+  vp_avec: '',
+  sphere: '+0.00',
+  cylindre: '-0.00',
+  axe: '0',
   addition: '',
   pio: '',
+  segment_anterieur: '',
   fond_oeil: '',
 })
+
+function dossierNumero(patientId: string): string {
+  const map: Record<string, string> = {
+    p1: '84920',
+    p2: '84921',
+    p3: '84922',
+    p4: '84923',
+  }
+  return map[patientId] ?? patientId.replace(/\D/g, '').slice(-5).padStart(5, '0')
+}
 
 let patients: Patient[] = [
   {
@@ -75,26 +89,54 @@ let consultations: Consultation[] = [
     id: 'c1',
     id_patient: 'p1',
     patient_name: 'Diallo Sylla',
+    dossier_numero: '84920',
     datecons: '2024-12-10T09:30:00',
     diagnostic: 'Myopie évolutive',
     motif: 'Baisse de vision de loin',
-    examen_od: { ...emptyOeil(), sphere: '-2.00', cylindre: '-0.50', axe: '90', avl: '10/10' },
-    examen_og: { ...emptyOeil(), sphere: '-1.75', cylindre: '-0.25', axe: '85', avl: '10/10' },
-    ordonnance: 'Correctol 2x/jour',
-    prescription: 'Lunettes VL',
+    examen_od: {
+      ...emptyOeil(),
+      vl_sans: '3/10',
+      vl_avec: '10/10',
+      sphere: '-2.00',
+      cylindre: '-0.50',
+      axe: '90',
+      pio: '14',
+      segment_anterieur: 'RAS',
+      fond_oeil: 'Excavation physiologique',
+    },
+    examen_og: {
+      ...emptyOeil(),
+      vl_sans: '4/10',
+      vl_avec: '10/10',
+      sphere: '-1.75',
+      cylindre: '-0.25',
+      axe: '85',
+      pio: '15',
+      segment_anterieur: 'RAS',
+      fond_oeil: 'RAS',
+    },
+    ordonnance: 'Correctol 2x/jour\nLarmes artificielles si besoin',
+    prescription: 'Lunettes VL\nOD: -2.00 (-0.50) 90°\nOG: -1.75 (-0.25) 85°',
+    conduite_a_tenir: 'Contrôle réfraction dans 6 mois. Éviter le travail prolongé sur écran sans pause.',
+    prochain_rdv_date: '2025-06-10',
+    prochain_rdv_delai: 'Dans 6 mois',
     statut: 'terminee',
   },
   {
     id: 'c2',
     id_patient: 'p2',
     patient_name: 'Marie Laurent',
+    dossier_numero: '84921',
     datecons: '2024-12-01T14:00:00',
     diagnostic: 'Presbytie',
     motif: 'Contrôle visuel',
-    examen_od: { ...emptyOeil(), addition: '+2.00' },
-    examen_og: { ...emptyOeil(), addition: '+2.00' },
+    examen_od: { ...emptyOeil(), addition: '+2.00', vl_avec: '10/10', vp_avec: 'P2' },
+    examen_og: { ...emptyOeil(), addition: '+2.00', vl_avec: '10/10', vp_avec: 'P2' },
     ordonnance: '',
-    prescription: 'Verres progressifs',
+    prescription: 'Verres progressifs\nAdd +2.00',
+    conduite_a_tenir: 'Adaptation verres progressifs. Revoir si céphalées.',
+    prochain_rdv_date: '2025-01-01',
+    prochain_rdv_delai: 'Dans 1 mois',
     statut: 'terminee',
   },
 ]
@@ -243,6 +285,9 @@ export const mockStore = {
       consultations = consultations.map((c) => (c.id === id ? { ...c, ...data } : c))
       return consultations.find((c) => c.id === id)!
     },
+    remove: (id: string) => {
+      consultations = consultations.filter((c) => c.id !== id)
+    },
   },
   rendezVous: {
     list: () => [...rendezVous],
@@ -314,4 +359,4 @@ export const mockStore = {
   }),
 }
 
-export { emptyOeil }
+export { emptyOeil, dossierNumero }
