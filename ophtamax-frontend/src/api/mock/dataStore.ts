@@ -3,10 +3,14 @@ import type {
   Consultation,
   ExamenOeil,
   Facture,
+  FileAttenteItem,
   Patient,
   ReferentielItem,
   RendezVous,
+  RendezVousFormData,
   SocieteInfo,
+  StatutFileAttente,
+  StatutRdv,
 } from '@/api/types/entities'
 
 const emptyOeil = (): ExamenOeil => ({
@@ -36,51 +40,51 @@ function dossierNumero(patientId: string): string {
 let patients: Patient[] = [
   {
     id: 'p1',
-    nom: 'Sylla',
-    prenom: 'Diallo',
+    nom: '',
+    prenom: '',
     sexe: 'M',
-    date_nais: '1985-03-12',
-    profession: 'Commerçant',
-    contact: '07 08 12 34 56',
-    assurance: 'MCI',
-    antecedents: 'Diabète type 2',
-    derniere_visite: '2024-11-15',
+    date_nais: '',
+    profession: '',
+    contact: '',
+    assurance: '',
+    antecedents: '',
+    derniere_visite: '',
   },
   {
     id: 'p2',
-    nom: 'Laurent',
-    prenom: 'Marie',
+    nom: '',
+    prenom: '',
     sexe: 'F',
-    date_nais: '1992-07-22',
-    profession: 'Enseignante',
-    contact: '05 44 22 11 00',
-    assurance: 'MUNASSUR',
+    date_nais: '',
+    profession: '',
+    contact: '',
+    assurance: '',
     antecedents: '',
-    derniere_visite: '2024-12-01',
+    derniere_visite: '',
   },
   {
     id: 'p3',
-    nom: 'Dupont',
-    prenom: 'Jean',
+    nom: '',
+    prenom: '',
     sexe: 'M',
-    date_nais: '1978-01-05',
-    profession: 'Chauffeur',
-    contact: '01 02 03 04 05',
+    date_nais: '',
+    profession: '',
+    contact: '',
     assurance: '',
-    antecedents: 'Hypertension',
-    derniere_visite: '2024-10-20',
+    antecedents: '',
+    derniere_visite: '',
   },
   {
     id: 'p4',
-    nom: 'Traoré',
-    prenom: 'Awa',
+    nom: '',
+    prenom: '',
     sexe: 'F',
-    date_nais: '1995-11-30',
-    profession: 'Infirmière',
-    contact: '07 77 88 99 00',
-    assurance: 'OLEA',
+    date_nais: '',
+    profession: '',
+    contact: '',
+    assurance: '',
     antecedents: '',
-    derniere_visite: '2024-12-10',
+    derniere_visite: '',
   },
 ]
 
@@ -88,8 +92,8 @@ let consultations: Consultation[] = [
   {
     id: 'c1',
     id_patient: 'p1',
-    patient_name: 'Diallo Sylla',
-    dossier_numero: '84920',
+    patient_name: '',
+    dossier_numero: '',
     datecons: '2024-12-10T09:30:00',
     diagnostic: 'Myopie évolutive',
     motif: 'Baisse de vision de loin',
@@ -125,8 +129,8 @@ let consultations: Consultation[] = [
   {
     id: 'c2',
     id_patient: 'p2',
-    patient_name: 'Marie Laurent',
-    dossier_numero: '84921',
+    patient_name: '',
+    dossier_numero: '',
     datecons: '2024-12-01T14:00:00',
     diagnostic: 'Presbytie',
     motif: 'Contrôle visuel',
@@ -141,23 +145,33 @@ let consultations: Consultation[] = [
   },
 ]
 
+// Rendez-vous spread sur les 14 prochains jours (relatifs à aujourd'hui)
+function rdvDate(daysOffset: number, hour: number, min = 0): string {
+  const d = new Date()
+  d.setDate(d.getDate() + daysOffset)
+  d.setHours(hour, min, 0, 0)
+  return d.toISOString()
+}
+
 let rendezVous: RendezVous[] = [
   {
     id: 'rdv1',
     patient_id: 'p3',
-    patient_name: 'Jean Dupont',
-    date_heure: '2024-12-12T09:15:00',
+    patient_name: '',
+    date_heure: rdvDate(0, 9, 15),
     duree_min: 30,
+    medecin_id: 'u2',
     medecin: 'Dr Koffi',
-    motif: 'Fond d\'œil',
+    motif: "Fond d'œil",
     statut: 'en_consultation',
   },
   {
     id: 'rdv2',
     patient_id: 'p4',
-    patient_name: 'Awa Traoré',
-    date_heure: '2024-12-12T09:45:00',
+    patient_name: '',
+    date_heure: rdvDate(0, 9, 45),
     duree_min: 20,
+    medecin_id: 'u2',
     medecin: 'Dr Koffi',
     motif: 'Contrôle post-op',
     statut: 'en_attente',
@@ -165,24 +179,141 @@ let rendezVous: RendezVous[] = [
   {
     id: 'rdv3',
     patient_id: 'p1',
-    patient_name: 'Diallo Sylla',
-    date_heure: '2024-12-12T11:00:00',
+    patient_name: '',
+    date_heure: rdvDate(0, 11, 0),
     duree_min: 30,
+    medecin_id: 'u2',
     medecin: 'Dr Koffi',
     motif: 'OCT Maculaire',
     statut: 'planifie',
+  },
+  {
+    id: 'rdv4',
+    patient_id: 'p2',
+    patient_name: '',
+    date_heure: rdvDate(0, 14, 30),
+    duree_min: 45,
+    medecin_id: 'u2',
+    medecin: 'Dr Koffi',
+    motif: 'Contrôle réfraction',
+    statut: 'planifie',
+  },
+  {
+    id: 'rdv5',
+    patient_id: 'p3',
+    patient_name: '',
+    date_heure: rdvDate(1, 10, 0),
+    duree_min: 30,
+    medecin_id: 'u2',
+    medecin: 'Dr Koffi',
+    motif: 'Bilan glaucome',
+    statut: 'planifie',
+  },
+  {
+    id: 'rdv6',
+    patient_id: 'p4',
+    patient_name: '',
+    date_heure: rdvDate(2, 9, 0),
+    duree_min: 20,
+    medecin_id: 'u2',
+    medecin: 'Dr Koffi',
+    motif: 'Nouvelle consultation',
+    statut: 'planifie',
+  },
+  {
+    id: 'rdv7',
+    patient_id: 'p1',
+    patient_name: '',
+    date_heure: rdvDate(3, 11, 30),
+    duree_min: 30,
+    medecin_id: 'u2',
+    medecin: 'Dr Koffi',
+    motif: 'Suivi myopie',
+    statut: 'planifie',
+  },
+  {
+    id: 'rdv8',
+    patient_id: 'p2',
+    patient_name: '',
+    date_heure: rdvDate(7, 8, 30),
+    duree_min: 30,
+    medecin_id: 'u2',
+    medecin: 'Dr Koffi',
+    motif: 'Champ visuel',
+    statut: 'planifie',
+  },
+  {
+    id: 'rdv9',
+    patient_id: 'p3',
+    patient_name: '',
+    date_heure: rdvDate(7, 15, 0),
+    duree_min: 45,
+    medecin_id: 'u2',
+    medecin: 'Dr Koffi',
+    motif: 'Cataracte — suivi',
+    statut: 'planifie',
+  },
+  {
+    id: 'rdv10',
+    patient_id: 'p4',
+    patient_name: '',
+    date_heure: rdvDate(-1, 10, 0),
+    duree_min: 30,
+    medecin_id: 'u2',
+    medecin: 'Dr Koffi',
+    motif: 'Rétinopathie — contrôle',
+    statut: 'termine',
+  },
+]
+
+let fileAttente: FileAttenteItem[] = [
+  {
+    id: 'fa1',
+    rdv_id: 'rdv1',
+    patient_id: 'p3',
+    patient_name: '',
+    patient_age: undefined,
+    motif: "Fond d'œil",
+    heure_arrivee: (() => { const d = new Date(); d.setHours(9, 0, 0, 0); return d.toISOString() })(),
+    statut: 'en_consultation',
+    priorite: 1,
+    medecin: 'Dr Koffi',
+  },
+  {
+    id: 'fa2',
+    rdv_id: 'rdv2',
+    patient_id: 'p4',
+    patient_name: '',
+    patient_age: undefined,
+    motif: 'Contrôle post-op',
+    heure_arrivee: (() => { const d = new Date(); d.setHours(9, 30, 0, 0); return d.toISOString() })(),
+    statut: 'en_attente',
+    priorite: 2,
+    medecin: 'Dr Koffi',
+  },
+  {
+    id: 'fa3',
+    rdv_id: 'rdv3',
+    patient_id: 'p1',
+    patient_name: '',
+    patient_age: undefined,
+    motif: 'OCT Maculaire',
+    heure_arrivee: (() => { const d = new Date(); d.setHours(10, 50, 0, 0); return d.toISOString() })(),
+    statut: 'en_attente',
+    priorite: 3,
+    medecin: 'Dr Koffi',
   },
 ]
 
 let factures: Facture[] = [
   {
     id: 'f1',
-    numero: 'FAC-2024-0892',
+    numero: '',
     patient_id: 'p1',
-    patient_name: 'Diallo Sylla',
-    date: '2024-12-10',
-    montant_ht: 45000,
-    montant_ttc: 45000,
+    patient_name: '',
+    date: new Date().toISOString(),
+    montant_ht:  new Number(45000).valueOf() as number,
+    montant_ttc:  new Number(45000).valueOf() as number,
     statut: 'payee',
     mode_paiement: 'Espèces',
     lignes: [
@@ -194,7 +325,7 @@ let factures: Facture[] = [
     id: 'f2',
     numero: 'FAC-2024-0893',
     patient_id: 'p2',
-    patient_name: 'Marie Laurent',
+    patient_name: '',
     date: '2024-12-11',
     montant_ht: 35000,
     montant_ttc: 35000,
@@ -206,7 +337,7 @@ let factures: Facture[] = [
     id: 'f3',
     numero: 'FAC-2024-0894',
     patient_id: 'p3',
-    patient_name: 'Jean Dupont',
+    patient_name: '',
     date: '2024-12-11',
     montant_ht: 15000,
     montant_ttc: 15000,
@@ -290,15 +421,55 @@ export const mockStore = {
     },
   },
   rendezVous: {
-    list: () => [...rendezVous],
-    updateStatut: (id: string, statut: RendezVous['statut']) => {
+    list: (from?: string, to?: string, medecin_id?: string) => {
+      let list = [...rendezVous]
+      if (from) list = list.filter((r) => r.date_heure >= from)
+      if (to) list = list.filter((r) => r.date_heure <= to)
+      if (medecin_id) list = list.filter((r) => r.medecin_id === medecin_id)
+      return list.sort((a, b) => a.date_heure.localeCompare(b.date_heure))
+    },
+    get: (id: string) => rendezVous.find((r) => r.id === id),
+    create: (data: RendezVousFormData & { patient_name: string; medecin: string }) => {
+      const r: RendezVous = { ...data, id: uid() }
+      rendezVous = [...rendezVous, r]
+      rendezVous.sort((a, b) => a.date_heure.localeCompare(b.date_heure))
+      return r
+    },
+    update: (id: string, data: Partial<RendezVousFormData>) => {
+      rendezVous = rendezVous.map((r) => (r.id === id ? { ...r, ...data } : r))
+      return rendezVous.find((r) => r.id === id)!
+    },
+    updateStatut: (id: string, statut: StatutRdv) => {
       rendezVous = rendezVous.map((r) => (r.id === id ? { ...r, statut } : r))
       return rendezVous.find((r) => r.id === id)!
     },
-    create: (data: Omit<RendezVous, 'id'>) => {
-      const r: RendezVous = { ...data, id: uid() }
-      rendezVous = [r, ...rendezVous]
-      return r
+    remove: (id: string) => {
+      rendezVous = rendezVous.filter((r) => r.id !== id)
+    },
+  },
+  fileAttente: {
+    list: (date?: string) => {
+      if (!date) return [...fileAttente]
+      return fileAttente.filter((f) => f.heure_arrivee.startsWith(date))
+    },
+    add: (patient_id: string, patient_name: string, motif: string, rdv_id: string, medecin: string, priorite?: number) => {
+      const item: FileAttenteItem = {
+        id: uid(),
+        rdv_id,
+        patient_id,
+        patient_name,
+        motif,
+        heure_arrivee: new Date().toISOString(),
+        statut: 'en_attente',
+        priorite: priorite ?? fileAttente.length + 1,
+        medecin,
+      }
+      fileAttente = [...fileAttente, item]
+      return item
+    },
+    updateStatut: (id: string, statut: StatutFileAttente) => {
+      fileAttente = fileAttente.map((f) => (f.id === id ? { ...f, statut } : f))
+      return fileAttente.find((f) => f.id === id)!
     },
   },
   factures: {

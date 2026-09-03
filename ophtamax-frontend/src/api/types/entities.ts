@@ -54,15 +54,44 @@ export interface ExamenOeil {
   fond_oeil: string
 }
 
+export type StatutRdv = 'planifie' | 'en_attente' | 'en_consultation' | 'termine' | 'absent'
+
 export interface RendezVous {
   id: string
   patient_id: string
   patient_name: string
   date_heure: string
   duree_min: number
+  medecin_id: string
   medecin: string
   motif: string
-  statut: 'planifie' | 'en_attente' | 'en_consultation' | 'termine' | 'absent'
+  notes?: string
+  statut: StatutRdv
+}
+
+export interface RendezVousFormData {
+  patient_id: string
+  date_heure: string
+  duree_min: number
+  medecin_id: string
+  motif: string
+  notes?: string
+  statut: StatutRdv
+}
+
+export type StatutFileAttente = 'en_attente' | 'en_consultation' | 'termine' | 'absent'
+
+export interface FileAttenteItem {
+  id: string
+  rdv_id: string
+  patient_id: string
+  patient_name: string
+  patient_age?: number
+  motif: string
+  heure_arrivee: string
+  statut: StatutFileAttente
+  priorite: number
+  medecin: string
 }
 
 export interface Facture {
