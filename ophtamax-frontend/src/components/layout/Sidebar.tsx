@@ -18,6 +18,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Agenda', path: PATHS.agenda, icon: 'calendar_today' },
   { label: 'Consultations', path: PATHS.consultations, icon: 'medical_services' },
   { label: 'Ordonnances', path: PATHS.ordonnances, icon: 'description' },
+  { label: 'Prescription examen', path: PATHS.prescriptionExamen, icon: 'biotech' },
+  { label: 'Prescription Lunettes', path: PATHS.prescriptionLunettes, icon: 'visibility' },
   { label: 'Facturation', path: PATHS.facturation, icon: 'receipt_long' },
   { label: 'Statistiques', path: PATHS.statistiques, icon: 'analytics' },
   { label: 'Paramètres', path: PATHS.parametres, icon: 'settings' },
@@ -36,9 +38,7 @@ export function Sidebar() {
   const visibleItems = NAV_ITEMS.filter((item) => canSeeNav(role, item.path))
 
   const displayName = user
-    ? user.id_role === 'OPHT'
-      ? `Dr ${user.nom}`
-      : `${user.prenoms} ${user.nom}`
+    ? (user.fonction || user.login_user)
     : 'Mode démo'
 
   const displayRole = user?.fonction ?? 'Sans connexion BDD'
@@ -86,7 +86,7 @@ export function Sidebar() {
       <div className="mt-auto border-t border-outline-variant px-2 pt-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-primary/10 text-label-md font-semibold text-primary">
-            {user ? `${user.prenoms.charAt(0)}${user.nom.charAt(0)}` : 'D'}
+            {user?.login_user?.charAt(0).toUpperCase() ?? 'D'}
           </div>
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-label-md font-semibold tracking-wide text-on-surface">

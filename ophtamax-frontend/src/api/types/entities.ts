@@ -29,7 +29,6 @@ export interface Consultation {
   dossier_numero: string
   datecons: string
   diagnostic: string
-  motif: string
   examen_od: ExamenOeil
   examen_og: ExamenOeil
   ordonnance: string
@@ -107,10 +106,94 @@ export interface Facture {
   lignes: FactureLigne[]
 }
 
+export interface FactureFormData {
+  patient_id: string
+  date: string
+  statut: 'payee' | 'partielle' | 'impayee'
+  mode_paiement?: string
+  lignes: FactureLigne[]
+}
+
 export interface FactureLigne {
   libelle: string
   quantite: number
   prix_unitaire: number
+}
+
+export interface PrescriptionExamen {
+  id: string
+  patient_id: string
+  patient_name: string
+  date: string
+  examens: string
+  indication: string
+  medecin: string
+  notes: string
+}
+
+export interface PrescriptionExamenFormData {
+  patient_id: string
+  date: string
+  examens: string
+  indication: string
+  medecin: string
+  notes: string
+}
+
+export interface Ordonnance {
+  id: string
+  patient_id: string
+  patient_name: string
+  date: string
+  contenu: string
+  diagnostic: string
+  medecin: string
+  notes: string
+}
+
+export interface OrdonnanceFormData {
+  patient_id: string
+  date: string
+  contenu: string
+  diagnostic: string
+  medecin: string
+  notes: string
+}
+
+export interface PrescriptionLunettes {
+  id: string
+  patient_id: string
+  patient_name: string
+  date: string
+  correction: string
+  od_sphere: string
+  od_cylindre: string
+  od_axe: string
+  od_addition: string
+  og_sphere: string
+  og_cylindre: string
+  og_axe: string
+  og_addition: string
+  type_verre: string
+  medecin: string
+  notes: string
+}
+
+export interface PrescriptionLunettesFormData {
+  patient_id: string
+  date: string
+  correction: string
+  od_sphere: string
+  od_cylindre: string
+  od_axe: string
+  od_addition: string
+  og_sphere: string
+  og_cylindre: string
+  og_axe: string
+  og_addition: string
+  type_verre: string
+  medecin: string
+  notes: string
 }
 
 export interface AppUser {

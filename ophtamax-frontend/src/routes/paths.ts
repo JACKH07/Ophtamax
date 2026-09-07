@@ -5,6 +5,8 @@ export const PATHS = {
   agenda: '/agenda',
   consultations: '/consultations',
   ordonnances: '/ordonnances',
+  prescriptionExamen: '/prescription-examen',
+  prescriptionLunettes: '/prescription-lunettes',
   facturation: '/facturation',
   statistiques: '/statistiques',
   parametres: '/parametres',

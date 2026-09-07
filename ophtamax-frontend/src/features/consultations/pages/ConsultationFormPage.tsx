@@ -51,7 +51,6 @@ export function ConsultationFormPage() {
   })
 
   const [patientId, setPatientId] = useState(preselectedPatient ?? '')
-  const [motif, setMotif] = useState('')
   const [diagnostic, setDiagnostic] = useState('')
   const [examenOd, setExamenOd] = useState<ExamenOeil>(emptyOeil())
   const [examenOg, setExamenOg] = useState<ExamenOeil>(emptyOeil())
@@ -64,7 +63,6 @@ export function ConsultationFormPage() {
   useEffect(() => {
     if (!existing) return
     setPatientId(existing.id_patient)
-    setMotif(existing.motif)
     setDiagnostic(existing.diagnostic)
     setExamenOd(existing.examen_od)
     setExamenOg(existing.examen_og)
@@ -97,7 +95,6 @@ export function ConsultationFormPage() {
       id_patient: selectedPatient.id,
       patient_name: `${selectedPatient.prenom} ${selectedPatient.nom}`,
       dossier_numero: dossierNumero(selectedPatient.id),
-      motif,
       diagnostic,
       examen_od: examenOd,
       examen_og: examenOg,
@@ -117,19 +114,11 @@ export function ConsultationFormPage() {
     mutation.mutate(payload)
   }
 
-  const goPrintOrdonnance = () => {
-    const payload = buildPayload('terminee')
-    if (!payload) return
-    mutation.mutate(payload, {
-      onSuccess: (c) => navigate(`${PATHS.ordonnances}/${c.id}?type=ordonnance`),
-    })
-  }
-
   const goPrintCompteRendu = () => {
     const payload = buildPayload('terminee')
     if (!payload) return
     mutation.mutate(payload, {
-      onSuccess: (c) => navigate(`${PATHS.ordonnances}/${c.id}?type=compte-rendu`),
+      onSuccess: (c) => navigate(`${PATHS.consultations}/${c.id}/documents`),
     })
   }
 
@@ -198,23 +187,7 @@ export function ConsultationFormPage() {
         </div>
       </div>
 
-      {/* Motif & Anamnèse — phase 1 texte libre */}
-      <section className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
-        <h3 className="mb-4 flex items-center gap-2 text-headline-sm font-semibold text-on-surface">
-          <MaterialIcon name="assignment" className="text-primary" />
-          Motif &amp; Anamnèse
-        </h3>
-        <label className="mb-1 block text-label-sm text-on-surface-variant">Description détaillée</label>
-        <textarea
-          rows={4}
-          value={motif}
-          onChange={(e) => setMotif(e.target.value)}
-          placeholder="Saisissez le motif de la visite et les antécédents pertinents..."
-          className={inputClass}
-        />
-      </section>
-
-      {/* Examen structuré OD / OG — phase 2 */}
+      {/* Examen structuré OD / OG */}
       <div className="grid gap-gutter lg:grid-cols-2">
         <EyeExamPanel side="OD" values={examenOd} onChange={setExamenOd} />
         <EyeExamPanel side="OG" values={examenOg} onChange={setExamenOg} />
@@ -278,22 +251,22 @@ export function ConsultationFormPage() {
 
         <div className="mb-4 grid gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-1 block text-label-sm text-on-surface-variant">Ordonnance (médicaments)</label>
+            <label className="mb-1 block text-label-sm text-on-surface-variant">Notes de traitement</label>
             <textarea
               rows={3}
               value={ordonnance}
               onChange={(e) => setOrdonnance(e.target.value)}
-              placeholder="Traitement prescrit..."
+              placeholder="Notes cliniques / traitement"
               className={inputClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-label-sm text-on-surface-variant">Prescription optique</label>
+            <label className="mb-1 block text-label-sm text-on-surface-variant">Notes optiques</label>
             <textarea
               rows={3}
               value={prescription}
               onChange={(e) => setPrescription(e.target.value)}
-              placeholder="Correction optique / lunettes..."
+              placeholder="Notes optiques (hors module Prescription Lunettes)"
               className={inputClass}
             />
           </div>
@@ -302,7 +275,7 @@ export function ConsultationFormPage() {
         <div className="flex gap-3 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-body-sm text-on-surface-variant">
           <MaterialIcon name="info" className="shrink-0 text-primary" />
           <p>
-            Pensez à générer l&apos;ordonnance si une correction optique a été prescrite lors de cette consultation.
+            Ordonnances, prescription examen et prescription lunettes se créent dans leurs modules dédiés.
           </p>
         </div>
       </section>
@@ -318,15 +291,6 @@ export function ConsultationFormPage() {
           >
             <MaterialIcon name="picture_as_pdf" className="text-[18px]" />
             Compte-rendu PDF
-          </button>
-          <button
-            type="button"
-            disabled={!patientId || mutation.isPending}
-            onClick={goPrintOrdonnance}
-            className="flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-label-md font-semibold text-on-surface hover:bg-surface-container-low disabled:opacity-50"
-          >
-            <MaterialIcon name="prescriptions" className="text-[18px]" />
-            Générer ordonnance
           </button>
           <button
             type="submit"

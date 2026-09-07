@@ -1,28 +1,35 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
-import { fetchPatients } from '@/features/patients/services/patientService'
+import { deletePatient, fetchPatients } from '@/features/patients/services/patientService'
 import { usePermissions } from '@/hooks/usePermissions'
 import { PATHS } from '@/routes/paths'
 
 function formatDate(d: string) {
+  if (!d) return '—'
   return new Date(d).toLocaleDateString('fr-FR')
 }
 
 function initials(nom: string, prenom: string) {
-  return `${prenom[0] ?? ''}${nom[0] ?? ''}`.toUpperCase()
+  return `${prenom[0] ?? ''}${nom[0] ?? ''}`.toUpperCase() || '?'
 }
 
 export function PatientsListPage() {
   const [search, setSearch] = useState('')
   const { can } = usePermissions()
+  const queryClient = useQueryClient()
 
   const { data: patients = [], isLoading } = useQuery({
     queryKey: ['patients', search],
     queryFn: () => fetchPatients(search),
+  })
+
+  const removeMutation = useMutation({
+    mutationFn: deletePatient,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['patients'] }),
   })
 
   return (
@@ -85,13 +92,15 @@ export function PatientsListPage() {
                         {initials(p.nom, p.prenom)}
                       </div>
                       <div>
-                        <p className="font-medium text-on-surface">{p.prenom} {p.nom}</p>
+                        <p className="font-medium text-on-surface">
+                          {`${p.prenom} ${p.nom}`.trim() || `Patient ${p.id}`}
+                        </p>
                         <p className="text-label-sm text-secondary">{p.sexe === 'M' ? 'Homme' : 'Femme'}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-body-sm">{formatDate(p.date_nais)}</td>
-                  <td className="px-4 py-3 text-body-sm">{p.contact}</td>
+                  <td className="px-4 py-3 text-body-sm">{p.contact || '—'}</td>
                   <td className="px-4 py-3">
                     {p.assurance ? (
                       <StatusBadge label={p.assurance} variant="muted" />
@@ -102,13 +111,37 @@ export function PatientsListPage() {
                   <td className="px-4 py-3 text-body-sm">{p.derniere_visite ? formatDate(p.derniere_visite) : '—'}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-1">
-                      <Link to={`${PATHS.patients}/${p.id}`} className="rounded-md p-1.5 text-secondary hover:bg-surface-container-highest hover:text-primary" title="Voir">
+                      <Link
+                        to={`${PATHS.patients}/${p.id}`}
+                        className="rounded-md p-1.5 text-secondary hover:bg-surface-container-highest hover:text-primary"
+                        title="Voir"
+                      >
                         <MaterialIcon name="visibility" className="text-[18px]" />
                       </Link>
                       {can('patients.edit') && (
-                        <Link to={`${PATHS.patients}/${p.id}/modifier`} className="rounded-md p-1.5 text-secondary hover:bg-surface-container-highest hover:text-primary" title="Modifier">
+                        <Link
+                          to={`${PATHS.patients}/${p.id}/modifier`}
+                          className="rounded-md p-1.5 text-secondary hover:bg-surface-container-highest hover:text-primary"
+                          title="Modifier"
+                        >
                           <MaterialIcon name="edit" className="text-[18px]" />
                         </Link>
+                      )}
+                      {can('patients.delete') && (
+                        <button
+                          type="button"
+                          title="Supprimer"
+                          disabled={removeMutation.isPending}
+                          onClick={() => {
+                            const label = `${p.prenom} ${p.nom}`.trim() || p.id
+                            if (window.confirm(`Supprimer le patient « ${label} » ?`)) {
+                              removeMutation.mutate(p.id)
+                            }
+                          }}
+                          className="rounded-md p-1.5 text-secondary hover:bg-error-container hover:text-error disabled:opacity-50"
+                        >
+                          <MaterialIcon name="delete" className="text-[18px]" />
+                        </button>
                       )}
                     </div>
                   </td>

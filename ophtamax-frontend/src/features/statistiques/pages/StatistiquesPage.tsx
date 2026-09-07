@@ -14,7 +14,7 @@ export function StatistiquesPage() {
 
   if (!stats) return <div className="py-12 text-center text-secondary">Chargement...</div>
 
-  const maxVal = Math.max(...stats.consultations_par_mois.map((m) => m.value))
+  const maxVal = Math.max(...stats.consultations_par_mois.map((m) => m.value), 1)
 
   return (
     <div className="flex flex-col gap-stack-lg">
@@ -22,8 +22,8 @@ export function StatistiquesPage() {
 
       <div className="grid gap-gutter md:grid-cols-4">
         {[
-          { label: 'Consultations (mois)', value: stats.consultations_mois, trend: `+${stats.consultations_evolution}%` },
-          { label: 'CA mensuel', value: `${(stats.ca_mois / 1000000).toFixed(1)}M FCFA`, trend: `+${stats.ca_evolution}%` },
+          { label: 'Consultations (mois)', value: stats.consultations_mois, trend: stats.consultations_evolution ? `+${stats.consultations_evolution}%` : '0%' },
+          { label: 'CA mensuel', value: `${(stats.ca_mois / 1000000).toFixed(1)}M FCFA`, trend: stats.ca_evolution ? `+${stats.ca_evolution}%` : '0%' },
           { label: 'Nouveaux patients', value: stats.nouveaux_patients, trend: '' },
           { label: 'Taux occupation', value: `${stats.taux_occupation}%`, trend: '' },
         ].map((kpi) => (

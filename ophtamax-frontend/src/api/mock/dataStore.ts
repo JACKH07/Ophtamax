@@ -3,8 +3,15 @@ import type {
   Consultation,
   ExamenOeil,
   Facture,
+  FactureFormData,
   FileAttenteItem,
+  Ordonnance,
+  OrdonnanceFormData,
   Patient,
+  PrescriptionExamen,
+  PrescriptionExamenFormData,
+  PrescriptionLunettes,
+  PrescriptionLunettesFormData,
   ReferentielItem,
   RendezVous,
   RendezVousFormData,
@@ -96,7 +103,6 @@ let consultations: Consultation[] = [
     dossier_numero: '',
     datecons: '2024-12-10T09:30:00',
     diagnostic: 'Myopie évolutive',
-    motif: 'Baisse de vision de loin',
     examen_od: {
       ...emptyOeil(),
       vl_sans: '3/10',
@@ -133,7 +139,6 @@ let consultations: Consultation[] = [
     dossier_numero: '',
     datecons: '2024-12-01T14:00:00',
     diagnostic: 'Presbytie',
-    motif: 'Contrôle visuel',
     examen_od: { ...emptyOeil(), addition: '+2.00', vl_avec: '10/10', vp_avec: 'P2' },
     examen_og: { ...emptyOeil(), addition: '+2.00', vl_avec: '10/10', vp_avec: 'P2' },
     ordonnance: '',
@@ -161,7 +166,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(0, 9, 15),
     duree_min: 30,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: "Fond d'œil",
     statut: 'en_consultation',
   },
@@ -172,7 +177,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(0, 9, 45),
     duree_min: 20,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Contrôle post-op',
     statut: 'en_attente',
   },
@@ -183,7 +188,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(0, 11, 0),
     duree_min: 30,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'OCT Maculaire',
     statut: 'planifie',
   },
@@ -194,7 +199,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(0, 14, 30),
     duree_min: 45,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Contrôle réfraction',
     statut: 'planifie',
   },
@@ -205,7 +210,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(1, 10, 0),
     duree_min: 30,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Bilan glaucome',
     statut: 'planifie',
   },
@@ -216,7 +221,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(2, 9, 0),
     duree_min: 20,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Nouvelle consultation',
     statut: 'planifie',
   },
@@ -227,7 +232,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(3, 11, 30),
     duree_min: 30,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Suivi myopie',
     statut: 'planifie',
   },
@@ -238,7 +243,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(7, 8, 30),
     duree_min: 30,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Champ visuel',
     statut: 'planifie',
   },
@@ -249,7 +254,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(7, 15, 0),
     duree_min: 45,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Cataracte — suivi',
     statut: 'planifie',
   },
@@ -260,7 +265,7 @@ let rendezVous: RendezVous[] = [
     date_heure: rdvDate(-1, 10, 0),
     duree_min: 30,
     medecin_id: 'u2',
-    medecin: 'Dr Koffi',
+    medecin: '',
     motif: 'Rétinopathie — contrôle',
     statut: 'termine',
   },
@@ -277,7 +282,7 @@ let fileAttente: FileAttenteItem[] = [
     heure_arrivee: (() => { const d = new Date(); d.setHours(9, 0, 0, 0); return d.toISOString() })(),
     statut: 'en_consultation',
     priorite: 1,
-    medecin: 'Dr Koffi',
+    medecin: '',
   },
   {
     id: 'fa2',
@@ -289,7 +294,7 @@ let fileAttente: FileAttenteItem[] = [
     heure_arrivee: (() => { const d = new Date(); d.setHours(9, 30, 0, 0); return d.toISOString() })(),
     statut: 'en_attente',
     priorite: 2,
-    medecin: 'Dr Koffi',
+    medecin: '',
   },
   {
     id: 'fa3',
@@ -301,55 +306,22 @@ let fileAttente: FileAttenteItem[] = [
     heure_arrivee: (() => { const d = new Date(); d.setHours(10, 50, 0, 0); return d.toISOString() })(),
     statut: 'en_attente',
     priorite: 3,
-    medecin: 'Dr Koffi',
+    medecin: '',
   },
 ]
 
-let factures: Facture[] = [
-  {
-    id: 'f1',
-    numero: '',
-    patient_id: 'p1',
-    patient_name: '',
-    date: new Date().toISOString(),
-    montant_ht:  new Number(45000).valueOf() as number,
-    montant_ttc:  new Number(45000).valueOf() as number,
-    statut: 'payee',
-    mode_paiement: 'Espèces',
-    lignes: [
-      { libelle: 'Consultation ophtalmologique', quantite: 1, prix_unitaire: 25000 },
-      { libelle: 'Fond d\'œil', quantite: 1, prix_unitaire: 20000 },
-    ],
-  },
-  {
-    id: 'f2',
-    numero: 'FAC-2024-0893',
-    patient_id: 'p2',
-    patient_name: '',
-    date: '2024-12-11',
-    montant_ht: 35000,
-    montant_ttc: 35000,
-    statut: 'partielle',
-    mode_paiement: 'CB',
-    lignes: [{ libelle: 'Consultation + réfraction', quantite: 1, prix_unitaire: 35000 }],
-  },
-  {
-    id: 'f3',
-    numero: 'FAC-2024-0894',
-    patient_id: 'p3',
-    patient_name: '',
-    date: '2024-12-11',
-    montant_ht: 15000,
-    montant_ttc: 15000,
-    statut: 'impayee',
-    lignes: [{ libelle: 'Champ visuel', quantite: 1, prix_unitaire: 15000 }],
-  },
-]
+let factures: Facture[] = []
+
+let prescriptionsExamen: PrescriptionExamen[] = []
+
+let ordonnances: Ordonnance[] = []
+
+let prescriptionsLunettes: PrescriptionLunettes[] = []
 
 let users: AppUser[] = [
-  { id: 'u1', nom: 'Koffi', prenoms: 'Jean', login_user: 'opht', email: 'jkoffi@ophtamax.local', id_role: 'OPHT', fonction: 'Ophtalmologiste', actif: true },
-  { id: 'u2', nom: 'Amani', prenoms: 'Fatou', login_user: 'secretaire', email: 'sec@ophtamax.local', id_role: 'SEC', fonction: 'Secrétaire', actif: true },
-  { id: 'u3', nom: 'Admin', prenoms: 'Système', login_user: 'admin', email: 'admin@ophtamax.local', id_role: 'ADMIN', fonction: 'Administrateur', actif: true },
+  { id: 'u1', nom: '', prenoms: '', login_user: 'opht', email: 'opht@ophtamax.local', id_role: 'OPHT', fonction: 'Ophtalmologiste', actif: true },
+  { id: 'u2', nom: '', prenoms: '', login_user: 'secretaire', email: 'sec@ophtamax.local', id_role: 'SEC', fonction: 'Secrétaire', actif: true },
+  { id: 'u3', nom: '', prenoms: '', login_user: 'admin', email: 'admin@ophtamax.local', id_role: 'ADMIN', fonction: 'Administrateur', actif: true },
 ]
 
 let genres: ReferentielItem[] = [
@@ -367,6 +339,8 @@ let examens: ReferentielItem[] = [
   { id: 'e1', code: 'CV', libelle: 'Champ visuel' },
   { id: 'e2', code: 'RET', libelle: 'Rétinographie' },
   { id: 'e3', code: 'REF', libelle: 'Réfractométrie' },
+  { id: 'e4', code: 'OCT', libelle: 'OCT maculaire' },
+  { id: 'e5', code: 'FO', libelle: "Fond d'œil dilaté" },
 ]
 
 let assurances: ReferentielItem[] = [
@@ -376,7 +350,7 @@ let assurances: ReferentielItem[] = [
 ]
 
 let societe: SocieteInfo = {
-  nom: 'Centre d\'Ophtalmologie Saint-Louis',
+  nom: 'New Cabinet Médical d\'Ophtalmologie Kahydara',
   adresse: 'Abidjan, Côte d\'Ivoire',
   contact: '+225 27 00 00 00 00',
   slogan: 'Votre vision, notre priorité',
@@ -475,11 +449,82 @@ export const mockStore = {
   factures: {
     list: () => [...factures],
     get: (id: string) => factures.find((f) => f.id === id),
+    create: (data: FactureFormData & { patient_name: string }) => {
+      const total = data.lignes.reduce((s, l) => s + l.quantite * l.prix_unitaire, 0)
+      const year = new Date().getFullYear()
+      const seq = String(factures.length + 1).padStart(4, '0')
+      const f: Facture = {
+        id: uid(),
+        numero: `FAC-${year}-${seq}`,
+        patient_id: data.patient_id,
+        patient_name: data.patient_name,
+        date: data.date.slice(0, 10),
+        montant_ht: total,
+        montant_ttc: total,
+        statut: data.statut,
+        mode_paiement: data.mode_paiement,
+        lignes: data.lignes,
+      }
+      factures = [f, ...factures]
+      return f
+    },
     caisseJour: () => {
       const today = new Date().toISOString().slice(0, 10)
-      const duJour = factures.filter((f) => f.date === today || f.statut === 'payee')
+      const duJour = factures.filter((f) => f.date.startsWith(today))
       const total = duJour.filter((f) => f.statut === 'payee').reduce((s, f) => s + f.montant_ttc, 0)
       return { total, count: duJour.length, factures: duJour }
+    },
+  },
+  prescriptionsExamen: {
+    list: () => [...prescriptionsExamen],
+    get: (id: string) => prescriptionsExamen.find((p) => p.id === id),
+    create: (data: PrescriptionExamenFormData & { patient_name: string }) => {
+      const item: PrescriptionExamen = { ...data, id: uid() }
+      prescriptionsExamen = [item, ...prescriptionsExamen]
+      return item
+    },
+    update: (id: string, data: Partial<PrescriptionExamenFormData> & { patient_name?: string }) => {
+      prescriptionsExamen = prescriptionsExamen.map((p) =>
+        p.id === id ? { ...p, ...data } : p,
+      )
+      return prescriptionsExamen.find((p) => p.id === id)!
+    },
+    remove: (id: string) => {
+      prescriptionsExamen = prescriptionsExamen.filter((p) => p.id !== id)
+    },
+  },
+  ordonnances: {
+    list: () => [...ordonnances],
+    get: (id: string) => ordonnances.find((o) => o.id === id),
+    create: (data: OrdonnanceFormData & { patient_name: string }) => {
+      const item: Ordonnance = { ...data, id: uid() }
+      ordonnances = [item, ...ordonnances]
+      return item
+    },
+    update: (id: string, data: Partial<OrdonnanceFormData> & { patient_name?: string }) => {
+      ordonnances = ordonnances.map((o) => (o.id === id ? { ...o, ...data } : o))
+      return ordonnances.find((o) => o.id === id)!
+    },
+    remove: (id: string) => {
+      ordonnances = ordonnances.filter((o) => o.id !== id)
+    },
+  },
+  prescriptionsLunettes: {
+    list: () => [...prescriptionsLunettes],
+    get: (id: string) => prescriptionsLunettes.find((p) => p.id === id),
+    create: (data: PrescriptionLunettesFormData & { patient_name: string }) => {
+      const item: PrescriptionLunettes = { ...data, id: uid() }
+      prescriptionsLunettes = [item, ...prescriptionsLunettes]
+      return item
+    },
+    update: (id: string, data: Partial<PrescriptionLunettesFormData> & { patient_name?: string }) => {
+      prescriptionsLunettes = prescriptionsLunettes.map((p) =>
+        p.id === id ? { ...p, ...data } : p,
+      )
+      return prescriptionsLunettes.find((p) => p.id === id)!
+    },
+    remove: (id: string) => {
+      prescriptionsLunettes = prescriptionsLunettes.filter((p) => p.id !== id)
     },
   },
   users: {
@@ -494,6 +539,9 @@ export const mockStore = {
       users = users.map((u) => (u.id === id ? { ...u, ...data } : u))
       return users.find((u) => u.id === id)!
     },
+    remove: (id: string) => {
+      users = users.filter((u) => u.id !== id)
+    },
   },
   referentiels: {
     genres: () => [...genres],
@@ -507,25 +555,25 @@ export const mockStore = {
     },
   },
   statistiques: () => ({
-    consultations_mois: 342,
-    consultations_evolution: 8,
-    ca_mois: 12500000,
-    ca_evolution: 12,
-    nouveaux_patients: 48,
-    taux_occupation: 78,
+    consultations_mois: 0,
+    consultations_evolution: 0,
+    ca_mois: 0,
+    ca_evolution: 0,
+    nouveaux_patients: 0,
+    taux_occupation: 0,
     top_diagnostics: [
-      { label: 'Myopie évolutive', percent: 35 },
-      { label: 'Presbytie', percent: 28 },
-      { label: 'Cataracte (Dépistage)', percent: 18 },
-      { label: 'Glaucome (Suivi)', percent: 12 },
+      { label: 'Myopie évolutive', percent: 0 },
+      { label: 'Presbytie', percent: 0 },
+      { label: 'Cataracte (Dépistage)', percent: 0 },
+      { label: 'Glaucome (Suivi)', percent: 0 },
     ],
     consultations_par_mois: [
-      { mois: 'Juil', value: 280 },
-      { mois: 'Août', value: 310 },
-      { mois: 'Sep', value: 295 },
-      { mois: 'Oct', value: 320 },
-      { mois: 'Nov', value: 335 },
-      { mois: 'Déc', value: 342 },
+      { mois: 'Juil', value: 0 },
+      { mois: 'Août', value: 0 },
+      { mois: 'Sep', value: 0 },
+      { mois: 'Oct', value: 0 },
+      { mois: 'Nov', value: 0 },
+      { mois: 'Déc', value: 0 },
     ],
   }),
 }

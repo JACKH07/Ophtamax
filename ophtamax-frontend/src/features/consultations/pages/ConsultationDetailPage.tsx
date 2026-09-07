@@ -75,14 +75,7 @@ export function ConsultationDetailPage() {
               </Link>
             )}
             <Link
-              to={`${PATHS.ordonnances}/${c.id}?type=ordonnance`}
-              className="flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-label-md text-primary hover:bg-primary/5"
-            >
-              <MaterialIcon name="print" className="text-[18px]" />
-              Ordonnance
-            </Link>
-            <Link
-              to={`${PATHS.ordonnances}/${c.id}?type=compte-rendu`}
+              to={`${PATHS.consultations}/${c.id}/documents`}
               className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-label-md text-on-primary"
             >
               <MaterialIcon name="picture_as_pdf" className="text-[18px]" />
@@ -96,11 +89,6 @@ export function ConsultationDetailPage() {
         label={c.statut === 'terminee' ? 'Terminée' : 'Brouillon'}
         variant={c.statut === 'terminee' ? 'success' : 'warning'}
       />
-
-      <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
-        <h3 className="mb-3 text-headline-sm font-semibold">Motif &amp; Anamnèse</h3>
-        <p className="whitespace-pre-wrap text-body-md">{c.motif || '—'}</p>
-      </div>
 
       <div className="grid gap-gutter md:grid-cols-2">
         <EyeSummary label="OD — Œil Droit" examen={c.examen_od} />
@@ -125,13 +113,13 @@ export function ConsultationDetailPage() {
         <div className="grid gap-gutter md:grid-cols-2">
           {c.ordonnance && (
             <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5">
-              <h4 className="mb-2 font-semibold">Ordonnance</h4>
+              <h4 className="mb-2 font-semibold">Notes de traitement</h4>
               <p className="whitespace-pre-wrap text-body-sm">{c.ordonnance}</p>
             </div>
           )}
           {c.prescription && (
             <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5">
-              <h4 className="mb-2 font-semibold">Prescription optique</h4>
+              <h4 className="mb-2 font-semibold">Notes optiques</h4>
               <p className="whitespace-pre-wrap text-body-sm">{c.prescription}</p>
             </div>
           )}

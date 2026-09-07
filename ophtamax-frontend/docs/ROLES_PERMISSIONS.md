@@ -50,10 +50,10 @@ Implémentée dans `src/routes/rolePermissions.ts`.
   "data": {
     "user": {
       "id": "...",
-      "nom": "Koffi",
-      "prenoms": "Jean",
-      "login_user": "jkoffi",
-      "email": "...",
+      "nom": "",
+      "prenoms": "",
+      "login_user": "opht",
+      "email": "opht@ophtamax.local",
       "id_role": "OPHT",
       "fonction": "Ophtalmologiste"
     },
@@ -70,6 +70,6 @@ Comptes de test :
 |-------------|--------------|------|
 | `admin` | `admin` | ADMIN |
 | `secretaire` | `secretaire` | SEC |
-| `opht` | `opht` | OPHT (Dr Koffi) |
+| `opht` | `opht` | OPHT |
 | `assistant` | `assistant` | ASS |
 | `compta` | `compta` | COMPTA |

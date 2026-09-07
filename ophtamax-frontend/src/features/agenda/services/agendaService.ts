@@ -11,10 +11,9 @@ import type {
 // ── Helpers pour retrouver le patient_name et medecin depuis les données mock
 function resolveNames(data: RendezVousFormData): { patient_name: string; medecin: string } {
   const patient = mockStore.patients.get(data.patient_id)
-  const user = mockStore.users.get(data.medecin_id)
   return {
-    patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
-    medecin: user ? `Dr ${user.nom}` : 'Médecin inconnu',
+    patient_name: patient ? `${patient.nom} ${patient.prenom}`.trim() || `Patient ${data.patient_id}` : 'Patient inconnu',
+    medecin: '',
   }
 }
 

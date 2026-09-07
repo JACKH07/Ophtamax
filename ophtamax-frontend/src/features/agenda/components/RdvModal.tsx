@@ -8,31 +8,23 @@ import { createRendezVous, updateRendezVous } from '@/features/agenda/services/a
 import { mockStore } from '@/api/mock/dataStore'
 import type { RendezVous } from '@/api/types/entities'
 
-// ── Validation ──────────────────────────────────────────────────────────────
+const DEFAULT_DUREE_MIN = 30
 
 const schema = z.object({
   patient_id: z.string().min(1, 'Sélectionnez un patient'),
   medecin_id: z.string().min(1, 'Sélectionnez un médecin'),
   date_heure: z.string().min(1, 'Date et heure obligatoires'),
-  duree_min: z.number().min(5).max(120),
   motif: z.string().min(2, 'Motif obligatoire'),
-  notes: z.string().optional(),
   statut: z.enum(['planifie', 'en_attente', 'en_consultation', 'termine', 'absent']),
 })
 
 type FormValues = z.infer<typeof schema>
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
 interface RdvModalProps {
-  /** Rendez-vous à modifier (null = nouveau) */
   rdv: RendezVous | null
-  /** Date pré-remplie pour un nouveau RDV (clic sur un créneau) */
   defaultDate?: string
   onClose: () => void
 }
-
-// ── Composant ────────────────────────────────────────────────────────────────
 
 export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
   const queryClient = useQueryClient()
@@ -53,9 +45,7 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
       date_heure: rdv?.date_heure
         ? rdv.date_heure.slice(0, 16)
         : (defaultDate ?? new Date().toISOString().slice(0, 16)),
-      duree_min: rdv?.duree_min ?? 30,
       motif: rdv?.motif ?? '',
-      notes: rdv?.notes ?? '',
       statut: rdv?.statut ?? 'planifie',
     },
   })
@@ -67,19 +57,19 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
       date_heure: rdv?.date_heure
         ? rdv.date_heure.slice(0, 16)
         : (defaultDate ?? new Date().toISOString().slice(0, 16)),
-      duree_min: rdv?.duree_min ?? 30,
       motif: rdv?.motif ?? '',
-      notes: rdv?.notes ?? '',
       statut: rdv?.statut ?? 'planifie',
     })
   }, [rdv, defaultDate])
 
   const mutation = useMutation({
     mutationFn: (values: FormValues) => {
-      const payload = { ...values, duree_min: Number(values.duree_min) }
-      return rdv
-        ? updateRendezVous(rdv.id, payload)
-        : createRendezVous(payload)
+      const payload = {
+        ...values,
+        duree_min: rdv?.duree_min ?? DEFAULT_DUREE_MIN,
+        notes: '',
+      }
+      return rdv ? updateRendezVous(rdv.id, payload) : createRendezVous(payload)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agenda'] })
@@ -88,12 +78,9 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
     },
   })
 
-  const onSubmit = (values: FormValues) => mutation.mutate(values)
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="relative w-full max-w-lg rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-xl">
-        {/* En-tête */}
         <div className="flex items-center justify-between border-b border-outline-variant px-6 py-4">
           <h2 className="text-headline-sm font-semibold text-on-surface">
             {rdv ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous'}
@@ -107,9 +94,7 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
           </button>
         </div>
 
-        {/* Formulaire */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 px-6 py-5">
-          {/* Patient */}
+        <form onSubmit={handleSubmit((values) => mutation.mutate(values))} className="space-y-4 px-6 py-5">
           <div>
             <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
             <select
@@ -119,7 +104,7 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
               <option value="">— Sélectionner —</option>
               {patients.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.nom} {p.prenom}
+                  {`${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`}
                 </option>
               ))}
             </select>
@@ -128,7 +113,6 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
             )}
           </div>
 
-          {/* Médecin */}
           <div>
             <label className="mb-1 block text-label-sm text-secondary">Médecin *</label>
             <select
@@ -137,41 +121,24 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
             >
               {medecins.map((u) => (
                 <option key={u.id} value={u.id}>
-                  Dr {u.nom} {u.prenoms}
+                  {u.fonction || u.login_user}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Date + Durée */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-label-sm text-secondary">Date & heure *</label>
-              <input
-                type="datetime-local"
-                {...register('date_heure')}
-                className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              {errors.date_heure && (
-                <p className="mt-1 text-label-sm text-error">{errors.date_heure.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="mb-1 block text-label-sm text-secondary">Durée (min)</label>
-              <select
-                {...register('duree_min', { valueAsNumber: true })}
-                className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                {[15, 20, 30, 45, 60, 90].map((d) => (
-                  <option key={d} value={d}>
-                    {d} min
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="mb-1 block text-label-sm text-secondary">Date & heure *</label>
+            <input
+              type="datetime-local"
+              {...register('date_heure')}
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            {errors.date_heure && (
+              <p className="mt-1 text-label-sm text-error">{errors.date_heure.message}</p>
+            )}
           </div>
 
-          {/* Motif */}
           <div>
             <label className="mb-1 block text-label-sm text-secondary">Motif *</label>
             <input
@@ -185,7 +152,6 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
             )}
           </div>
 
-          {/* Statut (uniquement en mode édition) */}
           {rdv && (
             <div>
               <label className="mb-1 block text-label-sm text-secondary">Statut</label>
@@ -202,23 +168,10 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
             </div>
           )}
 
-          {/* Notes */}
-          <div>
-            <label className="mb-1 block text-label-sm text-secondary">Notes</label>
-            <textarea
-              rows={2}
-              placeholder="Notes ou instructions particulières…"
-              {...register('notes')}
-              className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          {/* Erreur serveur */}
           {mutation.isError && (
             <p className="text-label-sm text-error">Erreur lors de la sauvegarde.</p>
           )}
 
-          {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"

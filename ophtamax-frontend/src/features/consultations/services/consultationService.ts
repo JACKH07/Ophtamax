@@ -23,7 +23,6 @@ export interface ConsultationFormData {
   id_patient: string
   patient_name: string
   dossier_numero: string
-  motif: string
   diagnostic: string
   examen_od: ExamenOeil
   examen_og: ExamenOeil

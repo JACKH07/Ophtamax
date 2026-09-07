@@ -79,7 +79,7 @@ export function PatientDetailPage() {
                   <li key={c.id} className="flex items-center justify-between px-5 py-4 hover:bg-surface-container-low/50">
                     <div>
                       <p className="font-medium text-on-surface">{c.diagnostic || 'Consultation'}</p>
-                      <p className="text-label-sm text-secondary">{formatDate(c.datecons)} · {c.motif}</p>
+                      <p className="text-label-sm text-secondary">{formatDate(c.datecons)}</p>
                     </div>
                     <Link to={`${PATHS.consultations}/${c.id}`} className="text-label-md text-primary hover:underline">Voir</Link>
                   </li>

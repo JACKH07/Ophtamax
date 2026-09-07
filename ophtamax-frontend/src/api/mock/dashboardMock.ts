@@ -6,54 +6,17 @@ import type {
 } from '@/api/types/dashboard'
 
 export const mockDashboardSummary: DashboardSummary = {
-  consultations_today: 42,
-  consultations_planned: 3,
-  patients_waiting: 12,
-  average_wait_minutes: 15,
-  revenue_today: 2450,
+  consultations_today: 0,
+  consultations_planned: 0,
+  patients_waiting: 0,
+  average_wait_minutes: 0,
+  revenue_today: 0,
   revenue_status: 'À jour',
-  new_patients_week: 28,
-  new_patients_trend_percent: 12,
+  new_patients_week: 0,
+  new_patients_trend_percent: 0,
 }
 
-export const mockWaitingQueue: WaitingQueueItem[] = [
-  {
-    id: '1',
-    patient_name: 'Marie Laurent',
-    reason: 'Contrôle visuel',
-    time: '09:15',
-    status: 'en_consultation',
-    practitioner: 'Dr Koffi',
-    avatar_tone: 'primary',
-  },
-  {
-    id: '2',
-    patient_name: 'Jean Dupont',
-    reason: 'Fond d\'œil',
-    time: '09:45',
-    status: 'en_attente',
-    practitioner: 'Dr Koffi',
-    avatar_tone: 'secondary',
-  },
-  {
-    id: '3',
-    patient_name: 'Sophie Atlan',
-    reason: 'Renouvellement lunettes',
-    time: '10:15',
-    status: 'en_attente',
-    practitioner: 'Dr Blanc',
-    avatar_tone: 'surface',
-  },
-  {
-    id: '4',
-    patient_name: 'Claude Martin',
-    reason: 'Suivi glaucome',
-    time: '08:30',
-    status: 'termine',
-    practitioner: 'Dr Koffi',
-    avatar_tone: 'muted',
-  },
-]
+export const mockWaitingQueue: WaitingQueueItem[] = []
 
 export const mockUpcomingSlots: UpcomingSlot[] = [
   {
@@ -81,8 +44,8 @@ export const mockUpcomingSlots: UpcomingSlot[] = [
 ]
 
 export const mockTopDiagnostics: TopDiagnostic[] = [
-  { label: 'Myopie évolutive', percent: 35 },
-  { label: 'Presbytie', percent: 28 },
-  { label: 'Cataracte (Dépistage)', percent: 18 },
-  { label: 'Glaucome (Suivi)', percent: 12 },
+  { label: 'Myopie évolutive', percent: 0 },
+  { label: 'Presbytie', percent: 0 },
+  { label: 'Cataracte (Dépistage)', percent: 0 },
+  { label: 'Glaucome (Suivi)', percent: 0 },
 ]

@@ -13,3 +13,8 @@ export async function fetchUser(id: string): Promise<AppUser> {
   if (!u) throw new Error('Utilisateur introuvable')
   return u
 }
+
+export async function deleteUser(id: string): Promise<void> {
+  if (!USE_MOCK) throw new Error('API non disponible')
+  mockStore.users.remove(id)
+}

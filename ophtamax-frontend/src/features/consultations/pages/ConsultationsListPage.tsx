@@ -79,7 +79,9 @@ export function ConsultationsListPage() {
                     >
                       {c.patient_name}
                     </Link>
-                    <p className="text-label-sm text-secondary line-clamp-1">{c.motif}</p>
+                    <p className="text-label-sm text-secondary line-clamp-1">
+                      {c.diagnostic || 'Consultation'}
+                    </p>
                   </td>
                   <td className="px-4 py-3 text-body-sm text-secondary">#{c.dossier_numero}</td>
                   <td className="px-4 py-3 text-body-sm">
@@ -111,9 +113,9 @@ export function ConsultationsListPage() {
                         </Link>
                       )}
                       <Link
-                        to={`${PATHS.ordonnances}/${c.id}`}
+                        to={`${PATHS.consultations}/${c.id}/documents`}
                         className="rounded-md p-1.5 text-secondary hover:bg-surface-container-highest hover:text-primary"
-                        title="Imprimer"
+                        title="Compte-rendu"
                       >
                         <MaterialIcon name="print" className="text-[18px]" />
                       </Link>

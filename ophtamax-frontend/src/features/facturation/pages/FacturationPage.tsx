@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { FactureModal } from '@/features/facturation/components/FactureModal'
 import { fetchCaisseJour, fetchFactures } from '@/features/facturation/services/facturationService'
 
 const STATUT: Record<string, { label: string; variant: 'success' | 'warning' | 'error' }> = {
@@ -15,6 +17,7 @@ function formatFcfa(n: number) {
 }
 
 export function FacturationPage() {
+  const [modalOpen, setModalOpen] = useState(false)
   const { data: factures = [] } = useQuery({ queryKey: ['factures'], queryFn: fetchFactures })
   const { data: caisse } = useQuery({ queryKey: ['caisse'], queryFn: fetchCaisseJour })
 
@@ -26,7 +29,11 @@ export function FacturationPage() {
         title="Facturation & Caisse"
         subtitle="Gestion des factures et encaissements."
         actions={
-          <button type="button" className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-label-md text-on-primary shadow-sm hover:bg-primary-container">
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-label-md text-on-primary shadow-sm hover:bg-primary-container"
+          >
             <MaterialIcon name="add" className="text-[18px]" /> Nouvelle facture
           </button>
         }
@@ -51,33 +58,43 @@ export function FacturationPage() {
         <div className="border-b border-outline-variant px-5 py-4">
           <h3 className="text-headline-sm font-semibold">Factures récentes</h3>
         </div>
-        <table className="w-full border-collapse text-left">
-          <thead className="border-b border-outline-variant bg-surface-container-low">
-            <tr>
-              {['N° Facture', 'Patient', 'Date', 'Montant TTC', 'Statut', 'Paiement', ''].map((h) => (
-                <th key={h} className="px-4 py-3 text-label-md text-on-surface-variant">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant">
-            {factures.map((f) => (
-              <tr key={f.id} className="hover:bg-surface-container-low/50">
-                <td className="px-4 py-3 font-medium text-primary">{f.numero}</td>
-                <td className="px-4 py-3">{f.patient_name}</td>
-                <td className="px-4 py-3 text-body-sm">{new Date(f.date).toLocaleDateString('fr-FR')}</td>
-                <td className="px-4 py-3 font-medium">{formatFcfa(f.montant_ttc)}</td>
-                <td className="px-4 py-3"><StatusBadge label={STATUT[f.statut].label} variant={STATUT[f.statut].variant} /></td>
-                <td className="px-4 py-3 text-body-sm">{f.mode_paiement ?? '—'}</td>
-                <td className="px-4 py-3">
-                  <button type="button" className="rounded-md p-1.5 text-secondary hover:bg-surface-container hover:text-primary">
-                    <MaterialIcon name="print" className="text-[18px]" />
-                  </button>
-                </td>
+        {factures.length === 0 ? (
+          <p className="px-5 py-10 text-center text-secondary">
+            Aucune facture. Cliquez sur « Nouvelle facture » pour en créer une.
+          </p>
+        ) : (
+          <table className="w-full border-collapse text-left">
+            <thead className="border-b border-outline-variant bg-surface-container-low">
+              <tr>
+                {['N° Facture', 'Patient', 'Date', 'Montant TTC', 'Statut', 'Paiement', ''].map((h) => (
+                  <th key={h || 'actions'} className="px-4 py-3 text-label-md text-on-surface-variant">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-outline-variant">
+              {factures.map((f) => (
+                <tr key={f.id} className="hover:bg-surface-container-low/50">
+                  <td className="px-4 py-3 font-medium text-primary">{f.numero}</td>
+                  <td className="px-4 py-3">{f.patient_name || '—'}</td>
+                  <td className="px-4 py-3 text-body-sm">{new Date(f.date).toLocaleDateString('fr-FR')}</td>
+                  <td className="px-4 py-3 font-medium">{formatFcfa(f.montant_ttc)}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge label={STATUT[f.statut].label} variant={STATUT[f.statut].variant} />
+                  </td>
+                  <td className="px-4 py-3 text-body-sm">{f.mode_paiement ?? '—'}</td>
+                  <td className="px-4 py-3">
+                    <button type="button" className="rounded-md p-1.5 text-secondary hover:bg-surface-container hover:text-primary">
+                      <MaterialIcon name="print" className="text-[18px]" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {modalOpen && <FactureModal onClose={() => setModalOpen(false)} />}
     </div>
   )
 }

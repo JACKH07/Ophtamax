@@ -6,6 +6,8 @@ export const ROUTE_ACCESS: Record<string, RoleCode[]> = {
   '/agenda': ['ADMIN', 'SEC', 'OPHT', 'ASS'],
   '/consultations': ['ADMIN', 'SEC', 'OPHT', 'ASS'],
   '/ordonnances': ['ADMIN', 'OPHT'],
+  '/prescription-examen': ['ADMIN', 'OPHT'],
+  '/prescription-lunettes': ['ADMIN', 'OPHT'],
   '/facturation': ['ADMIN', 'SEC', 'COMPTA'],
   '/statistiques': ['ADMIN', 'OPHT', 'COMPTA'],
   '/parametres': ['ADMIN'],
