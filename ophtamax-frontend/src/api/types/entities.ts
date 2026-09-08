@@ -125,8 +125,14 @@ export interface PrescriptionExamen {
   patient_id: string
   patient_name: string
   date: string
+  /** EXAMEN DEMANDÉ */
   examens: string
+  /** DIAGNOSTIC (libellé historique : indication) */
   indication: string
+  /** Libellé « Bulletin de : … » */
+  bulletin_de: string
+  /** Champ SERVICE du bulletin */
+  service: string
   medecin: string
   notes: string
 }
@@ -136,6 +142,8 @@ export interface PrescriptionExamenFormData {
   date: string
   examens: string
   indication: string
+  bulletin_de: string
+  service: string
   medecin: string
   notes: string
 }
@@ -166,14 +174,30 @@ export interface PrescriptionLunettes {
   patient_name: string
   date: string
   correction: string
+  /** Vision de loin OD */
   od_sphere: string
   od_cylindre: string
   od_axe: string
   od_addition: string
+  /** Vision de près OD (si vide, addition utilisée) */
+  od_vp_sphere: string
+  od_vp_cylindre: string
+  od_vp_axe: string
+  /** Vision de loin OG */
   og_sphere: string
   og_cylindre: string
   og_axe: string
   og_addition: string
+  /** Vision de près OG */
+  og_vp_sphere: string
+  og_vp_cylindre: string
+  og_vp_axe: string
+  distance_interpupillaire: string
+  /** simple | double | progressif */
+  type_foyer: string
+  /** Protogray, Anti-reflet, Teinte A, Teinte AB… */
+  traitements: string[]
+  /** Conservé pour compatibilité */
   type_verre: string
   medecin: string
   notes: string
@@ -187,10 +211,19 @@ export interface PrescriptionLunettesFormData {
   od_cylindre: string
   od_axe: string
   od_addition: string
+  od_vp_sphere: string
+  od_vp_cylindre: string
+  od_vp_axe: string
   og_sphere: string
   og_cylindre: string
   og_axe: string
   og_addition: string
+  og_vp_sphere: string
+  og_vp_cylindre: string
+  og_vp_axe: string
+  distance_interpupillaire: string
+  type_foyer: string
+  traitements: string[]
   type_verre: string
   medecin: string
   notes: string

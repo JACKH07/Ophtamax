@@ -1,0 +1,1024 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+3 0 obj
+<< /Length 10052 >>
+stream
+BT
+/F2 18.0 Tf
+1 0 0 1 40.00 801.89 Tm
+(Ophtamax — Champs des formulaires) Tj
+ET
+40.00 785.89 m 555.28 785.89 l S
+BT
+/F1 9.0 Tf
+1 0 0 1 40.00 767.89 Tm
+(Document de référence des champs UI de chaque formulaire du frontend.) Tj
+/F1 9.0 Tf
+1 0 0 1 40.00 755.89 Tm
+(Légende : * = obligatoire  |  Types : texte, liste, date, zone de texte, nombre) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 729.89 Tm
+(1. Patient) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 713.89 Tm
+(Routes : /patients/nouveau  ·  /patients/:id/modifier) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 701.89 Tm
+(Champ \(label UI\)) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 701.89 Tm
+(Type) Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 701.89 Tm
+(Oblig.) Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 701.89 Tm
+(Options / notes) Tj
+ET
+40.00 696.89 m 555.28 696.89 l S
+BT
+/F1 8.0 Tf
+1 0 0 1 40.00 688.89 Tm
+(Nom) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 688.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 688.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 688.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 677.89 Tm
+(Prénom) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 677.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 677.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 677.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 666.89 Tm
+(Date de naissance) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 666.89 Tm
+(date) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 666.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 666.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 655.89 Tm
+(Contact) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 655.89 Tm
+(téléphone) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 655.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 655.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 644.89 Tm
+(Profession) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 644.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 644.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 644.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 633.89 Tm
+(Sexe) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 633.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 633.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 633.89 Tm
+(Masculin, Féminin) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 622.89 Tm
+(Assurance) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 622.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 622.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 622.89 Tm
+(Aucune, MCI, MUNASSUR, OLEA) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 611.89 Tm
+(Antécédents) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 611.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 611.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 611.89 Tm
+(—) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 588.89 Tm
+(2. Consultation) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 572.89 Tm
+(Routes : /consultations/nouvelle  ·  /consultations/:id/modifier) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 560.89 Tm
+(Champ \(label UI\)) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 560.89 Tm
+(Type) Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 560.89 Tm
+(Oblig.) Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 560.89 Tm
+(Options / notes) Tj
+ET
+40.00 555.89 m 555.28 555.89 l S
+BT
+/F1 8.0 Tf
+1 0 0 1 40.00 547.89 Tm
+(Patient) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 547.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 547.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 547.89 Tm
+(Liste des patients) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 536.89 Tm
+(— Œil Droit / Œil Gauche —) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 536.89 Tm
+() Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 536.89 Tm
+() Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 536.89 Tm
+() Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 525.89 Tm
+(VL \(Sans Corr.\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 525.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 525.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 525.89 Tm
+(OD et OG) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 514.89 Tm
+(VL \(Avec Corr.\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 514.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 514.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 514.89 Tm
+(OD et OG) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 503.89 Tm
+(VP \(Sans Corr.\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 503.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 503.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 503.89 Tm
+(OD et OG) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 492.89 Tm
+(VP \(Avec Corr.\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 492.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 492.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 492.89 Tm
+(OD et OG) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 481.89 Tm
+(Sphère) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 481.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 481.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 481.89 Tm
+(défaut +0.00) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 470.89 Tm
+(Cylindre) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 470.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 470.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 470.89 Tm
+(défaut -0.00) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 459.89 Tm
+(Axe \(°\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 459.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 459.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 459.89 Tm
+(défaut 0) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 448.89 Tm
+(PIO \(mmHg\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 448.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 448.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 448.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 437.89 Tm
+(Addition) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 437.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 437.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 437.89 Tm
+(défaut +0.00) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 426.89 Tm
+(Segment antérieur) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 426.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 426.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 426.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 415.89 Tm
+(Fond d'œil) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 415.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 415.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 415.89 Tm
+(—) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 404.89 Tm
+(— Conclusion & Suivi —) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 404.89 Tm
+() Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 404.89 Tm
+() Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 404.89 Tm
+() Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 393.89 Tm
+(Diagnostic) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 393.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 393.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 393.89 Tm
+(CIM-10 ou texte libre) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 382.89 Tm
+(Prochain RDV recommandé) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 382.89 Tm
+(date) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 382.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 382.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 371.89 Tm
+(Délai prochain RDV) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 371.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 371.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 371.89 Tm
+(1 mois, 3 mois, 6 mois, 1 an, Selon besoin) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 360.89 Tm
+(Conduite à tenir \(CAT\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 360.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 360.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 360.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 349.89 Tm
+(Notes de traitement) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 349.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 349.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 349.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 338.89 Tm
+(Notes optiques) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 338.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 338.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 338.89 Tm
+(—) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 315.89 Tm
+(3. Ordonnance) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 299.89 Tm
+(Routes : /ordonnances/nouvelle  ·  /ordonnances/:id/modifier) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 287.89 Tm
+(Champ \(label UI\)) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 287.89 Tm
+(Type) Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 287.89 Tm
+(Oblig.) Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 287.89 Tm
+(Options / notes) Tj
+ET
+40.00 282.89 m 555.28 282.89 l S
+BT
+/F1 8.0 Tf
+1 0 0 1 40.00 274.89 Tm
+(Patient) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 274.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 274.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 274.89 Tm
+(Liste des patients) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 263.89 Tm
+(Date) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 263.89 Tm
+(date) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 263.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 263.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 252.89 Tm
+(Médecin) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 252.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 252.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 252.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 241.89 Tm
+(Diagnostic) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 241.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 241.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 241.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 230.89 Tm
+(Ordonnance \(médicaments\)) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 230.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 230.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 230.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 219.89 Tm
+(Notes) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 219.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 219.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 219.89 Tm
+(—) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 196.89 Tm
+(4. Prescription d'examen) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 180.89 Tm
+(Routes : /prescription-examen/nouvelle  ·  /prescription-examen/:id/modifier) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 168.89 Tm
+(Champ \(label UI\)) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 168.89 Tm
+(Type) Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 168.89 Tm
+(Oblig.) Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 168.89 Tm
+(Options / notes) Tj
+ET
+40.00 163.89 m 555.28 163.89 l S
+BT
+/F1 8.0 Tf
+1 0 0 1 40.00 155.89 Tm
+(Patient) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 155.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 155.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 155.89 Tm
+(Liste des patients) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 144.89 Tm
+(Date) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 144.89 Tm
+(date) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 144.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 144.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 133.89 Tm
+(Médecin) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 133.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 133.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 133.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 122.89 Tm
+(Indication) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 122.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 122.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 122.89 Tm
+(Motif clinique) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 111.89 Tm
+(Examens prescrits) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 111.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 111.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 111.89 Tm
+(Champ visuel, Rétinographie, Réfractométrie, OCT, FO dilaté) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 100.89 Tm
+(Notes) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 100.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 100.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 100.89 Tm
+(—) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 77.89 Tm
+(5. Prescription de lunettes) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 61.89 Tm
+(Routes : /prescription-lunettes/nouvelle  ·  /prescription-lunettes/:id/modifier) Tj
+ET
+endstream
+endobj
+4 0 obj
+<< /Length 6786 >>
+stream
+BT
+/F2 8.0 Tf
+1 0 0 1 40.00 801.89 Tm
+(Champ \(label UI\)) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 801.89 Tm
+(Type) Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 801.89 Tm
+(Oblig.) Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 801.89 Tm
+(Options / notes) Tj
+ET
+40.00 796.89 m 555.28 796.89 l S
+BT
+/F1 8.0 Tf
+1 0 0 1 40.00 788.89 Tm
+(Patient) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 788.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 788.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 788.89 Tm
+(Liste des patients) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 777.89 Tm
+(Date) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 777.89 Tm
+(date) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 777.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 777.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 766.89 Tm
+(Médecin) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 766.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 766.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 766.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 755.89 Tm
+(Type de verre) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 755.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 755.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 755.89 Tm
+(Unifocaux VL/VP, Progressifs, Bifocaux, Lentilles) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 744.89 Tm
+(OD — Sphère) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 744.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 744.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 744.89 Tm
+(défaut +0.00) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 733.89 Tm
+(OD — Cylindre) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 733.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 733.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 733.89 Tm
+(défaut -0.00) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 722.89 Tm
+(OD — Axe) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 722.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 722.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 722.89 Tm
+(défaut 0) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 711.89 Tm
+(OD — Addition) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 711.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 711.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 711.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 700.89 Tm
+(OG — Sphère) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 700.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 700.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 700.89 Tm
+(défaut +0.00) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 689.89 Tm
+(OG — Cylindre) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 689.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 689.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 689.89 Tm
+(défaut -0.00) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 678.89 Tm
+(OG — Axe) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 678.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 678.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 678.89 Tm
+(défaut 0) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 667.89 Tm
+(OG — Addition) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 667.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 667.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 667.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 656.89 Tm
+(Correction / consignes) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 656.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 656.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 656.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 645.89 Tm
+(Notes) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 645.89 Tm
+(zone de texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 645.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 645.89 Tm
+(—) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 622.89 Tm
+(6. Rendez-vous \(Agenda\)) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 606.89 Tm
+(Routes : Modal sur /agenda) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 594.89 Tm
+(Champ \(label UI\)) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 594.89 Tm
+(Type) Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 594.89 Tm
+(Oblig.) Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 594.89 Tm
+(Options / notes) Tj
+ET
+40.00 589.89 m 555.28 589.89 l S
+BT
+/F1 8.0 Tf
+1 0 0 1 40.00 581.89 Tm
+(Patient) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 581.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 581.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 581.89 Tm
+(Liste des patients) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 570.89 Tm
+(Médecin) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 570.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 570.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 570.89 Tm
+(Utilisateurs rôle OPHT) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 559.89 Tm
+(Date & heure) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 559.89 Tm
+(date-heure) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 559.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 559.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 548.89 Tm
+(Motif) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 548.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 548.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 548.89 Tm
+(min. 2 caractères) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 537.89 Tm
+(Statut) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 537.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 537.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 537.89 Tm
+(Planifié, En attente, En consultation, Terminé, Absent \(éd…) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 514.89 Tm
+(7. Facture) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 498.89 Tm
+(Routes : Modal sur /facturation) Tj
+/F2 8.0 Tf
+1 0 0 1 40.00 486.89 Tm
+(Champ \(label UI\)) Tj
+/F2 8.0 Tf
+1 0 0 1 210.00 486.89 Tm
+(Type) Tj
+/F2 8.0 Tf
+1 0 0 1 280.00 486.89 Tm
+(Oblig.) Tj
+/F2 8.0 Tf
+1 0 0 1 325.00 486.89 Tm
+(Options / notes) Tj
+ET
+40.00 481.89 m 555.28 481.89 l S
+BT
+/F1 8.0 Tf
+1 0 0 1 40.00 473.89 Tm
+(Patient) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 473.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 473.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 473.89 Tm
+(Liste des patients) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 462.89 Tm
+(Date) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 462.89 Tm
+(date) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 462.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 462.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 451.89 Tm
+(Statut) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 451.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 451.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 451.89 Tm
+(Payée, Partielle, Impayée) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 440.89 Tm
+(Mode de paiement) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 440.89 Tm
+(liste) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 440.89 Tm
+(Non) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 440.89 Tm
+(Espèces, CB, Mobile Money, Chèque, Virement) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 429.89 Tm
+(Ligne — Libellé) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 429.89 Tm
+(texte) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 429.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 429.89 Tm
+(? 1 ligne) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 418.89 Tm
+(Ligne — Quantité) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 418.89 Tm
+(nombre) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 418.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 418.89 Tm
+(min 1) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 407.89 Tm
+(Ligne — Prix unitaire) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 407.89 Tm
+(nombre) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 407.89 Tm
+(Oui) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 407.89 Tm
+(FCFA) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 396.89 Tm
+(Total TTC) Tj
+/F1 8.0 Tf
+1 0 0 1 210.00 396.89 Tm
+(calculé) Tj
+/F1 8.0 Tf
+1 0 0 1 280.00 396.89 Tm
+(—) Tj
+/F1 8.0 Tf
+1 0 0 1 325.00 396.89 Tm
+(Affiché, non éditable) Tj
+/F2 13.0 Tf
+1 0 0 1 40.00 373.89 Tm
+(8. Utilisateurs) Tj
+/F1 9.0 Tf
+1 0 0 1 40.00 357.89 Tm
+(Route : /utilisateurs — aucun formulaire de création/édition actuellement.) Tj
+/F1 9.0 Tf
+1 0 0 1 40.00 345.89 Tm
+(Le bouton « Nouvel utilisateur » n'est pas encore branché.) Tj
+/F1 8.0 Tf
+1 0 0 1 40.00 323.89 Tm
+(Généré automatiquement à partir du code frontend Ophtamax.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 7 0 R /MediaBox [0 0 595.28 841.89] /Contents 3 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 7 0 R /MediaBox [0 0 595.28 841.89] /Contents 4 0 R /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> >>
+endobj
+7 0 obj
+<< /Type /Pages /Kids [5 0 R 6 0 R] /Count 2 >>
+endobj
+8 0 obj
+<< /Type /Catalog /Pages 7 0 R >>
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000009 00000 n 
+0000000106 00000 n 
+0000000208 00000 n 
+0000010313 00000 n 
+0000017151 00000 n 
+0000017293 00000 n 
+0000017435 00000 n 
+0000017498 00000 n 
+trailer
+<< /Size 9 /Root 8 0 R >>
+startxref
+17547
+%%EOF

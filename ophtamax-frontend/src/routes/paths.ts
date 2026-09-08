@@ -4,6 +4,7 @@ export const PATHS = {
   patients: '/patients',
   agenda: '/agenda',
   consultations: '/consultations',
+  consultationNouvelle: '/consultations/nouvelle',
   ordonnances: '/ordonnances',
   prescriptionExamen: '/prescription-examen',
   prescriptionLunettes: '/prescription-lunettes',

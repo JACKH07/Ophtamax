@@ -35,280 +35,16 @@ const emptyOeil = (): ExamenOeil => ({
 })
 
 function dossierNumero(patientId: string): string {
-  const map: Record<string, string> = {
-    p1: '84920',
-    p2: '84921',
-    p3: '84922',
-    p4: '84923',
-  }
-  return map[patientId] ?? patientId.replace(/\D/g, '').slice(-5).padStart(5, '0')
+  return patientId.replace(/\D/g, '').slice(-5).padStart(5, '0') || '00001'
 }
 
-let patients: Patient[] = [
-  {
-    id: 'p1',
-    nom: '',
-    prenom: '',
-    sexe: 'M',
-    date_nais: '',
-    profession: '',
-    contact: '',
-    assurance: '',
-    antecedents: '',
-    derniere_visite: '',
-  },
-  {
-    id: 'p2',
-    nom: '',
-    prenom: '',
-    sexe: 'F',
-    date_nais: '',
-    profession: '',
-    contact: '',
-    assurance: '',
-    antecedents: '',
-    derniere_visite: '',
-  },
-  {
-    id: 'p3',
-    nom: '',
-    prenom: '',
-    sexe: 'M',
-    date_nais: '',
-    profession: '',
-    contact: '',
-    assurance: '',
-    antecedents: '',
-    derniere_visite: '',
-  },
-  {
-    id: 'p4',
-    nom: '',
-    prenom: '',
-    sexe: 'F',
-    date_nais: '',
-    profession: '',
-    contact: '',
-    assurance: '',
-    antecedents: '',
-    derniere_visite: '',
-  },
-]
+let patients: Patient[] = []
 
-let consultations: Consultation[] = [
-  {
-    id: 'c1',
-    id_patient: 'p1',
-    patient_name: '',
-    dossier_numero: '',
-    datecons: '2024-12-10T09:30:00',
-    diagnostic: 'Myopie évolutive',
-    examen_od: {
-      ...emptyOeil(),
-      vl_sans: '3/10',
-      vl_avec: '10/10',
-      sphere: '-2.00',
-      cylindre: '-0.50',
-      axe: '90',
-      pio: '14',
-      segment_anterieur: 'RAS',
-      fond_oeil: 'Excavation physiologique',
-    },
-    examen_og: {
-      ...emptyOeil(),
-      vl_sans: '4/10',
-      vl_avec: '10/10',
-      sphere: '-1.75',
-      cylindre: '-0.25',
-      axe: '85',
-      pio: '15',
-      segment_anterieur: 'RAS',
-      fond_oeil: 'RAS',
-    },
-    ordonnance: 'Correctol 2x/jour\nLarmes artificielles si besoin',
-    prescription: 'Lunettes VL\nOD: -2.00 (-0.50) 90°\nOG: -1.75 (-0.25) 85°',
-    conduite_a_tenir: 'Contrôle réfraction dans 6 mois. Éviter le travail prolongé sur écran sans pause.',
-    prochain_rdv_date: '2025-06-10',
-    prochain_rdv_delai: 'Dans 6 mois',
-    statut: 'terminee',
-  },
-  {
-    id: 'c2',
-    id_patient: 'p2',
-    patient_name: '',
-    dossier_numero: '',
-    datecons: '2024-12-01T14:00:00',
-    diagnostic: 'Presbytie',
-    examen_od: { ...emptyOeil(), addition: '+2.00', vl_avec: '10/10', vp_avec: 'P2' },
-    examen_og: { ...emptyOeil(), addition: '+2.00', vl_avec: '10/10', vp_avec: 'P2' },
-    ordonnance: '',
-    prescription: 'Verres progressifs\nAdd +2.00',
-    conduite_a_tenir: 'Adaptation verres progressifs. Revoir si céphalées.',
-    prochain_rdv_date: '2025-01-01',
-    prochain_rdv_delai: 'Dans 1 mois',
-    statut: 'terminee',
-  },
-]
+let consultations: Consultation[] = []
 
-// Rendez-vous spread sur les 14 prochains jours (relatifs à aujourd'hui)
-function rdvDate(daysOffset: number, hour: number, min = 0): string {
-  const d = new Date()
-  d.setDate(d.getDate() + daysOffset)
-  d.setHours(hour, min, 0, 0)
-  return d.toISOString()
-}
+let rendezVous: RendezVous[] = []
 
-let rendezVous: RendezVous[] = [
-  {
-    id: 'rdv1',
-    patient_id: 'p3',
-    patient_name: '',
-    date_heure: rdvDate(0, 9, 15),
-    duree_min: 30,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: "Fond d'œil",
-    statut: 'en_consultation',
-  },
-  {
-    id: 'rdv2',
-    patient_id: 'p4',
-    patient_name: '',
-    date_heure: rdvDate(0, 9, 45),
-    duree_min: 20,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Contrôle post-op',
-    statut: 'en_attente',
-  },
-  {
-    id: 'rdv3',
-    patient_id: 'p1',
-    patient_name: '',
-    date_heure: rdvDate(0, 11, 0),
-    duree_min: 30,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'OCT Maculaire',
-    statut: 'planifie',
-  },
-  {
-    id: 'rdv4',
-    patient_id: 'p2',
-    patient_name: '',
-    date_heure: rdvDate(0, 14, 30),
-    duree_min: 45,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Contrôle réfraction',
-    statut: 'planifie',
-  },
-  {
-    id: 'rdv5',
-    patient_id: 'p3',
-    patient_name: '',
-    date_heure: rdvDate(1, 10, 0),
-    duree_min: 30,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Bilan glaucome',
-    statut: 'planifie',
-  },
-  {
-    id: 'rdv6',
-    patient_id: 'p4',
-    patient_name: '',
-    date_heure: rdvDate(2, 9, 0),
-    duree_min: 20,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Nouvelle consultation',
-    statut: 'planifie',
-  },
-  {
-    id: 'rdv7',
-    patient_id: 'p1',
-    patient_name: '',
-    date_heure: rdvDate(3, 11, 30),
-    duree_min: 30,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Suivi myopie',
-    statut: 'planifie',
-  },
-  {
-    id: 'rdv8',
-    patient_id: 'p2',
-    patient_name: '',
-    date_heure: rdvDate(7, 8, 30),
-    duree_min: 30,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Champ visuel',
-    statut: 'planifie',
-  },
-  {
-    id: 'rdv9',
-    patient_id: 'p3',
-    patient_name: '',
-    date_heure: rdvDate(7, 15, 0),
-    duree_min: 45,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Cataracte — suivi',
-    statut: 'planifie',
-  },
-  {
-    id: 'rdv10',
-    patient_id: 'p4',
-    patient_name: '',
-    date_heure: rdvDate(-1, 10, 0),
-    duree_min: 30,
-    medecin_id: 'u2',
-    medecin: '',
-    motif: 'Rétinopathie — contrôle',
-    statut: 'termine',
-  },
-]
-
-let fileAttente: FileAttenteItem[] = [
-  {
-    id: 'fa1',
-    rdv_id: 'rdv1',
-    patient_id: 'p3',
-    patient_name: '',
-    patient_age: undefined,
-    motif: "Fond d'œil",
-    heure_arrivee: (() => { const d = new Date(); d.setHours(9, 0, 0, 0); return d.toISOString() })(),
-    statut: 'en_consultation',
-    priorite: 1,
-    medecin: '',
-  },
-  {
-    id: 'fa2',
-    rdv_id: 'rdv2',
-    patient_id: 'p4',
-    patient_name: '',
-    patient_age: undefined,
-    motif: 'Contrôle post-op',
-    heure_arrivee: (() => { const d = new Date(); d.setHours(9, 30, 0, 0); return d.toISOString() })(),
-    statut: 'en_attente',
-    priorite: 2,
-    medecin: '',
-  },
-  {
-    id: 'fa3',
-    rdv_id: 'rdv3',
-    patient_id: 'p1',
-    patient_name: '',
-    patient_age: undefined,
-    motif: 'OCT Maculaire',
-    heure_arrivee: (() => { const d = new Date(); d.setHours(10, 50, 0, 0); return d.toISOString() })(),
-    statut: 'en_attente',
-    priorite: 3,
-    medecin: '',
-  },
-]
+let fileAttente: FileAttenteItem[] = []
 
 let factures: Facture[] = []
 
@@ -350,7 +86,7 @@ let assurances: ReferentielItem[] = [
 ]
 
 let societe: SocieteInfo = {
-  nom: 'New Cabinet Médical d\'Ophtalmologie Kahydara',
+  nom: 'Cabinet Médical d\'Ophtalmologie Kahydara',
   adresse: 'Abidjan, Côte d\'Ivoire',
   contact: '+225 27 00 00 00 00',
   slogan: 'Votre vision, notre priorité',
@@ -561,12 +297,7 @@ export const mockStore = {
     ca_evolution: 0,
     nouveaux_patients: 0,
     taux_occupation: 0,
-    top_diagnostics: [
-      { label: 'Myopie évolutive', percent: 0 },
-      { label: 'Presbytie', percent: 0 },
-      { label: 'Cataracte (Dépistage)', percent: 0 },
-      { label: 'Glaucome (Suivi)', percent: 0 },
-    ],
+    top_diagnostics: [] as { label: string; percent: number }[],
     consultations_par_mois: [
       { mois: 'Juil', value: 0 },
       { mois: 'Août', value: 0 },

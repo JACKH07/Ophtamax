@@ -54,8 +54,6 @@ export function ConsultationFormPage() {
   const [diagnostic, setDiagnostic] = useState('')
   const [examenOd, setExamenOd] = useState<ExamenOeil>(emptyOeil())
   const [examenOg, setExamenOg] = useState<ExamenOeil>(emptyOeil())
-  const [ordonnance, setOrdonnance] = useState('')
-  const [prescription, setPrescription] = useState('')
   const [conduite, setConduite] = useState('')
   const [rdvDate, setRdvDate] = useState('')
   const [rdvDelai, setRdvDelai] = useState('Dans 1 mois')
@@ -66,8 +64,6 @@ export function ConsultationFormPage() {
     setDiagnostic(existing.diagnostic)
     setExamenOd(existing.examen_od)
     setExamenOg(existing.examen_og)
-    setOrdonnance(existing.ordonnance)
-    setPrescription(existing.prescription)
     setConduite(existing.conduite_a_tenir)
     setRdvDate(existing.prochain_rdv_date)
     setRdvDelai(existing.prochain_rdv_delai || 'Dans 1 mois')
@@ -98,8 +94,8 @@ export function ConsultationFormPage() {
       diagnostic,
       examen_od: examenOd,
       examen_og: examenOg,
-      ordonnance,
-      prescription,
+      ordonnance: '',
+      prescription: '',
       conduite_a_tenir: conduite,
       prochain_rdv_date: rdvDate,
       prochain_rdv_delai: rdvDelai,
@@ -228,7 +224,7 @@ export function ConsultationFormPage() {
               <select
                 value={rdvDelai}
                 onChange={(e) => setRdvDelai(e.target.value)}
-                className={`${inputClass} max-w-[160px]`}
+                className={`${inputClass} max-w-40`}
               >
                 {RDV_OPTIONS.map((o) => (
                   <option key={o} value={o}>{o}</option>
@@ -247,36 +243,6 @@ export function ConsultationFormPage() {
             placeholder="Plan de traitement, conseils, suivi..."
             className={inputClass}
           />
-        </div>
-
-        <div className="mb-4 grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="mb-1 block text-label-sm text-on-surface-variant">Notes de traitement</label>
-            <textarea
-              rows={3}
-              value={ordonnance}
-              onChange={(e) => setOrdonnance(e.target.value)}
-              placeholder="Notes cliniques / traitement"
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-label-sm text-on-surface-variant">Notes optiques</label>
-            <textarea
-              rows={3}
-              value={prescription}
-              onChange={(e) => setPrescription(e.target.value)}
-              placeholder="Notes optiques (hors module Prescription Lunettes)"
-              className={inputClass}
-            />
-          </div>
-        </div>
-
-        <div className="flex gap-3 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-body-sm text-on-surface-variant">
-          <MaterialIcon name="info" className="shrink-0 text-primary" />
-          <p>
-            Ordonnances, prescription examen et prescription lunettes se créent dans leurs modules dédiés.
-          </p>
         </div>
       </section>
 

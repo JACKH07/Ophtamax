@@ -30,20 +30,30 @@ export function PrescriptionExamenFormPage() {
 
   const [patientId, setPatientId] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [bulletinDe, setBulletinDe] = useState("Demande d'examen")
   const [examens, setExamens] = useState('')
-  const [indication, setIndication] = useState('')
+  const [diagnostic, setDiagnostic] = useState('')
+  const [service, setService] = useState('')
   const [medecin, setMedecin] = useState('')
-  const [notes, setNotes] = useState('')
 
   useEffect(() => {
     if (!existing) return
     setPatientId(existing.patient_id)
     setDate(existing.date.slice(0, 10))
+    setBulletinDe(existing.bulletin_de || "Demande d'examen")
     setExamens(existing.examens)
-    setIndication(existing.indication)
+    setDiagnostic(existing.indication)
+    setService(existing.service || '')
     setMedecin(existing.medecin)
-    setNotes(existing.notes)
   }, [existing])
+
+  const selectedPatient = patients.find((p) => p.id === patientId)
+
+  useEffect(() => {
+    if (!patientId || isEdit) return
+    const p = patients.find((x) => x.id === patientId)
+    if (p?.contact && !service) setService(p.contact)
+  }, [patientId, isEdit, patients, service])
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -51,9 +61,11 @@ export function PrescriptionExamenFormPage() {
         patient_id: patientId,
         date,
         examens,
-        indication,
+        indication: diagnostic,
+        bulletin_de: bulletinDe,
+        service,
         medecin,
-        notes,
+        notes: '',
       }
       return isEdit
         ? updatePrescriptionExamen(id!, payload)
@@ -75,8 +87,7 @@ export function PrescriptionExamenFormPage() {
   return (
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
-        title={isEdit ? 'Modifier la prescription examen' : 'Nouvelle prescription examen'}
-        subtitle="Module indépendant des consultations."
+        title={isEdit ? 'Modifier la demande d\'examen' : 'Nouvelle demande d\'examen'}
         actions={
           <Link
             to={PATHS.prescriptionExamen}
@@ -97,6 +108,16 @@ export function PrescriptionExamenFormPage() {
         className="max-w-2xl space-y-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
       >
         <div>
+          <label className="mb-1 block text-label-sm text-secondary">Bulletin de</label>
+          <input
+            value={bulletinDe}
+            onChange={(e) => setBulletinDe(e.target.value)}
+            placeholder="Demande d'examen"
+            className={inputClass}
+          />
+        </div>
+
+        <div>
           <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
           <select
             required
@@ -111,6 +132,14 @@ export function PrescriptionExamenFormPage() {
               </option>
             ))}
           </select>
+          {selectedPatient && (
+            <p className="mt-1 text-label-sm text-secondary">
+              {selectedPatient.sexe === 'M' ? 'Masculin' : 'Féminin'}
+              {selectedPatient.date_nais
+                ? ` · Né(e) le ${new Date(selectedPatient.date_nais).toLocaleDateString('fr-FR')}`
+                : ''}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -125,27 +154,37 @@ export function PrescriptionExamenFormPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-label-sm text-secondary">Médecin</label>
+            <label className="mb-1 block text-label-sm text-secondary">Service / Contact</label>
             <input
-              value={medecin}
-              onChange={(e) => setMedecin(e.target.value)}
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              placeholder="Tél. / service"
               className={inputClass}
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-label-sm text-secondary">Indication</label>
+          <label className="mb-1 block text-label-sm text-secondary">Médecin</label>
           <input
-            value={indication}
-            onChange={(e) => setIndication(e.target.value)}
-            placeholder="Motif clinique / indication"
+            value={medecin}
+            onChange={(e) => setMedecin(e.target.value)}
             className={inputClass}
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-label-sm text-secondary">Examens prescrits *</label>
+          <label className="mb-1 block text-label-sm text-secondary">Diagnostic</label>
+          <input
+            value={diagnostic}
+            onChange={(e) => setDiagnostic(e.target.value)}
+            placeholder="Ex : Glaucome"
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-label-sm text-secondary">Examen demandé *</label>
           <div className="mb-2 flex flex-wrap gap-2">
             {examensRef.map((ex) => (
               <button
@@ -163,18 +202,7 @@ export function PrescriptionExamenFormPage() {
             rows={4}
             value={examens}
             onChange={(e) => setExamens(e.target.value)}
-            placeholder="Liste des examens complémentaires..."
-            className={inputClass}
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-label-sm text-secondary">Notes</label>
-          <textarea
-            rows={2}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Instructions particulières..."
+            placeholder="Ex : Champ visuel automatisé"
             className={inputClass}
           />
         </div>

@@ -30,7 +30,7 @@ export function OrdonnancesListPage() {
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
         title="Ordonnances"
-        subtitle="Ordonnances médicamenteuses (module indépendant des consultations)."
+        subtitle="Ordonnances médicamenteuses"
         actions={
           <Link
             to={`${PATHS.ordonnances}/nouvelle`}

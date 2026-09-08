@@ -27,11 +27,11 @@ export function ConsultationsListPage() {
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
         title="Consultations"
-        subtitle="Examens ophtalmologiques, diagnostics et documents."
+        subtitle="Examens ophtalmologiques et diagnostics."
         actions={
           can('consultations.write') ? (
             <Link
-              to={`${PATHS.consultations}/nouvelle`}
+              to={PATHS.consultationNouvelle}
               className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-label-md font-semibold text-on-primary shadow-sm hover:bg-on-primary-fixed-variant"
             >
               <MaterialIcon name="add" className="text-[18px]" />
@@ -64,7 +64,7 @@ export function ConsultationsListPage() {
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-secondary">
                   Aucune consultation —{' '}
-                  <Link to={`${PATHS.consultations}/nouvelle`} className="text-primary hover:underline">
+                  <Link to={PATHS.consultationNouvelle} className="text-primary hover:underline">
                     créer la première
                   </Link>
                 </td>

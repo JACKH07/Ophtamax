@@ -30,7 +30,7 @@ export function PrescriptionLunettesListPage() {
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
         title="Prescription Lunettes"
-        subtitle="Prescriptions optiques (module indépendant des consultations)."
+        subtitle="Prescriptions optiques"
         actions={
           <Link
             to={`${PATHS.prescriptionLunettes}/nouvelle`}

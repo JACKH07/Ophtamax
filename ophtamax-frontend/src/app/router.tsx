@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { ProtectedRoute } from '@/components/guards/ProtectedRoute'
 import { RoleGuard } from '@/components/guards/RoleGuard'
@@ -52,11 +52,13 @@ export function AppRouter() {
             </Route>
 
             <Route element={<RoleGuard pathPrefix={PATHS.consultations} />}>
-              <Route path={PATHS.consultations} element={<ConsultationsListPage />} />
-              <Route path={`${PATHS.consultations}/nouvelle`} element={<ConsultationFormPage />} />
-              <Route path={`${PATHS.consultations}/:id/modifier`} element={<ConsultationFormPage />} />
-              <Route path={`${PATHS.consultations}/:id/documents`} element={<ConsultationDocPrintPage />} />
-              <Route path={`${PATHS.consultations}/:id`} element={<ConsultationDetailPage />} />
+              <Route path={PATHS.consultations} element={<Outlet />}>
+                <Route index element={<ConsultationsListPage />} />
+                <Route path="nouvelle" element={<ConsultationFormPage />} />
+                <Route path=":id/modifier" element={<ConsultationFormPage />} />
+                <Route path=":id/documents" element={<ConsultationDocPrintPage />} />
+                <Route path=":id" element={<ConsultationDetailPage />} />
+              </Route>
             </Route>
 
             <Route element={<RoleGuard pathPrefix={PATHS.ordonnances} />}>

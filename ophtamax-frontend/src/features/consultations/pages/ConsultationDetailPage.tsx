@@ -108,23 +108,6 @@ export function ConsultationDetailPage() {
             : c.prochain_rdv_delai || '—'}
         </p>
       </div>
-
-      {(c.ordonnance || c.prescription) && (
-        <div className="grid gap-gutter md:grid-cols-2">
-          {c.ordonnance && (
-            <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5">
-              <h4 className="mb-2 font-semibold">Notes de traitement</h4>
-              <p className="whitespace-pre-wrap text-body-sm">{c.ordonnance}</p>
-            </div>
-          )}
-          {c.prescription && (
-            <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5">
-              <h4 className="mb-2 font-semibold">Notes optiques</h4>
-              <p className="whitespace-pre-wrap text-body-sm">{c.prescription}</p>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }

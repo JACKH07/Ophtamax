@@ -60,7 +60,6 @@ export function OrdonnanceFormPage() {
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
         title={isEdit ? 'Modifier l\'ordonnance' : 'Nouvelle ordonnance'}
-        subtitle="Module indépendant des consultations."
         actions={
           <Link
             to={PATHS.ordonnances}

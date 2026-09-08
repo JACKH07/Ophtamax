@@ -14,11 +14,7 @@ import {
 import { PATHS } from '@/routes/paths'
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0,
-  }).format(amount).replace(/\s/g, ' ')
+  return `${new Intl.NumberFormat('fr-FR').format(amount)} FCFA`
 }
 
 export function DashboardPage() {

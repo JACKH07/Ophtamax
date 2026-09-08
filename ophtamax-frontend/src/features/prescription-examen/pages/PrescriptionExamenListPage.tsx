@@ -30,7 +30,7 @@ export function PrescriptionExamenListPage() {
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
         title="Prescription examen"
-        subtitle="Prescriptions d'examens complémentaires (module indépendant)."
+        subtitle="Demandes d'examens complémentaires"
         actions={
           <Link
             to={`${PATHS.prescriptionExamen}/nouvelle`}

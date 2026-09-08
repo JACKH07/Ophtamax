@@ -18,34 +18,6 @@ export const mockDashboardSummary: DashboardSummary = {
 
 export const mockWaitingQueue: WaitingQueueItem[] = []
 
-export const mockUpcomingSlots: UpcomingSlot[] = [
-  {
-    id: '1',
-    start_time: '11:00',
-    end_time: '11:30',
-    title: 'OCT Maculaire',
-    patient_name: 'S. Benali',
-    variant: 'primary',
-  },
-  {
-    id: '2',
-    start_time: '11:45',
-    end_time: '12:00',
-    title: 'Pause administrative',
-    variant: 'secondary',
-  },
-  {
-    id: '3',
-    start_time: '13:30',
-    end_time: '14:00',
-    title: 'Chirurgie cataracte (Bloc)',
-    variant: 'primary',
-  },
-]
+export const mockUpcomingSlots: UpcomingSlot[] = []
 
-export const mockTopDiagnostics: TopDiagnostic[] = [
-  { label: 'Myopie évolutive', percent: 0 },
-  { label: 'Presbytie', percent: 0 },
-  { label: 'Cataracte (Dépistage)', percent: 0 },
-  { label: 'Glaucome (Suivi)', percent: 0 },
-]
+export const mockTopDiagnostics: TopDiagnostic[] = []
