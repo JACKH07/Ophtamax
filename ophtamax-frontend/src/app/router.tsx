@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { USE_MOCK } from '@/api/endpoints'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { ProtectedRoute } from '@/components/guards/ProtectedRoute'
 import { RoleGuard } from '@/components/guards/RoleGuard'
@@ -32,7 +33,10 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={PATHS.login} element={<LoginPage />} />
+        <Route
+          path={PATHS.login}
+          element={USE_MOCK ? <Navigate to={PATHS.dashboard} replace /> : <LoginPage />}
+        />
         <Route path={PATHS.forbidden} element={<ForbiddenPage />} />
 
         <Route element={<ProtectedRoute />}>

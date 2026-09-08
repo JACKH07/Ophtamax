@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getErrorMessage } from '@/api/client'
 import { USE_MOCK } from '@/api/endpoints'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
@@ -10,9 +10,10 @@ import { loginSchema, type LoginFormData } from '@/features/auth/schemas/loginSc
 import { login } from '@/features/auth/services/authService'
 import { PATHS } from '@/routes/paths'
 
+const LOGO_SRC = '/logo-doch.png'
+
 /**
- * Page de connexion isolée : en mode démo (sans BDD),
- * elle n'empêche plus d'accéder aux autres pages.
+ * Page de connexion — auth mock (démo) ou API backend PHP.
  */
 export function LoginPage() {
   const navigate = useNavigate()
@@ -31,11 +32,6 @@ export function LoginPage() {
   })
 
   const onSubmit = async (data: LoginFormData) => {
-    if (!USE_MOCK) {
-      setError('Base de données / API non connectée. Activez VITE_USE_MOCK=true pour la démo.')
-      return
-    }
-
     setError(null)
     setIsSubmitting(true)
     try {
@@ -57,26 +53,26 @@ export function LoginPage() {
       <main className="w-full max-w-md px-4 py-8">
         <div className="relative flex w-full flex-col items-center overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest/90 p-8 shadow-[0_4px_24px_rgba(0,98,106,0.06)] backdrop-blur-md">
           <div className="mb-8 flex w-full flex-col items-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-container shadow-sm">
-              <MaterialIcon name="visibility" filled className="text-[32px] text-on-primary-container" />
-            </div>
+            <img
+              src={LOGO_SRC}
+              alt="Doch Group"
+              className="mb-4 h-20 w-auto object-contain"
+            />
             <h1 className="mb-1 text-headline-md font-semibold text-primary">Ophtamax</h1>
             <p className="text-body-sm text-on-surface-variant">Management Platform</p>
           </div>
 
-          {USE_MOCK && (
+          {!USE_MOCK && (
             <div className="mb-6 w-full rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-body-sm text-on-surface-variant">
-              <p className="font-semibold text-primary">Mode démo — BDD non connectée</p>
-              <p className="mt-1">
-                Les pages de l&apos;application sont accessibles sans connexion.
-              </p>
-              <Link
-                to={PATHS.dashboard}
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-label-md font-semibold tracking-wide text-on-primary hover:bg-on-primary-fixed-variant"
-              >
-                Accéder à l&apos;application
-                <MaterialIcon name="arrow_forward" className="text-[18px]" />
-              </Link>
+              <p className="font-semibold text-primary">Connexion sécurisée</p>
+              <p className="mt-1">Authentification via le serveur Ophtamax.</p>
+            </div>
+          )}
+
+          {USE_MOCK && (
+            <div className="mb-6 w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 text-body-sm text-on-surface-variant">
+              <p className="font-semibold text-on-surface">Mode démo</p>
+              <p className="mt-1">opht / opht · admin / admin · nkahydara / 12345</p>
             </div>
           )}
 
@@ -93,6 +89,7 @@ export function LoginPage() {
                 <input
                   id="login"
                   type="text"
+                  autoComplete="username"
                   placeholder="Entrez votre identifiant"
                   className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-3 pl-10 pr-4 text-body-md shadow-sm transition-all placeholder:text-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   {...register('login')}
@@ -115,6 +112,7 @@ export function LoginPage() {
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-3 pl-10 pr-10 text-body-md shadow-sm transition-all placeholder:text-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   {...register('password')}
@@ -139,16 +137,9 @@ export function LoginPage() {
               </div>
             )}
 
-            {USE_MOCK && !error && (
-              <div className="rounded-lg bg-surface-container-low px-4 py-3 text-body-sm text-on-surface-variant">
-                <p className="font-semibold text-on-surface">Comptes démo (optionnel)</p>
-                <p className="mt-1">opht / opht · admin / admin</p>
-              </div>
-            )}
-
             <button
               type="submit"
-              disabled={isSubmitting || !USE_MOCK}
+              disabled={isSubmitting}
               className="mt-4 flex w-full items-center justify-center rounded-lg border border-transparent bg-primary px-4 py-3 text-label-md font-semibold tracking-wide text-on-primary shadow-sm transition-all hover:bg-on-primary-fixed-variant focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-[0.98] disabled:opacity-60"
             >
               {isSubmitting ? 'Connexion...' : 'Se connecter'}
@@ -161,7 +152,7 @@ export function LoginPage() {
 
         <div className="mt-8 w-full text-center">
           <p className="text-body-sm text-on-surface-variant/70">
-            © 2024 Centre d&apos;Ophtalmologie Saint-Louis. Tous droits réservés.
+            © {new Date().getFullYear()} Cabinet Médical d&apos;Ophtalmologie Kahydara — Doch Group&apos;s
           </p>
         </div>
       </main>

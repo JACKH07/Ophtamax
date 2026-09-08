@@ -47,7 +47,7 @@ export function FactureModal({ onClose }: FactureModalProps) {
       date: new Date().toISOString().slice(0, 10),
       statut: 'payee',
       mode_paiement: 'Espèces',
-      lignes: [{ libelle: 'Consultation ophtalmologique', quantite: 1, prix_unitaire: 25000 }],
+      lignes: [{ libelle: 'Consultation ophtalmologique', quantite: 1, prix_unitaire: 0 }],
     },
   })
 

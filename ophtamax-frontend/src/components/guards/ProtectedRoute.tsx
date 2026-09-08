@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore'
 
 /**
  * En mode démo (sans BDD / API), les pages sont accessibles sans connexion.
- * Quand VITE_USE_MOCK=false, l'auth Laravel est requise.
+ * Quand VITE_USE_MOCK=false, l'authentification backend est requise.
  */
 export function ProtectedRoute() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)

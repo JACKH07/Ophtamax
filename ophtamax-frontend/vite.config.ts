@@ -16,8 +16,9 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
+      // Frontend → API PHP Ophtamax (php -S 127.0.0.1:8080 api/router.php)
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://127.0.0.1:8088',
         changeOrigin: true,
       },
     },

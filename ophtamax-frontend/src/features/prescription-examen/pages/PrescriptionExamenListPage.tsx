@@ -45,7 +45,7 @@ export function PrescriptionExamenListPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {items.length === 0 ? (
           <p className="col-span-full py-12 text-center text-secondary">
-            Aucune prescription examen. Créez-en une depuis ce module.
+            Aucune prescription examen.
           </p>
         ) : (
           items.map((item) => (

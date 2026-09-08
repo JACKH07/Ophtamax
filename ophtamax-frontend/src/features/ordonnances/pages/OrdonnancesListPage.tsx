@@ -45,7 +45,7 @@ export function OrdonnancesListPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {items.length === 0 ? (
           <p className="col-span-full py-12 text-center text-secondary">
-            Aucune ordonnance. Créez-en une depuis ce module.
+            Aucune ordonnance.
           </p>
         ) : (
           items.map((item) => (

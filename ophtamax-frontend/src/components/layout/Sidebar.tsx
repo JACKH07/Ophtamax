@@ -145,15 +145,6 @@ export function Sidebar() {
             <span className="truncate text-label-sm text-secondary">{displayRole}</span>
           </div>
         </div>
-        {USE_MOCK && (
-          <NavLink
-            to={PATHS.login}
-            className="mt-3 flex items-center gap-2 text-label-sm text-secondary hover:text-primary"
-          >
-            <MaterialIcon name="login" className="text-[16px]" />
-            Page connexion
-          </NavLink>
-        )}
       </div>
     </nav>
   )
