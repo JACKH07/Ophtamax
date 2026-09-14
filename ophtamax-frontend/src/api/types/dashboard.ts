@@ -35,3 +35,16 @@ export interface TopDiagnostic {
   label: string
   percent: number
 }
+
+/** Point journalier pour courbes / barres (7 derniers jours) */
+export interface DashboardDayPoint {
+  date: string
+  label: string
+  consultations: number
+  recettes: number
+}
+
+export interface DashboardCharts {
+  activity_7d: DashboardDayPoint[]
+  diagnostics: TopDiagnostic[]
+}

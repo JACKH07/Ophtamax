@@ -1,6 +1,7 @@
 import { apiClient } from '@/api/client'
 import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import {
+  mockDashboardCharts,
   mockDashboardSummary,
   mockTopDiagnostics,
   mockUpcomingSlots,
@@ -8,6 +9,7 @@ import {
 } from '@/api/mock/dashboardMock'
 import type { ApiResponse } from '@/api/types/auth'
 import type {
+  DashboardCharts,
   DashboardSummary,
   TopDiagnostic,
   UpcomingSlot,
@@ -47,5 +49,12 @@ export async function fetchTopDiagnostics(): Promise<TopDiagnostic[]> {
   const { data } = await apiClient.get<ApiResponse<TopDiagnostic[]>>(
     ENDPOINTS.dashboard.topDiagnostics,
   )
+  return data.data
+}
+
+export async function fetchDashboardCharts(): Promise<DashboardCharts> {
+  if (USE_MOCK) return mockDashboardCharts
+
+  const { data } = await apiClient.get<ApiResponse<DashboardCharts>>(ENDPOINTS.dashboard.charts)
   return data.data
 }

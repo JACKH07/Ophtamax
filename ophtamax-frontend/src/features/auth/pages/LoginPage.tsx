@@ -152,7 +152,7 @@ export function LoginPage() {
 
         <div className="mt-8 w-full text-center">
           <p className="text-body-sm text-on-surface-variant/70">
-            © {new Date().getFullYear()} Cabinet Médical d&apos;Ophtalmologie Kahydara — Doch Group&apos;s
+            © {new Date().getFullYear()} New Cabinet Médical d&apos;Ophtalmologue Kahydara — Doch Group&apos;s
           </p>
         </div>
       </main>

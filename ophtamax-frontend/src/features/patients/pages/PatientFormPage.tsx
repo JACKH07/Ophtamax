@@ -3,19 +3,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { mockStore } from '@/api/mock/dataStore'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
 import { patientSchema, type PatientFormValues } from '@/features/patients/schemas/patientSchema'
 import { createPatient, fetchPatient, updatePatient } from '@/features/patients/services/patientService'
 import { PATHS } from '@/routes/paths'
 
-const ASSURANCES = ['', 'MCI', 'MUNASSUR', 'OLEA']
-
 export function PatientFormPage() {
   const { id } = useParams()
   const isEdit = Boolean(id)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const professions = mockStore.referentiels.professions()
+  const assurances = mockStore.referentiels.assurances()
 
   const { data: patient } = useQuery({
     queryKey: ['patient', id],
@@ -75,7 +76,6 @@ export function PatientFormPage() {
             ['prenom', 'Prénom', 'text'],
             ['date_nais', 'Date de naissance', 'date'],
             ['contact', 'Contact', 'tel'],
-            ['profession', 'Profession', 'text'],
           ] as const).map(([field, label, type]) => (
             <div key={field}>
               <label className="mb-1 block text-label-sm text-on-surface-variant">{label}</label>
@@ -83,6 +83,16 @@ export function PatientFormPage() {
               {errors[field] && <p className="mt-1 text-label-sm text-error">{errors[field]?.message}</p>}
             </div>
           ))}
+          <div>
+            <label className="mb-1 block text-label-sm text-on-surface-variant">Profession</label>
+            <select className="w-full rounded-lg border border-outline-variant px-3 py-2 text-body-md focus:border-primary focus:outline-none" {...register('profession')}>
+              <option value="">Sélectionner</option>
+              {professions.map((p) => (
+                <option key={p.id} value={p.libelle}>{p.libelle}</option>
+              ))}
+            </select>
+            {errors.profession && <p className="mt-1 text-label-sm text-error">{errors.profession.message}</p>}
+          </div>
           <div>
             <label className="mb-1 block text-label-sm text-on-surface-variant">Sexe</label>
             <select className="w-full rounded-lg border border-outline-variant px-3 py-2 text-body-md focus:border-primary focus:outline-none" {...register('sexe')}>
@@ -94,7 +104,9 @@ export function PatientFormPage() {
             <label className="mb-1 block text-label-sm text-on-surface-variant">Assurance</label>
             <select className="w-full rounded-lg border border-outline-variant px-3 py-2 text-body-md focus:border-primary focus:outline-none" {...register('assurance')}>
               <option value="">Aucune</option>
-              {ASSURANCES.filter(Boolean).map((a) => <option key={a} value={a}>{a}</option>)}
+              {assurances.map((a) => (
+                <option key={a.id} value={a.libelle}>{a.libelle}</option>
+              ))}
             </select>
           </div>
           <div className="md:col-span-2">

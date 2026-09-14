@@ -15,6 +15,7 @@ import { OrdonnanceFormPage } from '@/features/ordonnances/pages/OrdonnanceFormP
 import { OrdonnancePrintPage } from '@/features/ordonnances/pages/OrdonnancePrintPage'
 import { OrdonnancesListPage } from '@/features/ordonnances/pages/OrdonnancesListPage'
 import { ParametresPage } from '@/features/parametres/pages/ParametresPage'
+import { ReferentielPage } from '@/features/parametres/pages/ReferentielPage'
 import { PatientDetailPage } from '@/features/patients/pages/PatientDetailPage'
 import { PatientFormPage } from '@/features/patients/pages/PatientFormPage'
 import { PatientsListPage } from '@/features/patients/pages/PatientsListPage'
@@ -92,6 +93,18 @@ export function AppRouter() {
 
             <Route element={<RoleGuard pathPrefix={PATHS.statistiques} />}>
               <Route path={PATHS.statistiques} element={<StatistiquesPage />} />
+            </Route>
+
+            <Route element={<RoleGuard pathPrefix={PATHS.professions} />}>
+              <Route path={PATHS.professions} element={<ReferentielPage kind="professions" />} />
+            </Route>
+
+            <Route element={<RoleGuard pathPrefix={PATHS.assurances} />}>
+              <Route path={PATHS.assurances} element={<ReferentielPage kind="assurances" />} />
+            </Route>
+
+            <Route element={<RoleGuard pathPrefix={PATHS.examens} />}>
+              <Route path={PATHS.examens} element={<ReferentielPage kind="examens" />} />
             </Route>
 
             <Route element={<RoleGuard pathPrefix={PATHS.parametres} />}>

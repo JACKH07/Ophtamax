@@ -86,7 +86,7 @@ let assurances: ReferentielItem[] = [
 ]
 
 let societe: SocieteInfo = {
-  nom: 'Cabinet Médical d\'Ophtalmologie Kahydara',
+  nom: 'New Cabinet Médical d\'Ophtalmologue Kahydara',
   adresse: 'Abidjan, Côte d\'Ivoire',
   contact: '+225 27 00 00 00 00',
   slogan: 'Votre vision, notre priorité',
@@ -288,6 +288,30 @@ export const mockStore = {
     updateSociete: (data: Partial<SocieteInfo>) => {
       societe = { ...societe, ...data }
       return societe
+    },
+    addProfession: (data: Omit<ReferentielItem, 'id'>) => {
+      const item: ReferentielItem = { ...data, id: uid() }
+      professions = [...professions, item]
+      return item
+    },
+    removeProfession: (id: string) => {
+      professions = professions.filter((p) => p.id !== id)
+    },
+    addAssurance: (data: Omit<ReferentielItem, 'id'>) => {
+      const item: ReferentielItem = { ...data, id: uid() }
+      assurances = [...assurances, item]
+      return item
+    },
+    removeAssurance: (id: string) => {
+      assurances = assurances.filter((a) => a.id !== id)
+    },
+    addExamen: (data: Omit<ReferentielItem, 'id'>) => {
+      const item: ReferentielItem = { ...data, id: uid() }
+      examens = [...examens, item]
+      return item
+    },
+    removeExamen: (id: string) => {
+      examens = examens.filter((e) => e.id !== id)
     },
   },
   statistiques: () => ({

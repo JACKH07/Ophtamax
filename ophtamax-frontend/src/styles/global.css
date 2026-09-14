@@ -151,7 +151,30 @@
   }
 }
 
+/* ─── Préloader (complément ; styles critiques aussi dans index.html) ─── */
+#app-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: var(--color-background, #f7fafa);
+  transition: opacity 0.4s ease;
+}
+
+#app-preloader.is-hiding {
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media print {
+  #app-preloader {
+    display: none !important;
+  }
+
   @page {
     size: A4;
     margin: 12mm;

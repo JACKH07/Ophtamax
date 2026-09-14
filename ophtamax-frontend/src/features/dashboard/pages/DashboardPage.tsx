@@ -1,11 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
+import {
+  ConsultationsWeekChart,
+  DiagnosticsDonutChart,
+  RevenueWeekChart,
+} from '@/features/dashboard/components/DashboardCharts'
 import { StatCard } from '@/features/dashboard/components/StatCard'
 import { TopDiagnostics } from '@/features/dashboard/components/TopDiagnostics'
 import { UpcomingSlots } from '@/features/dashboard/components/UpcomingSlots'
 import { WaitingQueueTable } from '@/features/dashboard/components/WaitingQueueTable'
 import {
+  fetchDashboardCharts,
   fetchDashboardSummary,
   fetchTopDiagnostics,
   fetchUpcomingSlots,
@@ -38,7 +44,13 @@ export function DashboardPage() {
     queryFn: fetchTopDiagnostics,
   })
 
+  const chartsQuery = useQuery({
+    queryKey: ['dashboard', 'charts'],
+    queryFn: fetchDashboardCharts,
+  })
+
   const summary = summaryQuery.data
+  const charts = chartsQuery.data
 
   return (
     <>
@@ -98,6 +110,14 @@ export function DashboardPage() {
             subtitle={`+${summary.new_patients_trend_percent}% vs sem. pr.`}
             icon="group_add"
           />
+        </div>
+      )}
+
+      {charts && (
+        <div className="grid grid-cols-1 gap-gutter lg:grid-cols-3">
+          <ConsultationsWeekChart data={charts.activity_7d} />
+          <RevenueWeekChart data={charts.activity_7d} />
+          <DiagnosticsDonutChart items={charts.diagnostics} />
         </div>
       )}
 

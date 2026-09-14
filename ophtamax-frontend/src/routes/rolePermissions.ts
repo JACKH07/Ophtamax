@@ -10,6 +10,9 @@ export const ROUTE_ACCESS: Record<string, RoleCode[]> = {
   '/prescription-lunettes': ['ADMIN', 'OPHT'],
   '/facturation': ['ADMIN', 'SEC', 'COMPTA'],
   '/statistiques': ['ADMIN', 'OPHT', 'COMPTA'],
+  '/professions': ['ADMIN', 'OPHT'],
+  '/assurances': ['ADMIN', 'OPHT'],
+  '/examens': ['ADMIN', 'OPHT'],
   '/parametres': ['ADMIN'],
   '/utilisateurs': ['ADMIN'],
 }
@@ -34,6 +37,7 @@ export const ROLE_PERMISSIONS: Record<RoleCode, Permission[]> = {
   OPHT: [
     'consultations.write',
     'ordonnance.print',
+    'settings.manage',
   ],
   ASS: [
     'consultations.write',

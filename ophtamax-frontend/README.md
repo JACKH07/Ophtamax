@@ -1,6 +1,6 @@
 # Ophtamax Frontend v2
 
-Application React.js complète pour la gestion de cabinet d'ophtalmologie.
+Application React.js complète pour la gestion de cabinet d'ophtalmologue.
 
 ## Démarrage rapide
 

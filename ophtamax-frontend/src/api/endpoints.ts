@@ -12,5 +12,6 @@ export const ENDPOINTS = {
     waitingQueue: '/dashboard/waiting-queue',
     upcomingSlots: '/dashboard/upcoming-slots',
     topDiagnostics: '/dashboard/top-diagnostics',
+    charts: '/dashboard/charts',
   },
 } as const

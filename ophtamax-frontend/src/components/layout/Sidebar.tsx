@@ -36,9 +36,12 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: 'Organisation',
+    title: 'Administration',
     items: [
       { label: 'Agenda', path: PATHS.agenda, icon: 'calendar_today' },
+      { label: 'Profession', path: PATHS.professions, icon: 'work' },
+      { label: 'Assurance', path: PATHS.assurances, icon: 'health_and_safety' },
+      { label: 'Examen', path: PATHS.examens, icon: 'biotech' },
       { label: 'Statistiques', path: PATHS.statistiques, icon: 'analytics' },
       { label: 'Utilisateurs', path: PATHS.utilisateurs, icon: 'person_add' },
       { label: 'Paramètres', path: PATHS.parametres, icon: 'settings' },

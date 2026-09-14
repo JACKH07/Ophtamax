@@ -36,7 +36,7 @@ function BulletinExamenBody({ item }: { item: PrescriptionExamen }) {
       <div className="mb-4 grid grid-cols-[1fr_auto_1fr] items-start gap-2 border-b-2 border-[#1e3a5f] pb-3">
         <div className="text-[9px] leading-snug text-[#444]">
           <p className="font-bold uppercase text-[#1e3a5f]">
-            {societe.nom || 'Cabinet médical d\'ophtalmologie'}
+            {societe.nom || 'New Cabinet médical d\'ophtalmologue'}
           </p>
           <p className="mt-0.5 italic">Consultation des maladies des yeux</p>
           <p className="mt-1">{societe.adresse}</p>
