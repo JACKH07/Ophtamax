@@ -1,39 +1,60 @@
-import { USE_MOCK } from '@/api/endpoints'
+import { apiClient } from '@/api/client'
+import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockStore } from '@/api/mock/dataStore'
+import type { ApiResponse } from '@/api/types/auth'
 import type { ReferentielItem, SocieteInfo } from '@/api/types/entities'
 
 export type ReferentielKind = 'professions' | 'assurances' | 'examens'
 
 export async function fetchSociete(): Promise<SocieteInfo> {
-  if (!USE_MOCK) throw new Error('API non disponible')
-  return mockStore.referentiels.societe()
+  if (USE_MOCK) return mockStore.referentiels.societe()
+  const { data } = await apiClient.get<ApiResponse<SocieteInfo>>(ENDPOINTS.parametres.societe)
+  return data.data
 }
 
-export async function updateSociete(data: Partial<SocieteInfo>): Promise<SocieteInfo> {
-  if (!USE_MOCK) throw new Error('API non disponible')
-  return mockStore.referentiels.updateSociete(data)
+export async function updateSociete(payload: Partial<SocieteInfo>): Promise<SocieteInfo> {
+  if (USE_MOCK) return mockStore.referentiels.updateSociete(payload)
+  const { data } = await apiClient.put<ApiResponse<SocieteInfo>>(
+    ENDPOINTS.parametres.societe,
+    payload,
+  )
+  return data.data
 }
 
 export async function fetchReferentiel(kind: ReferentielKind): Promise<ReferentielItem[]> {
-  if (!USE_MOCK) throw new Error('API non disponible')
-  if (kind === 'professions') return mockStore.referentiels.professions()
-  if (kind === 'assurances') return mockStore.referentiels.assurances()
-  return mockStore.referentiels.examens()
+  if (USE_MOCK) {
+    if (kind === 'professions') return mockStore.referentiels.professions()
+    if (kind === 'assurances') return mockStore.referentiels.assurances()
+    return mockStore.referentiels.examens()
+  }
+  const url =
+    kind === 'professions'
+      ? ENDPOINTS.referentiels.professions
+      : kind === 'assurances'
+        ? ENDPOINTS.referentiels.assurances
+        : ENDPOINTS.referentiels.examens
+  const { data } = await apiClient.get<ApiResponse<ReferentielItem[]>>(url)
+  return data.data
 }
 
 export async function addReferentiel(
   kind: ReferentielKind,
   data: { code: string; libelle: string },
 ): Promise<ReferentielItem> {
-  if (!USE_MOCK) throw new Error('API non disponible')
-  if (kind === 'professions') return mockStore.referentiels.addProfession(data)
-  if (kind === 'assurances') return mockStore.referentiels.addAssurance(data)
-  return mockStore.referentiels.addExamen(data)
+  if (USE_MOCK) {
+    if (kind === 'professions') return mockStore.referentiels.addProfession(data)
+    if (kind === 'assurances') return mockStore.referentiels.addAssurance(data)
+    return mockStore.referentiels.addExamen(data)
+  }
+  throw new Error('Ajout référentiel non disponible via API pour le moment')
 }
 
 export async function removeReferentiel(kind: ReferentielKind, id: string): Promise<void> {
-  if (!USE_MOCK) throw new Error('API non disponible')
-  if (kind === 'professions') mockStore.referentiels.removeProfession(id)
-  else if (kind === 'assurances') mockStore.referentiels.removeAssurance(id)
-  else mockStore.referentiels.removeExamen(id)
+  if (USE_MOCK) {
+    if (kind === 'professions') mockStore.referentiels.removeProfession(id)
+    else if (kind === 'assurances') mockStore.referentiels.removeAssurance(id)
+    else mockStore.referentiels.removeExamen(id)
+    return
+  }
+  throw new Error('Suppression référentiel non disponible via API pour le moment')
 }

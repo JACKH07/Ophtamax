@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { getErrorMessage } from '@/api/client'
 import { USE_MOCK } from '@/api/endpoints'
 import type { RoleCode } from '@/api/types/auth'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
+import { logout as logoutRequest } from '@/features/auth/services/authService'
 import { PATHS } from '@/routes/paths'
 import { ROUTE_ACCESS } from '@/routes/rolePermissions'
 import { useAuthStore } from '@/stores/authStore'
@@ -76,7 +79,9 @@ function NavItemLink({ item }: { item: NavItem }) {
 export function Sidebar() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
+  const clearAuth = useAuthStore((s) => s.clearAuth)
   const role = user?.id_role ?? 'ADMIN'
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const showDashboard = canSeeNav(role, DASHBOARD_ITEM.path)
   const visibleGroups = NAV_GROUPS.map((group) => ({
@@ -85,10 +90,23 @@ export function Sidebar() {
   })).filter((group) => group.items.length > 0)
 
   const displayName = user
-    ? (user.fonction || user.login_user)
+    ? (`${user.nom} ${user.prenoms}`.trim() || user.login_user)
     : 'Mode démo'
 
   const displayRole = user?.fonction ?? 'Sans connexion BDD'
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logoutRequest()
+    } catch (err) {
+      console.error(getErrorMessage(err))
+    } finally {
+      clearAuth()
+      setIsLoggingOut(false)
+      navigate(PATHS.login, { replace: true })
+    }
+  }
 
   return (
     <nav className="fixed left-0 top-0 z-20 flex h-full w-sidebar-width flex-col border-r border-outline-variant bg-surface-container-lowest px-4 py-6 shadow-sm">
@@ -136,7 +154,7 @@ export function Sidebar() {
         ))}
       </div>
 
-      <div className="mt-auto border-t border-outline-variant px-2 pt-4">
+      <div className="mt-auto space-y-3 border-t border-outline-variant px-2 pt-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-primary/10 text-label-md font-semibold text-primary">
             {user?.login_user?.charAt(0).toUpperCase() ?? 'D'}
@@ -148,6 +166,16 @@ export function Sidebar() {
             <span className="truncate text-label-sm text-secondary">{displayRole}</span>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-outline-variant bg-surface px-3 py-2.5 text-label-md font-semibold text-on-surface-variant transition-colors hover:border-error/40 hover:bg-error-container/40 hover:text-error disabled:opacity-60"
+        >
+          <MaterialIcon name="logout" className="text-[18px]" />
+          {isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}
+        </button>
       </div>
     </nav>
   )

@@ -1,12 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-import { USE_MOCK } from '@/api/endpoints'
+import { apiClient } from '@/api/client'
+import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockStore } from '@/api/mock/dataStore'
+import type { ApiResponse } from '@/api/types/auth'
 import { PageHeader } from '@/components/common/PageHeader'
 import { TopDiagnostics } from '@/features/dashboard/components/TopDiagnostics'
 
 async function fetchStats() {
-  if (!USE_MOCK) throw new Error('API non disponible')
-  return mockStore.statistiques()
+  if (USE_MOCK) return mockStore.statistiques()
+  const { data } = await apiClient.get<ApiResponse<ReturnType<typeof mockStore.statistiques>>>(
+    ENDPOINTS.statistiques.summary,
+  )
+  return data.data
 }
 
 export function StatistiquesPage() {

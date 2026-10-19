@@ -168,3 +168,76 @@ function api_require_user(PDO $pdo): array
     }
     return $user;
 }
+
+function api_route_id(): ?string
+{
+    return $GLOBALS['_API_ID'] ?? null;
+}
+
+function api_route_action(): ?string
+{
+    return $GLOBALS['_API_ACTION'] ?? null;
+}
+
+function api_empty_oeil(): array
+{
+    return [
+        'vl_sans' => '',
+        'vl_avec' => '',
+        'vp_sans' => '',
+        'vp_avec' => '',
+        'sphere' => '',
+        'cylindre' => '',
+        'axe' => '',
+        'addition' => '',
+        'pio' => '',
+        'segment_anterieur' => '',
+        'fond_oeil' => '',
+    ];
+}
+
+function api_map_patient(array $row): array
+{
+    $sexe = strtoupper(substr((string) ($row['sexe'] ?? 'M'), 0, 1));
+    if ($sexe !== 'F') {
+        $sexe = 'M';
+    }
+
+    return [
+        'id' => (string) $row['id'],
+        'nom' => (string) ($row['nom'] ?? ''),
+        'prenom' => (string) ($row['prenom'] ?? ''),
+        'sexe' => $sexe,
+        'date_nais' => (string) ($row['date_nais'] ?? ''),
+        'profession' => (string) ($row['profession'] ?? ''),
+        'contact' => (string) ($row['contact'] ?? ''),
+        'assurance' => (string) ($row['assurance'] ?? ''),
+        'antecedents' => (string) ($row['antecedents'] ?? ''),
+        'derniere_visite' => $row['derniere_visite'] ?? null,
+    ];
+}
+
+function api_map_consultation(array $row): array
+{
+    return [
+        'id' => (string) $row['id'],
+        'id_patient' => (string) ($row['id_patient'] ?? ''),
+        'patient_name' => (string) ($row['nom_prenoms_pat'] ?? ''),
+        'dossier_numero' => 'D-' . substr((string) ($row['id_patient'] ?? ''), 0, 8),
+        'datecons' => (string) ($row['datecons'] ?? ''),
+        'diagnostic' => (string) ($row['diagnostic'] ?? ''),
+        'examen_od' => api_empty_oeil(),
+        'examen_og' => api_empty_oeil(),
+        'ordonnance' => (string) ($row['ordonnance'] ?? ''),
+        'prescription' => (string) ($row['prescription'] ?? ''),
+        'conduite_a_tenir' => (string) ($row['examen'] ?? ''),
+        'prochain_rdv_date' => '',
+        'prochain_rdv_delai' => '',
+        'statut' => 'terminee',
+    ];
+}
+
+function api_new_id(): string
+{
+    return sha1(uniqid((string) mt_rand(), true));
+}

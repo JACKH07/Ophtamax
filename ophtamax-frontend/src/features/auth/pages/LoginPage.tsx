@@ -10,7 +10,7 @@ import { loginSchema, type LoginFormData } from '@/features/auth/schemas/loginSc
 import { login } from '@/features/auth/services/authService'
 import { PATHS } from '@/routes/paths'
 
-const LOGO_SRC = '/logo-doch.png'
+const LOGO_SRC = '/logo-kahydara.jpg'
 
 /**
  * Page de connexion — auth mock (démo) ou API backend PHP.
