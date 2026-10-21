@@ -51,7 +51,7 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-surface-bright to-surface-container-high bg-eye-pattern font-sans text-on-surface">
       <main className="w-full max-w-md px-4 py-8">
-        <div className="relative flex w-full flex-col items-center overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest/90 p-8 shadow-[0_4px_24px_rgba(0,98,106,0.06)] backdrop-blur-md">
+        <div className="relative flex w-full flex-col items-center overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest/90 p-8 shadow-[0_4px_24px_rgba(0,72,80,0.12)] backdrop-blur-md">
           <div className="mb-8 flex w-full flex-col items-center">
             <img
               src={LOGO_SRC}

@@ -2,23 +2,23 @@
 
 /* ─── Design tokens Stitch / Ophtamax ─── */
 @theme {
-  --color-primary: #00626a;
+  --color-primary: #004850;
   --color-on-primary: #ffffff;
-  --color-primary-container: #0e7c86;
-  --color-on-primary-container: #ddfbff;
-  --color-primary-fixed: #98f0fb;
-  --color-primary-fixed-dim: #7cd4df;
-  --color-on-primary-fixed: #001f23;
-  --color-on-primary-fixed-variant: #004f56;
+  --color-primary-container: #0a6670;
+  --color-on-primary-container: #c8f4f8;
+  --color-primary-fixed: #7ad8e4;
+  --color-primary-fixed-dim: #5abcc8;
+  --color-on-primary-fixed: #001a1d;
+  --color-on-primary-fixed-variant: #003a40;
 
-  --color-secondary: #505f76;
+  --color-secondary: #3d4a5c;
   --color-on-secondary: #ffffff;
-  --color-secondary-container: #d0e1fb;
-  --color-on-secondary-container: #54647a;
-  --color-secondary-fixed: #d3e4fe;
-  --color-secondary-fixed-dim: #b7c8e1;
-  --color-on-secondary-fixed: #0b1c30;
-  --color-on-secondary-fixed-variant: #38485d;
+  --color-secondary-container: #b8c9e0;
+  --color-on-secondary-container: #3a4a5e;
+  --color-secondary-fixed: #c2d4ec;
+  --color-secondary-fixed-dim: #9eb0c8;
+  --color-on-secondary-fixed: #071422;
+  --color-on-secondary-fixed-variant: #2c3a4c;
 
   --color-tertiary: #85481b;
   --color-on-tertiary: #ffffff;
@@ -34,26 +34,26 @@
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
-  --color-background: #f7fafa;
-  --color-on-background: #181c1d;
-  --color-surface: #f7fafa;
-  --color-on-surface: #181c1d;
-  --color-surface-bright: #f7fafa;
-  --color-surface-dim: #d7dbdb;
-  --color-surface-variant: #dfe3e3;
-  --color-on-surface-variant: #3e494a;
+  --color-background: #eef3f3;
+  --color-on-background: #101415;
+  --color-surface: #eef3f3;
+  --color-on-surface: #101415;
+  --color-surface-bright: #f2f6f6;
+  --color-surface-dim: #c5cbcb;
+  --color-surface-variant: #d0d6d6;
+  --color-on-surface-variant: #2f393a;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f1f4f4;
-  --color-surface-container: #ebeeef;
-  --color-surface-container-high: #e5e9e9;
-  --color-surface-container-highest: #dfe3e3;
-  --color-surface-tint: #006972;
-  --color-inverse-surface: #2d3132;
-  --color-inverse-on-surface: #eef1f2;
-  --color-inverse-primary: #7cd4df;
+  --color-surface-container-low: #e6ecec;
+  --color-surface-container: #dde4e4;
+  --color-surface-container-high: #d4dbdb;
+  --color-surface-container-highest: #cbd3d3;
+  --color-surface-tint: #004850;
+  --color-inverse-surface: #1f2425;
+  --color-inverse-on-surface: #e8ecec;
+  --color-inverse-primary: #5abcc8;
 
-  --color-outline: #6e797a;
-  --color-outline-variant: #bdc9ca;
+  --color-outline: #556062;
+  --color-outline-variant: #9aa6a7;
 
   --spacing-sidebar-width: 260px;
   --spacing-margin-page: 32px;
@@ -102,7 +102,7 @@
   --text-label-sm--line-height: 14px;
   --text-label-sm--font-weight: 500;
 
-  --background-image-eye-pattern: url("data:image/svg+xml;utf8,<svg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'><path d='M30 20C18 20 8 30 8 30s10 10 22 10 22-10 22-10-10-10-22-10zm0 16c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z' fill='%2300626a' fill-opacity='0.03' fill-rule='evenodd'/></svg>");
+  --background-image-eye-pattern: url("data:image/svg+xml;utf8,<svg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'><path d='M30 20C18 20 8 30 8 30s10 10 22 10 22-10 22-10-10-10-22-10zm0 16c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z' fill='%23004850' fill-opacity='0.045' fill-rule='evenodd'/></svg>");
 }
 
 @layer base {
@@ -161,7 +161,7 @@
   align-items: center;
   justify-content: center;
   gap: 1.25rem;
-  background: var(--color-background, #f7fafa);
+  background: var(--color-background, #eef3f3);
   transition: opacity 0.4s ease;
 }
 

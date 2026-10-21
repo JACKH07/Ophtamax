@@ -16,10 +16,10 @@ import {
 import type { DashboardDayPoint, TopDiagnostic } from '@/api/types/dashboard'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 
-const PRIMARY = '#00626a'
+const PRIMARY = '#004850'
 const PRIMARY_SOFT = '#0e7c86'
 const SECONDARY = '#505f76'
-const DIAGNOSTIC_COLORS = ['#00626a', '#0e7c86', '#505f76', '#7cd4df', '#b7c8e1']
+const DIAGNOSTIC_COLORS = ['#004850', '#0a6670', '#3d4a5c', '#5abcc8', '#9eb0c8']
 
 function formatCurrency(amount: number): string {
   return `${new Intl.NumberFormat('fr-FR', { notation: 'compact' }).format(amount)} FCFA`

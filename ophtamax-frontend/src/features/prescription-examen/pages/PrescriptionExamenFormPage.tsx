@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { mockStore } from '@/api/mock/dataStore'
+import type { Patient } from '@/api/types/entities'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { fetchPatients } from '@/features/patients/services/patientService'
 import {
   createPrescriptionExamen,
   fetchPrescriptionExamen,
@@ -19,8 +21,17 @@ export function PrescriptionExamenFormPage() {
   const isEdit = Boolean(id)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const patients = mockStore.patients.list()
   const examensRef = mockStore.referentiels.examens()
+  const [patientQuery, setPatientQuery] = useState('')
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false)
+  const [patientError, setPatientError] = useState('')
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+
+  const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
+    queryKey: ['patients-search', patientQuery],
+    queryFn: () => fetchPatients(patientQuery.trim()),
+    enabled: suggestionsOpen && patientQuery.trim().length >= 2,
+  })
 
   const { data: existing } = useQuery({
     queryKey: ['prescription-examen', id],
@@ -38,6 +49,7 @@ export function PrescriptionExamenFormPage() {
 
   useEffect(() => {
     if (!existing) return
+    setPatientQuery(existing.patient_name ?? '')
     setPatientId(existing.patient_id)
     setDate(existing.date.slice(0, 10))
     setBulletinDe(existing.bulletin_de || "Demande d'examen")
@@ -46,14 +58,6 @@ export function PrescriptionExamenFormPage() {
     setService(existing.service || '')
     setMedecin(existing.medecin)
   }, [existing])
-
-  const selectedPatient = patients.find((p) => p.id === patientId)
-
-  useEffect(() => {
-    if (!patientId || isEdit) return
-    const p = patients.find((x) => x.id === patientId)
-    if (p?.contact && !service) setService(p.contact)
-  }, [patientId, isEdit, patients, service])
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -85,7 +89,7 @@ export function PrescriptionExamenFormPage() {
   }
 
   return (
-    <div className="flex flex-col gap-stack-lg">
+    <div className="flex min-h-0 flex-1 flex-col gap-stack-lg">
       <PageHeader
         title={isEdit ? 'Modifier la demande d\'examen' : 'Nouvelle demande d\'examen'}
         actions={
@@ -102,11 +106,17 @@ export function PrescriptionExamenFormPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!patientId || !examens.trim()) return
+          if (!patientId) {
+            setPatientError('Choisissez un patient dans la liste')
+            return
+          }
+          if (!examens.trim()) return
+          setPatientError('')
           mutation.mutate()
         }}
-        className="max-w-2xl space-y-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
+        className="flex w-full flex-1 flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
       >
+        <div className="grid gap-4 lg:grid-cols-2">
         <div>
           <label className="mb-1 block text-label-sm text-secondary">Bulletin de</label>
           <input
@@ -117,51 +127,96 @@ export function PrescriptionExamenFormPage() {
           />
         </div>
 
-        <div>
+        <div className="relative">
           <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
-          <select
-            required
-            value={patientId}
-            onChange={(e) => setPatientId(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">— Sélectionner —</option>
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {`${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`}
-              </option>
-            ))}
-          </select>
-          {selectedPatient && (
-            <p className="mt-1 text-label-sm text-secondary">
-              {selectedPatient.sexe === 'M' ? 'Masculin' : 'Féminin'}
-              {selectedPatient.date_nais
-                ? ` · Né(e) le ${new Date(selectedPatient.date_nais).toLocaleDateString('fr-FR')}`
+          <div className="relative">
+            <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
+            <input
+              required
+              value={patientQuery}
+              onChange={(e) => {
+                setPatientQuery(e.target.value)
+                setPatientId('')
+                setSelectedPatient(null)
+                setPatientError('')
+                setSuggestionsOpen(true)
+              }}
+              onFocus={() => setSuggestionsOpen(true)}
+              placeholder="Saisir le nom du patient"
+              autoComplete="off"
+              className={`${inputClass} pl-10`}
+            />
+          </div>
+          {patientError ? (
+            <p className="mt-1 text-label-sm text-error">{patientError}</p>
+          ) : patientId ? (
+            <p className="mt-1 text-label-sm text-primary">
+              Patient sélectionné
+              {selectedPatient
+                ? ` · ${selectedPatient.sexe === 'M' ? 'Masculin' : 'Féminin'}${
+                    selectedPatient.date_nais
+                      ? ` · Né(e) le ${new Date(selectedPatient.date_nais).toLocaleDateString('fr-FR')}`
+                      : ''
+                  }`
                 : ''}
             </p>
+          ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
+            <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
+          ) : null}
+          {suggestionsOpen && patientQuery.trim().length >= 2 && !patientId && (
+            <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
+              {patientsLoading && (
+                <li className="px-3 py-2 text-body-md text-secondary">Recherche…</li>
+              )}
+              {!patientsLoading && patientMatches.length === 0 && (
+                <li className="px-3 py-2 text-body-md text-secondary">Aucun patient trouvé</li>
+              )}
+              {patientMatches.map((p) => {
+                const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
+                return (
+                  <li key={p.id}>
+                    <button
+                      type="button"
+                      className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
+                      onClick={() => {
+                        setPatientId(p.id)
+                        setSelectedPatient(p)
+                        setPatientQuery(label)
+                        setPatientError('')
+                        setSuggestionsOpen(false)
+                        if (p.contact && !service) setService(p.contact)
+                      }}
+                    >
+                      <span className="text-body-md text-on-surface">{label}</span>
+                      <span className="text-label-sm text-secondary">
+                        {[p.contact, p.date_nais].filter(Boolean).join(' · ')}
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="mb-1 block text-label-sm text-secondary">Date *</label>
-            <input
-              type="date"
-              required
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-label-sm text-secondary">Service / Contact</label>
-            <input
-              value={service}
-              onChange={(e) => setService(e.target.value)}
-              placeholder="Tél. / service"
-              className={inputClass}
-            />
-          </div>
+        <div>
+          <label className="mb-1 block text-label-sm text-secondary">Date *</label>
+          <input
+            type="date"
+            required
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-label-sm text-secondary">Service / Contact</label>
+          <input
+            value={service}
+            onChange={(e) => setService(e.target.value)}
+            placeholder="Tél. / service"
+            className={inputClass}
+          />
         </div>
 
         <div>
@@ -182,8 +237,9 @@ export function PrescriptionExamenFormPage() {
             className={inputClass}
           />
         </div>
+        </div>
 
-        <div>
+        <div className="flex min-h-48 flex-1 flex-col">
           <label className="mb-1 block text-label-sm text-secondary">Examen demandé *</label>
           <div className="mb-2 flex flex-wrap gap-2">
             {examensRef.map((ex) => (
@@ -199,11 +255,10 @@ export function PrescriptionExamenFormPage() {
           </div>
           <textarea
             required
-            rows={4}
             value={examens}
             onChange={(e) => setExamens(e.target.value)}
             placeholder="Ex : Champ visuel automatisé"
-            className={inputClass}
+            className={`${inputClass} min-h-48 flex-1 resize-y`}
           />
         </div>
 

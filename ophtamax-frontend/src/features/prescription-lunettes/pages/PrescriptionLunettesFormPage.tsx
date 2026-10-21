@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { mockStore } from '@/api/mock/dataStore'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { fetchPatients } from '@/features/patients/services/patientService'
 import {
   createPrescriptionLunettes,
   fetchPrescriptionLunettes,
@@ -65,7 +65,15 @@ export function PrescriptionLunettesFormPage() {
   const isEdit = Boolean(id)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const patients = mockStore.patients.list()
+  const [patientQuery, setPatientQuery] = useState('')
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false)
+  const [patientError, setPatientError] = useState('')
+
+  const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
+    queryKey: ['patients-search', patientQuery],
+    queryFn: () => fetchPatients(patientQuery.trim()),
+    enabled: suggestionsOpen && patientQuery.trim().length >= 2,
+  })
 
   const { data: existing } = useQuery({
     queryKey: ['prescription-lunettes', id],
@@ -88,6 +96,7 @@ export function PrescriptionLunettesFormPage() {
 
   useEffect(() => {
     if (!existing) return
+    setPatientQuery(existing.patient_name ?? '')
     setForm({
       patientId: existing.patient_id,
       date: existing.date.slice(0, 10),
@@ -161,7 +170,7 @@ export function PrescriptionLunettesFormPage() {
   )
 
   return (
-    <div className="flex flex-col gap-stack-lg">
+    <div className="flex min-h-0 flex-1 flex-col gap-stack-lg">
       <PageHeader
         title={isEdit ? 'Modifier la prescription lunettes' : 'Nouvelle prescription lunettes'}
         subtitle="Modèle ordonnance optique (VL / VP)."
@@ -179,26 +188,72 @@ export function PrescriptionLunettesFormPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!form.patientId) return
+          if (!form.patientId) {
+            setPatientError('Choisissez un patient dans la liste')
+            return
+          }
+          setPatientError('')
           mutation.mutate()
         }}
-        className="max-w-4xl space-y-5 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
+        className="flex w-full flex-1 flex-col gap-5 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
       >
-        <div>
+        <div className="relative">
           <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
-          <select
-            required
-            value={form.patientId}
-            onChange={(e) => set('patientId', e.target.value)}
-            className={inputClass}
-          >
-            <option value="">— Sélectionner —</option>
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {`${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
+            <input
+              required
+              value={patientQuery}
+              onChange={(e) => {
+                setPatientQuery(e.target.value)
+                set('patientId', '')
+                setPatientError('')
+                setSuggestionsOpen(true)
+              }}
+              onFocus={() => setSuggestionsOpen(true)}
+              placeholder="Saisir le nom du patient"
+              autoComplete="off"
+              className={`${inputClass} pl-10`}
+            />
+          </div>
+          {patientError ? (
+            <p className="mt-1 text-label-sm text-error">{patientError}</p>
+          ) : form.patientId ? (
+            <p className="mt-1 text-label-sm text-primary">Patient sélectionné</p>
+          ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
+            <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
+          ) : null}
+          {suggestionsOpen && patientQuery.trim().length >= 2 && !form.patientId && (
+            <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
+              {patientsLoading && (
+                <li className="px-3 py-2 text-body-md text-secondary">Recherche…</li>
+              )}
+              {!patientsLoading && patientMatches.length === 0 && (
+                <li className="px-3 py-2 text-body-md text-secondary">Aucun patient trouvé</li>
+              )}
+              {patientMatches.map((p) => {
+                const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
+                return (
+                  <li key={p.id}>
+                    <button
+                      type="button"
+                      className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
+                      onClick={() => {
+                        set('patientId', p.id)
+                        setPatientQuery(label)
+                        setSuggestionsOpen(false)
+                      }}
+                    >
+                      <span className="text-body-md text-on-surface">{label}</span>
+                      <span className="text-label-sm text-secondary">
+                        {[p.contact, p.date_nais].filter(Boolean).join(' · ')}
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -222,6 +277,7 @@ export function PrescriptionLunettesFormPage() {
           </div>
         </div>
 
+        <div className="grid flex-1 gap-5 xl:grid-cols-2">
         {/* Vision de loin */}
         <div className="rounded-lg border border-outline-variant p-4">
           <p className="mb-3 text-label-md font-semibold uppercase tracking-wide text-primary">
@@ -317,18 +373,18 @@ export function PrescriptionLunettesFormPage() {
             </div>
           </div>
         </div>
-
-        <div>
-          <label className="mb-1 block text-label-sm text-secondary">Distance interpupillaire</label>
-          <input
-            value={form.distance_interpupillaire}
-            onChange={(e) => set('distance_interpupillaire', e.target.value)}
-            className={`${inputClass} max-w-xs`}
-            placeholder="Ex : 62 mm"
-          />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-label-sm text-secondary">Distance interpupillaire</label>
+            <input
+              value={form.distance_interpupillaire}
+              onChange={(e) => set('distance_interpupillaire', e.target.value)}
+              className={inputClass}
+              placeholder="Ex : 62 mm"
+            />
+          </div>
           <div>
             <p className="mb-2 text-label-sm font-semibold text-secondary">Type de foyer</p>
             <div className="space-y-2">
@@ -364,14 +420,13 @@ export function PrescriptionLunettesFormPage() {
           </div>
         </div>
 
-        <div>
+        <div className="flex min-h-24 flex-1 flex-col">
           <label className="mb-1 block text-label-sm text-secondary">Correction / consignes</label>
           <textarea
-            rows={2}
             value={form.correction}
             onChange={(e) => set('correction', e.target.value)}
             placeholder="Ex : Port permanent..."
-            className={inputClass}
+            className={`${inputClass} min-h-24 flex-1 resize-y`}
           />
         </div>
 
