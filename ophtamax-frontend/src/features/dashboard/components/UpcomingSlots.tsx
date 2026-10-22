@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { UpcomingSlot } from '@/api/types/dashboard'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PATHS } from '@/routes/paths'
+import { formatDateTimeFr } from '@/utils/date'
 
 interface UpcomingSlotsProps {
   slots: UpcomingSlot[]
@@ -42,7 +43,7 @@ export function UpcomingSlots({ slots }: UpcomingSlotsProps) {
                     isSecondary ? 'text-secondary' : 'text-primary'
                   }`}
                 >
-                  {slot.start_time} - {slot.end_time}
+                  {formatDateTimeFr(slot.start_time)} - {formatDateTimeFr(slot.end_time)}
                 </span>
                 <span className="mt-1 text-body-sm text-on-surface">{label}</span>
               </div>

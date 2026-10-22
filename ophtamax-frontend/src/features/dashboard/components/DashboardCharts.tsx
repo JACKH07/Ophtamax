@@ -15,6 +15,7 @@ import {
 } from 'recharts'
 import type { DashboardDayPoint, TopDiagnostic } from '@/api/types/dashboard'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
+import { formatDateFr } from '@/utils/date'
 
 const PRIMARY = '#004850'
 const PRIMARY_SOFT = '#0e7c86'
@@ -50,10 +51,11 @@ interface ConsultationsWeekChartProps {
 }
 
 export function ConsultationsWeekChart({ data }: ConsultationsWeekChartProps) {
+  const rows = data.map((point) => ({ ...point, label: formatDateFr(point.date) || point.label }))
   return (
     <ChartCard title="Consultations (7 jours)" icon="show_chart">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+        <AreaChart data={rows} margin={{ top: 8, right: 8, left: -12, bottom: 24 }}>
           <defs>
             <linearGradient id="consultationsFill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={PRIMARY} stopOpacity={0.35} />
@@ -61,14 +63,11 @@ export function ConsultationsWeekChart({ data }: ConsultationsWeekChartProps) {
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#dfe3e3" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: SECONDARY, fontSize: 12 }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="label" tick={{ fill: SECONDARY, fontSize: 10 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={48} />
           <YAxis allowDecimals={false} tick={{ fill: SECONDARY, fontSize: 12 }} axisLine={false} tickLine={false} />
           <Tooltip
             formatter={(value) => [value ?? 0, 'Consultations']}
-            labelFormatter={(_, payload) => {
-              const point = payload?.[0]?.payload as DashboardDayPoint | undefined
-              return point?.date ?? ''
-            }}
+            labelFormatter={(label) => String(label ?? '')}
             contentStyle={{ borderRadius: 8, borderColor: '#c1c8c9', fontSize: 13 }}
           />
           <Area
@@ -90,12 +89,13 @@ interface RevenueWeekChartProps {
 }
 
 export function RevenueWeekChart({ data }: RevenueWeekChartProps) {
+  const rows = data.map((point) => ({ ...point, label: formatDateFr(point.date) || point.label }))
   return (
     <ChartCard title="Recettes (7 jours)" icon="payments">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+        <BarChart data={rows} margin={{ top: 8, right: 8, left: -8, bottom: 24 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#dfe3e3" vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: SECONDARY, fontSize: 12 }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="label" tick={{ fill: SECONDARY, fontSize: 10 }} axisLine={false} tickLine={false} interval={0} angle={-35} textAnchor="end" height={48} />
           <YAxis
             tick={{ fill: SECONDARY, fontSize: 11 }}
             axisLine={false}

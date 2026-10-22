@@ -6,6 +6,7 @@ import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PrintSheet } from '@/components/common/PrintDocumentHeader'
 import { fetchPrescriptionExamen } from '@/features/prescription-examen/services/prescriptionExamenService'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr } from '@/utils/date'
 
 const LOGO_SRC = '/logo-kahydara.jpg'
 
@@ -20,13 +21,13 @@ function patientAgeLabel(dateNais?: string) {
   const d = new Date(dateNais)
   if (Number.isNaN(d.getTime())) return ''
   const age = Math.floor((Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000))
-  return `${d.toLocaleDateString('fr-FR')}${Number.isFinite(age) ? ` (${age} ans)` : ''}`
+  return `${formatDateFr(dateNais)}${Number.isFinite(age) ? ` (${age} ans)` : ''}`
 }
 
 function BulletinExamenBody({ item }: { item: PrescriptionExamen }) {
   const societe = mockStore.referentiels.societe()
   const patient = mockStore.patients.get(item.patient_id)
-  const dateLabel = new Date(item.date).toLocaleDateString('fr-FR')
+  const dateLabel = formatDateFr(item.date)
   const sexe =
     patient?.sexe === 'M' ? 'Masculin' : patient?.sexe === 'F' ? 'Féminin' : ''
 

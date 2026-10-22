@@ -7,11 +7,7 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { deletePatient, fetchPatients } from '@/features/patients/services/patientService'
 import { usePermissions } from '@/hooks/usePermissions'
 import { PATHS } from '@/routes/paths'
-
-function formatDate(d: string) {
-  if (!d) return '—'
-  return new Date(d).toLocaleDateString('fr-FR')
-}
+import { formatDateFr } from '@/utils/date'
 
 function initials(nom: string, prenom: string) {
   return `${prenom[0] ?? ''}${nom[0] ?? ''}`.toUpperCase() || '?'
@@ -99,7 +95,7 @@ export function PatientsListPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-body-sm">{formatDate(p.date_nais)}</td>
+                  <td className="px-4 py-3 text-body-sm">{formatDateFr(p.date_nais) || '—'}</td>
                   <td className="px-4 py-3 text-body-sm">{p.contact || '—'}</td>
                   <td className="px-4 py-3">
                     {p.assurance ? (
@@ -108,7 +104,7 @@ export function PatientsListPage() {
                       <span className="text-label-sm text-secondary">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-body-sm">{p.derniere_visite ? formatDate(p.derniere_visite) : '—'}</td>
+                  <td className="px-4 py-3 text-body-sm">{formatDateFr(p.derniere_visite) || '—'}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-1">
                       <Link

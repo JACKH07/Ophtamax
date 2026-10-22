@@ -9,6 +9,7 @@ import {
 } from '@/components/common/PrintDocumentHeader'
 import { fetchConsultation } from '@/features/consultations/services/consultationService'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr } from '@/utils/date'
 
 export function ConsultationDocPrintPage() {
   const { id } = useParams()
@@ -62,9 +63,11 @@ export function ConsultationDocPrintPage() {
             title: 'Détails',
             lines: [
               c.diagnostic || 'Consultation',
-              c.prochain_rdv_delai
-                ? `Prochain RDV : ${c.prochain_rdv_delai}`
-                : '—',
+              c.prochain_rdv_date
+                ? `Prochain RDV : ${formatDateFr(c.prochain_rdv_date)}${c.prochain_rdv_delai ? ` (${c.prochain_rdv_delai})` : ''}`
+                : c.prochain_rdv_delai
+                  ? `Prochain RDV : ${c.prochain_rdv_delai}`
+                  : '—',
             ],
           },
           {

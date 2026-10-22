@@ -1,4 +1,5 @@
 import type { RendezVous } from '@/api/types/entities'
+import { formatDateFr } from '@/utils/date'
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
@@ -77,15 +78,12 @@ export function WeekCalendar({ view, currentDate, rdvs, onSlotClick, onRdvClick 
               key={day.toISOString()}
               className={`flex flex-col items-center py-2 text-label-sm ${isToday ? 'text-primary' : 'text-secondary'}`}
             >
-              <span className="text-[11px] uppercase tracking-wide">
-                {day.toLocaleDateString('fr-FR', { weekday: 'short' })}
-              </span>
               <span
-                className={`mt-0.5 flex h-7 w-7 items-center justify-center rounded-full text-label-md font-semibold ${
+                className={`mt-0.5 rounded-full px-2 py-1 text-[11px] font-semibold ${
                   isToday ? 'bg-primary text-on-primary' : ''
                 }`}
               >
-                {day.getDate()}
+                {formatDateFr(day)}
               </span>
             </div>
           )

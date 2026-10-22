@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { dossierNumero, emptyOeil, mockStore } from '@/api/mock/dataStore'
+import { dossierNumero, emptyOeil } from '@/api/mock/dataStore'
 import type { ExamenOeil, Patient } from '@/api/types/entities'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { EyeExamPanel } from '@/features/consultations/components/EyeExamPanel'
@@ -11,19 +11,16 @@ import {
   updateConsultation,
   type ConsultationFormData,
 } from '@/features/consultations/services/consultationService'
-import { fetchPatients } from '@/features/patients/services/patientService'
+import { fetchPatient, fetchPatients } from '@/features/patients/services/patientService'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr, formatDateTimeFr, maskDateFr, toIsoDate } from '@/utils/date'
 
 function patientAge(dateNais: string): number {
   return Math.floor((Date.now() - new Date(dateNais).getTime()) / (365.25 * 24 * 3600 * 1000))
 }
 
 function formatNow(): string {
-  return new Date().toLocaleString('fr-FR', {
-    weekday: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return formatDateTimeFr(new Date())
 }
 
 const RDV_OPTIONS = ['Dans 1 mois', 'Dans 3 mois', 'Dans 6 mois', 'Dans 1 an', 'Selon besoin']
@@ -39,9 +36,15 @@ export function ConsultationFormPage() {
   const queryClient = useQueryClient()
   const preselectedPatient = searchParams.get('patient')
 
-  const { data: patients = [] } = useQuery({
-    queryKey: ['patients'],
-    queryFn: () => fetchPatients(),
+  const [patientQuery, setPatientQuery] = useState('')
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false)
+  const [patientError, setPatientError] = useState('')
+  const presetApplied = useRef(false)
+
+  const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
+    queryKey: ['patients-search', patientQuery],
+    queryFn: () => fetchPatients(patientQuery.trim()),
+    enabled: suggestionsOpen && patientQuery.trim().length >= 2,
   })
 
   const { data: existing } = useQuery({
@@ -51,6 +54,7 @@ export function ConsultationFormPage() {
   })
 
   const [patientId, setPatientId] = useState(preselectedPatient ?? '')
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [diagnostic, setDiagnostic] = useState('')
   const [examenOd, setExamenOd] = useState<ExamenOeil>(emptyOeil())
   const [examenOg, setExamenOg] = useState<ExamenOeil>(emptyOeil())
@@ -65,14 +69,25 @@ export function ConsultationFormPage() {
     setExamenOd(existing.examen_od)
     setExamenOg(existing.examen_og)
     setConduite(existing.conduite_a_tenir)
-    setRdvDate(existing.prochain_rdv_date)
+    setRdvDate(formatDateFr(existing.prochain_rdv_date))
     setRdvDelai(existing.prochain_rdv_delai || 'Dans 1 mois')
   }, [existing])
 
-  const selectedPatient: Patient | undefined = useMemo(
-    () => patients.find((p) => p.id === patientId) ?? mockStore.patients.get(patientId),
-    [patients, patientId],
-  )
+  const presetId = existing?.id_patient || (!isEdit ? preselectedPatient : '') || ''
+
+  const { data: presetPatient } = useQuery({
+    queryKey: ['patient', presetId],
+    queryFn: () => fetchPatient(presetId),
+    enabled: Boolean(presetId),
+  })
+
+  useEffect(() => {
+    if (!presetPatient || presetApplied.current) return
+    presetApplied.current = true
+    setSelectedPatient(presetPatient)
+    setPatientId(presetPatient.id)
+    setPatientQuery(`${presetPatient.nom} ${presetPatient.prenom}`.trim())
+  }, [presetPatient])
 
   const mutation = useMutation({
     mutationFn: (data: ConsultationFormData) =>
@@ -97,22 +112,40 @@ export function ConsultationFormPage() {
       ordonnance: '',
       prescription: '',
       conduite_a_tenir: conduite,
-      prochain_rdv_date: rdvDate,
+      prochain_rdv_date: toIsoDate(rdvDate),
       prochain_rdv_delai: rdvDelai,
       statut,
     }
   }
 
+  const clearPatient = () => {
+    setPatientId('')
+    setSelectedPatient(null)
+    setPatientQuery('')
+    setPatientError('')
+    setSuggestionsOpen(false)
+  }
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
+    if (!selectedPatient) {
+      setPatientError('Choisissez un patient dans la liste')
+      return
+    }
     const payload = buildPayload('terminee')
     if (!payload) return
+    setPatientError('')
     mutation.mutate(payload)
   }
 
   const goPrintCompteRendu = () => {
+    if (!selectedPatient) {
+      setPatientError('Choisissez un patient dans la liste')
+      return
+    }
     const payload = buildPayload('terminee')
     if (!payload) return
+    setPatientError('')
     mutation.mutate(payload, {
       onSuccess: (c) => navigate(`${PATHS.consultations}/${c.id}/documents`),
     })
@@ -144,6 +177,7 @@ export function ConsultationFormPage() {
                     <p className="text-body-md font-semibold text-on-surface">
                       {selectedPatient.prenom} {selectedPatient.nom}
                     </p>
+                    <p className="text-label-sm text-primary">Patient sélectionné</p>
                     <p className="text-label-sm text-secondary">
                       {patientAge(selectedPatient.date_nais)} ans · Dossier #{dossierNumero(selectedPatient.id)}
                     </p>
@@ -152,7 +186,7 @@ export function ConsultationFormPage() {
                 {!isEdit && (
                   <button
                     type="button"
-                    onClick={() => setPatientId('')}
+                    onClick={clearPatient}
                     className="ml-2 rounded-md p-1 text-secondary hover:bg-surface-container-high hover:text-primary"
                     title="Changer de patient"
                   >
@@ -161,21 +195,63 @@ export function ConsultationFormPage() {
                 )}
               </div>
             ) : (
-              <div className="mt-3 max-w-md">
+              <div className="relative mt-3 max-w-md">
                 <label className="mb-1 block text-label-sm text-on-surface-variant">Patient</label>
-                <select
-                  required
-                  value={patientId}
-                  onChange={(e) => setPatientId(e.target.value)}
-                  className={inputClass}
-                >
-                  <option value="">Sélectionner un patient</option>
-                  {patients.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.prenom} {p.nom}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
+                  <input
+                    value={patientQuery}
+                    onChange={(e) => {
+                      setPatientQuery(e.target.value)
+                      setPatientId('')
+                      setSelectedPatient(null)
+                      setPatientError('')
+                      setSuggestionsOpen(true)
+                    }}
+                    onFocus={() => setSuggestionsOpen(true)}
+                    placeholder="Saisir le nom, le prénom ou le contact"
+                    autoComplete="off"
+                    className={`${inputClass} pl-10`}
+                  />
+                </div>
+                {patientError ? (
+                  <p className="mt-1 text-label-sm text-error">{patientError}</p>
+                ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
+                  <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
+                ) : null}
+                {suggestionsOpen && patientQuery.trim().length >= 2 && (
+                  <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
+                    {patientsLoading && (
+                      <li className="px-3 py-2 text-body-md text-secondary">Recherche…</li>
+                    )}
+                    {!patientsLoading && patientMatches.length === 0 && (
+                      <li className="px-3 py-2 text-body-md text-secondary">Aucun patient trouvé</li>
+                    )}
+                    {patientMatches.map((p) => {
+                      const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
+                      return (
+                        <li key={p.id}>
+                          <button
+                            type="button"
+                            className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
+                            onClick={() => {
+                              setPatientId(p.id)
+                              setSelectedPatient(p)
+                              setPatientQuery(label)
+                              setPatientError('')
+                              setSuggestionsOpen(false)
+                            }}
+                          >
+                            <span className="text-body-md text-on-surface">{label}</span>
+                            <span className="text-label-sm text-secondary">
+                              {[p.contact, formatDateFr(p.date_nais)].filter(Boolean).join(' · ')}
+                            </span>
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
               </div>
             )}
           </div>
@@ -216,9 +292,12 @@ export function ConsultationFormPage() {
             </label>
             <div className="flex gap-2">
               <input
-                type="date"
+                type="text"
+                inputMode="numeric"
+                placeholder="jj/mm/aaaa"
+                maxLength={10}
                 value={rdvDate}
-                onChange={(e) => setRdvDate(e.target.value)}
+                onChange={(e) => setRdvDate(maskDateFr(e.target.value))}
                 className={inputClass}
               />
               <select
@@ -251,7 +330,7 @@ export function ConsultationFormPage() {
         <div className="mx-auto flex max-w-container-max-width flex-wrap items-center justify-end gap-3">
           <button
             type="button"
-            disabled={!patientId || mutation.isPending}
+            disabled={mutation.isPending}
             onClick={goPrintCompteRendu}
             className="flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-label-md font-semibold text-on-surface hover:bg-surface-container-low disabled:opacity-50"
           >
@@ -260,7 +339,7 @@ export function ConsultationFormPage() {
           </button>
           <button
             type="submit"
-            disabled={!patientId || mutation.isPending}
+            disabled={mutation.isPending}
             className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-label-md font-semibold text-on-primary shadow-sm hover:bg-on-primary-fixed-variant disabled:opacity-50"
           >
             <MaterialIcon name="save" className="text-[18px]" />

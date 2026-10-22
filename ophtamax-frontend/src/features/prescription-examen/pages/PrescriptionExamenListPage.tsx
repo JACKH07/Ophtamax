@@ -8,6 +8,7 @@ import {
   fetchPrescriptionsExamen,
 } from '@/features/prescription-examen/services/prescriptionExamenService'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr } from '@/utils/date'
 
 export function PrescriptionExamenListPage() {
   const queryClient = useQueryClient()
@@ -55,7 +56,7 @@ export function PrescriptionExamenListPage() {
             >
               <p className="font-semibold text-on-surface">{item.patient_name}</p>
               <p className="text-label-sm text-secondary">
-                {new Date(item.date).toLocaleDateString('fr-FR')} · {item.medecin || '—'}
+                {formatDateFr(item.date) || '—'} · {item.medecin || '—'}
               </p>
               {item.indication && (
                 <p className="mt-2 text-body-sm font-medium">{item.indication}</p>

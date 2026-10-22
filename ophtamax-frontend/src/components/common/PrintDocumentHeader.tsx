@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { mockStore } from '@/api/mock/dataStore'
+import { formatDateFr } from '@/utils/date'
 
 const LOGO_SRC = '/logo-kahydara.jpg'
 
@@ -33,9 +34,7 @@ export function PrintDocumentHeader({
   columns,
 }: PrintDocumentHeaderProps) {
   const societe = mockStore.referentiels.societe()
-  const emission = date
-    ? new Date(date).toLocaleDateString('fr-FR')
-    : new Date().toLocaleDateString('fr-FR')
+  const emission = formatDateFr(date) || formatDateFr(new Date())
 
   return (
     <header className="print-sheet-header mb-6 text-[#222]">

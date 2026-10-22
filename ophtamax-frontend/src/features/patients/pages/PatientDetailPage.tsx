@@ -7,10 +7,7 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { fetchPatient } from '@/features/patients/services/patientService'
 import { usePermissions } from '@/hooks/usePermissions'
 import { PATHS } from '@/routes/paths'
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-}
+import { formatDateFr } from '@/utils/date'
 
 export function PatientDetailPage() {
   const { id } = useParams()
@@ -58,7 +55,7 @@ export function PatientDetailPage() {
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
             <h3 className="mb-4 text-headline-sm font-semibold text-on-surface">Informations</h3>
             <dl className="space-y-3 text-body-sm">
-              <div><dt className="text-label-sm text-secondary">Date de naissance</dt><dd className="font-medium">{formatDate(patient.date_nais)}</dd></div>
+              <div><dt className="text-label-sm text-secondary">Date de naissance</dt><dd className="font-medium">{formatDateFr(patient.date_nais) || '—'}</dd></div>
               <div><dt className="text-label-sm text-secondary">Profession</dt><dd className="font-medium">{patient.profession}</dd></div>
               <div><dt className="text-label-sm text-secondary">Assurance</dt><dd>{patient.assurance ? <StatusBadge label={patient.assurance} /> : '—'}</dd></div>
               <div><dt className="text-label-sm text-secondary">Antécédents</dt><dd className="font-medium">{patient.antecedents || 'Aucun'}</dd></div>
@@ -79,7 +76,7 @@ export function PatientDetailPage() {
                   <li key={c.id} className="flex items-center justify-between px-5 py-4 hover:bg-surface-container-low/50">
                     <div>
                       <p className="font-medium text-on-surface">{c.diagnostic || 'Consultation'}</p>
-                      <p className="text-label-sm text-secondary">{formatDate(c.datecons)}</p>
+                      <p className="text-label-sm text-secondary">{formatDateFr(c.datecons) || '—'}</p>
                     </div>
                     <Link to={`${PATHS.consultations}/${c.id}`} className="text-label-md text-primary hover:underline">Voir</Link>
                   </li>

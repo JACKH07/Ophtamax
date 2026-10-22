@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { FactureModal } from '@/features/facturation/components/FactureModal'
 import { fetchCaisseJour, fetchFactures } from '@/features/facturation/services/facturationService'
+import { formatDateFr } from '@/utils/date'
 
 const STATUT: Record<string, { label: string; variant: 'success' | 'warning' | 'error' }> = {
   payee: { label: 'Payée', variant: 'success' },
@@ -76,7 +77,7 @@ export function FacturationPage() {
                 <tr key={f.id} className="hover:bg-surface-container-low/50">
                   <td className="px-4 py-3 font-medium text-primary">{f.numero}</td>
                   <td className="px-4 py-3">{f.patient_name || '—'}</td>
-                  <td className="px-4 py-3 text-body-sm">{new Date(f.date).toLocaleDateString('fr-FR')}</td>
+                  <td className="px-4 py-3 text-body-sm">{formatDateFr(f.date) || '—'}</td>
                   <td className="px-4 py-3 font-medium">{formatFcfa(f.montant_ttc)}</td>
                   <td className="px-4 py-3">
                     <StatusBadge label={STATUT[f.statut].label} variant={STATUT[f.statut].variant} />

@@ -6,6 +6,7 @@ import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PrintSheet } from '@/components/common/PrintDocumentHeader'
 import { fetchPrescriptionLunettes } from '@/features/prescription-lunettes/services/prescriptionLunettesService'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr } from '@/utils/date'
 
 const LOGO_SRC = '/logo-kahydara.jpg'
 
@@ -65,7 +66,7 @@ function vpSphere(item: PrescriptionLunettes, side: 'od' | 'og') {
 
 function OrdonnanceLunettesBody({ item }: { item: PrescriptionLunettes }) {
   const societe = mockStore.referentiels.societe()
-  const dateLabel = new Date(item.date).toLocaleDateString('fr-FR')
+  const dateLabel = formatDateFr(item.date)
   const foyer = (item.type_foyer || '').toLowerCase()
   const traitements = item.traitements ?? []
 

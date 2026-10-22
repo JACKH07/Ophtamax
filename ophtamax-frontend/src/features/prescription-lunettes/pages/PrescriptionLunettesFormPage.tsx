@@ -10,6 +10,7 @@ import {
   updatePrescriptionLunettes,
 } from '@/features/prescription-lunettes/services/prescriptionLunettesService'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr } from '@/utils/date'
 
 const inputClass =
   'w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
@@ -246,7 +247,7 @@ export function PrescriptionLunettesFormPage() {
                     >
                       <span className="text-body-md text-on-surface">{label}</span>
                       <span className="text-label-sm text-secondary">
-                        {[p.contact, p.date_nais].filter(Boolean).join(' · ')}
+                        {[p.contact, formatDateFr(p.date_nais)].filter(Boolean).join(' · ')}
                       </span>
                     </button>
                   </li>

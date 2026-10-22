@@ -9,6 +9,7 @@ import {
 } from '@/features/consultations/services/consultationService'
 import { usePermissions } from '@/hooks/usePermissions'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr } from '@/utils/date'
 
 export function ConsultationsListPage() {
   const { can } = usePermissions()
@@ -85,7 +86,7 @@ export function ConsultationsListPage() {
                   </td>
                   <td className="px-4 py-3 text-body-sm text-secondary">#{c.dossier_numero}</td>
                   <td className="px-4 py-3 text-body-sm">
-                    {new Date(c.datecons).toLocaleDateString('fr-FR')}
+                    {formatDateFr(c.datecons) || '—'}
                   </td>
                   <td className="px-4 py-3 text-body-sm">{c.diagnostic || '—'}</td>
                   <td className="px-4 py-3">

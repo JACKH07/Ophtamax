@@ -28,7 +28,8 @@ export async function createFacture(payload: FactureFormData): Promise<Facture> 
       : 'Patient inconnu'
     return mockStore.factures.create({ ...payload, patient_name })
   }
-  throw new Error('Facturation : création non disponible (pas de table facture en BDD v1)')
+  const { data } = await apiClient.post<ApiResponse<Facture>>(ENDPOINTS.facturation.factures, payload)
+  return data.data
 }
 
 export async function fetchCaisseJour() {

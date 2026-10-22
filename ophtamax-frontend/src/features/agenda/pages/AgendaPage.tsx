@@ -7,13 +7,7 @@ import { RdvModal } from '@/features/agenda/components/RdvModal'
 import { FileAttenteWidget } from '@/features/agenda/components/FileAttenteWidget'
 import { fetchRendezVous } from '@/features/agenda/services/agendaService'
 import type { RendezVous } from '@/api/types/entities'
-
-// ── Constantes ────────────────────────────────────────────────────────────────
-
-const NOMS_MOIS = [
-  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
-]
+import { formatDateFr } from '@/utils/date'
 
 // ── Composant principal ───────────────────────────────────────────────────────
 
@@ -49,7 +43,7 @@ export function AgendaPage() {
 
   const navLabel =
     view === 'day'
-      ? currentDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+      ? formatDateFr(currentDate)
       : (() => {
           const start = new Date(currentDate)
           const day = start.getDay()
@@ -57,10 +51,7 @@ export function AgendaPage() {
           start.setDate(start.getDate() + monday)
           const end = new Date(start)
           end.setDate(start.getDate() + 5)
-          if (start.getMonth() === end.getMonth()) {
-            return `${start.getDate()} – ${end.getDate()} ${NOMS_MOIS[start.getMonth()]} ${start.getFullYear()}`
-          }
-          return `${start.getDate()} ${NOMS_MOIS[start.getMonth()]} – ${end.getDate()} ${NOMS_MOIS[end.getMonth()]} ${end.getFullYear()}`
+          return `${formatDateFr(start)} – ${formatDateFr(end)}`
         })()
 
   // ── Gestion modal ──────────────────────────────────────────────────────────
@@ -129,7 +120,7 @@ export function AgendaPage() {
                 <MaterialIcon name="chevron_left" className="text-[18px]" />
               </button>
               <span className="text-label-sm font-semibold text-on-surface">
-                {NOMS_MOIS[currentDate.getMonth()].slice(0, 3)} {currentDate.getFullYear()}
+                {formatDateFr(currentDate)}
               </span>
               <button
                 type="button"

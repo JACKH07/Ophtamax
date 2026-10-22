@@ -8,6 +8,7 @@ import {
   fetchOrdonnances,
 } from '@/features/ordonnances/services/ordonnanceService'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr } from '@/utils/date'
 
 export function OrdonnancesListPage() {
   const queryClient = useQueryClient()
@@ -55,7 +56,7 @@ export function OrdonnancesListPage() {
             >
               <p className="font-semibold text-on-surface">{item.patient_name}</p>
               <p className="text-label-sm text-secondary">
-                {new Date(item.date).toLocaleDateString('fr-FR')} · {item.medecin || '—'}
+                {formatDateFr(item.date) || '—'} · {item.medecin || '—'}
               </p>
               {item.diagnostic && (
                 <p className="mt-2 text-body-sm font-medium">{item.diagnostic}</p>

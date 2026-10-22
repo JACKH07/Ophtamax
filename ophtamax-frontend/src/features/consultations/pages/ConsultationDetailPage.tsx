@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { fetchConsultation } from '@/features/consultations/services/consultationService'
 import { usePermissions } from '@/hooks/usePermissions'
 import { PATHS } from '@/routes/paths'
+import { formatDateFr, formatDateTimeFr } from '@/utils/date'
 
 function EyeSummary({ label, examen }: { label: string; examen: ExamenOeil }) {
   return (
@@ -55,7 +56,7 @@ export function ConsultationDetailPage() {
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
         title={`Consultation — ${c.patient_name}`}
-        subtitle={`${new Date(c.datecons).toLocaleString('fr-FR')} · Dossier #${c.dossier_numero}`}
+        subtitle={`${formatDateTimeFr(c.datecons)} · Dossier #${c.dossier_numero}`}
         actions={
           <div className="flex flex-wrap gap-2">
             <Link
@@ -104,7 +105,7 @@ export function ConsultationDetailPage() {
         <p className="text-label-sm text-secondary">Prochain RDV</p>
         <p className="text-body-md">
           {c.prochain_rdv_date
-            ? `${new Date(c.prochain_rdv_date).toLocaleDateString('fr-FR')} (${c.prochain_rdv_delai})`
+            ? `${formatDateFr(c.prochain_rdv_date)} (${c.prochain_rdv_delai})`
             : c.prochain_rdv_delai || '—'}
         </p>
       </div>

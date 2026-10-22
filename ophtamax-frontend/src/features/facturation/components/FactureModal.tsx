@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getErrorMessage } from '@/api/client'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { createFacture } from '@/features/facturation/services/facturationService'
-import { mockStore } from '@/api/mock/dataStore'
+import { fetchPatients } from '@/features/patients/services/patientService'
+import { formatDateFr } from '@/utils/date'
 
 const ligneSchema = z.object({
   libelle: z.string().min(1, 'Libellé obligatoire'),
@@ -32,13 +35,21 @@ function formatFcfa(n: number) {
 
 export function FactureModal({ onClose }: FactureModalProps) {
   const queryClient = useQueryClient()
-  const patients = mockStore.patients.list()
+  const [patientQuery, setPatientQuery] = useState('')
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false)
+
+  const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
+    queryKey: ['patients-search', patientQuery],
+    queryFn: () => fetchPatients(patientQuery.trim()),
+    enabled: suggestionsOpen && patientQuery.trim().length >= 2,
+  })
 
   const {
     register,
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues, unknown, FormValues>({
     resolver: zodResolver(schema),
@@ -53,6 +64,7 @@ export function FactureModal({ onClose }: FactureModalProps) {
 
   const { fields, append, remove } = useFieldArray({ control, name: 'lignes' })
   const lignes = watch('lignes')
+  const patientId = watch('patient_id')
   const total = (lignes ?? []).reduce(
     (s, l) => s + (Number(l.quantite) || 0) * (Number(l.prix_unitaire) || 0),
     0,
@@ -95,19 +107,58 @@ export function FactureModal({ onClose }: FactureModalProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 px-6 py-5">
           <div>
             <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
-            <select
-              {...register('patient_id')}
-              className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="">— Sélectionner —</option>
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {`${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`}
-                </option>
-              ))}
-            </select>
-            {errors.patient_id && (
+            <div className="relative">
+              <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
+              <input
+                value={patientQuery}
+                onChange={(e) => {
+                  setPatientQuery(e.target.value)
+                  setValue('patient_id', '', { shouldValidate: true })
+                  setSuggestionsOpen(true)
+                }}
+                onFocus={() => setSuggestionsOpen(true)}
+                placeholder="Saisir le nom du patient"
+                autoComplete="off"
+                className="w-full rounded-lg border border-outline-variant bg-surface-container-low py-2 pl-10 pr-3 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            {errors.patient_id ? (
               <p className="mt-1 text-label-sm text-error">{errors.patient_id.message}</p>
+            ) : patientId ? (
+              <p className="mt-1 text-label-sm text-primary">Patient sélectionné</p>
+            ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
+              <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
+            ) : null}
+            {suggestionsOpen && patientQuery.trim().length >= 2 && !patientId && (
+              <ul className="mt-1 max-h-48 overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
+                {patientsLoading && (
+                  <li className="px-3 py-2 text-body-sm text-secondary">Recherche…</li>
+                )}
+                {!patientsLoading && patientMatches.length === 0 && (
+                  <li className="px-3 py-2 text-body-sm text-secondary">Aucun patient trouvé</li>
+                )}
+                {patientMatches.map((p) => {
+                  const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
+                  return (
+                    <li key={p.id}>
+                      <button
+                        type="button"
+                        className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
+                        onClick={() => {
+                          setValue('patient_id', p.id, { shouldValidate: true })
+                          setPatientQuery(label)
+                          setSuggestionsOpen(false)
+                        }}
+                      >
+                        <span className="text-body-sm text-on-surface">{label}</span>
+                        <span className="text-label-sm text-secondary">
+                          {[p.contact, formatDateFr(p.date_nais)].filter(Boolean).join(' · ')}
+                        </span>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
             )}
           </div>
 
@@ -207,7 +258,7 @@ export function FactureModal({ onClose }: FactureModalProps) {
           </div>
 
           {mutation.isError && (
-            <p className="text-label-sm text-error">Erreur lors de la création de la facture.</p>
+            <p className="text-label-sm text-error">{getErrorMessage(mutation.error)}</p>
           )}
 
           <div className="flex justify-end gap-3 pt-1">
