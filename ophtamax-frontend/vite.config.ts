@@ -16,7 +16,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      // Frontend → Laravel ophtamax-back (php artisan serve)
+      // Frontend → Laravel ophtamax-bk (php artisan serve)
       '/api': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
