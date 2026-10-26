@@ -8,7 +8,9 @@ $id = api_route_id();
 $action = api_route_action();
 
 if ($id && $action === 'consultations' && $method === 'GET') {
-    $stmt = $pdo->prepare('SELECT * FROM consultation WHERE id_patient = ? ORDER BY datecons DESC');
+    $stmt = $pdo->prepare(
+        "SELECT * FROM t_consultations WHERE idpatients = ? AND uid IS NOT NULL AND uid <> '' ORDER BY datecons DESC"
+    );
     $stmt->execute([$id]);
     api_json(array_map('api_map_consultation', $stmt->fetchAll(PDO::FETCH_ASSOC)));
 }
@@ -40,7 +42,7 @@ if ($method === 'GET' && !$id) {
     $total = (int) $countStmt->fetchColumn();
 
     $sql = "SELECT p.*, (
-        SELECT MAX(c.datecons) FROM consultation c WHERE c.id_patient = p.id
+        SELECT MAX(c.datecons) FROM t_consultations c WHERE c.idpatients = p.id
       ) AS derniere_visite
       FROM patient p
       WHERE {$sqlWhere}

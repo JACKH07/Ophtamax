@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
-import { fetchReferentiel } from '@/features/parametres/services/parametresService'
+import { fetchGenres, fetchReferentiel } from '@/features/parametres/services/parametresService'
 import { patientSchema, type PatientFormValues } from '@/features/patients/schemas/patientSchema'
 import { createPatient, fetchPatient, updatePatient } from '@/features/patients/services/patientService'
 import { PATHS } from '@/routes/paths'
@@ -22,6 +22,10 @@ export function PatientFormPage() {
   const { data: assurances = [] } = useQuery({
     queryKey: ['referentiel', 'assurances'],
     queryFn: () => fetchReferentiel('assurances'),
+  })
+  const { data: genres = [] } = useQuery({
+    queryKey: ['referentiel', 'genres'],
+    queryFn: fetchGenres,
   })
 
   const { data: patient } = useQuery({
@@ -102,8 +106,17 @@ export function PatientFormPage() {
           <div>
             <label className="mb-1 block text-label-sm text-on-surface-variant">Sexe</label>
             <select className="w-full rounded-lg border border-outline-variant px-3 py-2 text-body-md focus:border-primary focus:outline-none" {...register('sexe')}>
-              <option value="M">Masculin</option>
-              <option value="F">Féminin</option>
+              {(genres.length > 0 ? genres : [
+                { id: 'M', code: 'M', libelle: 'Masculin' },
+                { id: 'F', code: 'F', libelle: 'Féminin' },
+              ]).map((g) => {
+                const code = (g.code === 'F' || g.code === 'M' ? g.code : g.code.charAt(0).toUpperCase()) as 'M' | 'F'
+                return (
+                  <option key={g.id} value={code === 'F' ? 'F' : 'M'}>
+                    {g.libelle}
+                  </option>
+                )
+              })}
             </select>
           </div>
           <div>

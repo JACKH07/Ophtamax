@@ -1,12 +1,15 @@
 <?php
 require_once __DIR__ . '/../_bootstrap.php';
 api_require_user($pdo);
+api_consultation_ensure($pdo);
 
 $hasFactures = (bool) $pdo->query("SHOW TABLES LIKE 't_factures'")->fetch();
 $activity = [];
 for ($i = 6; $i >= 0; $i--) {
     $day = date('Y-m-d', strtotime("-{$i} days"));
-    $stmt = $pdo->prepare('SELECT COUNT(*) FROM consultation WHERE DATE(datecons) = ?');
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM t_consultations WHERE DATE(datecons) = ? AND uid IS NOT NULL AND uid <> ''"
+    );
     $stmt->execute([$day]);
     $recettes = 0.0;
     if ($hasFactures) {
@@ -24,8 +27,8 @@ for ($i = 6; $i >= 0; $i--) {
 
 $diagRows = $pdo->query(
     "SELECT LEFT(diagnostic, 40) AS label, COUNT(*) AS total
-     FROM consultation
-     WHERE diagnostic IS NOT NULL AND diagnostic != ''
+     FROM t_consultations
+     WHERE diagnostic IS NOT NULL AND diagnostic != '' AND uid IS NOT NULL AND uid <> ''
      GROUP BY LEFT(diagnostic, 40)
      ORDER BY total DESC
      LIMIT 5"

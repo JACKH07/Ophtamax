@@ -202,6 +202,13 @@ function api_empty_oeil(): array
     ];
 }
 
+function api_consultation_has_column(PDO $pdo, string $column): bool
+{
+    $stmt = $pdo->query('SHOW COLUMNS FROM t_consultations LIKE ' . $pdo->quote($column));
+
+    return (bool) $stmt->fetch();
+}
+
 function api_consultation_ensure(PDO $pdo): void
 {
     static $done = false;
@@ -210,20 +217,121 @@ function api_consultation_ensure(PDO $pdo): void
     }
     $done = true;
 
-    $col = $pdo->query("SHOW COLUMNS FROM consultation LIKE 'details_json'")->fetch();
-    if (!$col) {
-        $pdo->exec('ALTER TABLE consultation ADD COLUMN details_json LONGTEXT NULL');
+    // Legacy table: keep details_json for read fallback / migration source
+    $legacyExists = (bool) $pdo->query("SHOW TABLES LIKE 'consultation'")->fetch();
+    if ($legacyExists) {
+        $col = $pdo->query("SHOW COLUMNS FROM consultation LIKE 'details_json'")->fetch();
+        if (!$col) {
+            $pdo->exec('ALTER TABLE consultation ADD COLUMN details_json LONGTEXT NULL');
+        }
     }
 
-    $examen = $pdo->query("SHOW COLUMNS FROM consultation LIKE 'examen'")->fetch();
-    if ($examen && stripos((string) ($examen['Type'] ?? ''), 'varchar') !== false) {
-        $pdo->exec(
-            'ALTER TABLE consultation
-                MODIFY diagnostic TEXT NOT NULL,
-                MODIFY examen TEXT NOT NULL,
-                MODIFY ordonnance TEXT NOT NULL,
-                MODIFY prescription TEXT NOT NULL'
-        );
+    if (!api_consultation_has_column($pdo, 'uid')) {
+        $pdo->exec('ALTER TABLE t_consultations ADD COLUMN uid VARCHAR(64) NULL');
+    }
+    if (!api_consultation_has_column($pdo, 'nom_prenoms_pat')) {
+        $pdo->exec('ALTER TABLE t_consultations ADD COLUMN nom_prenoms_pat VARCHAR(255) NOT NULL DEFAULT ""');
+    }
+    if (!api_consultation_has_column($pdo, 'datecons')) {
+        $pdo->exec('ALTER TABLE t_consultations ADD COLUMN datecons DATETIME NULL');
+    }
+    if (!api_consultation_has_column($pdo, 'ordonnance')) {
+        $pdo->exec('ALTER TABLE t_consultations ADD COLUMN ordonnance TEXT NULL');
+    }
+    if (!api_consultation_has_column($pdo, 'prescription')) {
+        $pdo->exec('ALTER TABLE t_consultations ADD COLUMN prescription TEXT NULL');
+    }
+    if (!api_consultation_has_column($pdo, 'details_json')) {
+        $pdo->exec('ALTER TABLE t_consultations ADD COLUMN details_json LONGTEXT NULL');
+    }
+
+    $pdo->exec(
+        'ALTER TABLE t_consultations
+            MODIFY idpatients VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY vl_Sans_corr VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY vl_avec_corr VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY vp_Sans_corr VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY vp_avec_corr VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY sphere VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY cylindre VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY axe0 VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY pio_mmhg VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY addition VARCHAR(255) NOT NULL DEFAULT "",
+            MODIFY segment_anterieur TEXT NULL,
+            MODIFY fond_oeil TEXT NULL,
+            MODIFY diagnostic TEXT NULL,
+            MODIFY prochain_rdv DATE NULL,
+            MODIFY cat TEXT NULL'
+    );
+
+    try {
+        $pdo->exec('CREATE UNIQUE INDEX t_consultations_uid_unique ON t_consultations (uid)');
+    } catch (Throwable $e) {
+        // already exists
+    }
+
+    api_consultation_migrate_legacy($pdo);
+}
+
+function api_consultation_migrate_legacy(PDO $pdo): void
+{
+    $legacyExists = (bool) $pdo->query("SHOW TABLES LIKE 'consultation'")->fetch();
+    if (!$legacyExists) {
+        return;
+    }
+    $already = (int) $pdo->query("SELECT COUNT(*) FROM t_consultations WHERE uid IS NOT NULL AND uid <> ''")->fetchColumn();
+    if ($already > 0) {
+        return;
+    }
+    $legacyCount = (int) $pdo->query('SELECT COUNT(*) FROM consultation')->fetchColumn();
+    if ($legacyCount === 0) {
+        return;
+    }
+
+    $rows = $pdo->query('SELECT * FROM consultation')->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare(
+        'INSERT INTO t_consultations
+            (uid, idpatients, nom_prenoms_pat, datecons, diagnostic, cat, ordonnance, prescription, details_json,
+             vl_Sans_corr, vl_avec_corr, vp_Sans_corr, vp_avec_corr, sphere, cylindre, axe0, pio_mmhg, addition,
+             segment_anterieur, fond_oeil, prochain_rdv, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+    $now = date('Y-m-d H:i:s');
+    foreach ($rows as $row) {
+        $details = [];
+        if (!empty($row['details_json'])) {
+            $decoded = json_decode((string) $row['details_json'], true);
+            if (is_array($decoded)) {
+                $details = $decoded;
+            }
+        }
+        $od = is_array($details['examen_od'] ?? null) ? $details['examen_od'] : [];
+        $rdvDate = substr((string) ($details['prochain_rdv_date'] ?? ''), 0, 10);
+        $stmt->execute([
+            (string) $row['id'],
+            (string) ($row['id_patient'] ?? ''),
+            (string) ($row['nom_prenoms_pat'] ?? ''),
+            $row['datecons'] ?? $now,
+            (string) ($row['diagnostic'] ?? ''),
+            (string) ($row['examen'] ?? ''),
+            (string) ($row['ordonnance'] ?? ''),
+            (string) ($row['prescription'] ?? ''),
+            $row['details_json'] ?? null,
+            (string) ($od['vl_sans'] ?? ''),
+            (string) ($od['vl_avec'] ?? ''),
+            (string) ($od['vp_sans'] ?? ''),
+            (string) ($od['vp_avec'] ?? ''),
+            (string) ($od['sphere'] ?? ''),
+            (string) ($od['cylindre'] ?? ''),
+            (string) ($od['axe'] ?? ''),
+            (string) ($od['pio'] ?? ''),
+            (string) ($od['addition'] ?? ''),
+            (string) ($od['segment_anterieur'] ?? ''),
+            (string) ($od['fond_oeil'] ?? ''),
+            $rdvDate !== '' ? $rdvDate : null,
+            $now,
+            $now,
+        ]);
     }
 }
 
@@ -307,21 +415,62 @@ function api_map_consultation(array $row): array
     $od = is_array($details['examen_od'] ?? null) ? $details['examen_od'] : [];
     $og = is_array($details['examen_og'] ?? null) ? $details['examen_og'] : [];
 
+    // Colonnes plates OD (table t_consultations) si JSON absent
+    if ($od === [] && (isset($row['vl_Sans_corr']) || isset($row['sphere']))) {
+        $od = [
+            'vl_sans' => (string) ($row['vl_Sans_corr'] ?? ''),
+            'vl_avec' => (string) ($row['vl_avec_corr'] ?? ''),
+            'vp_sans' => (string) ($row['vp_Sans_corr'] ?? ''),
+            'vp_avec' => (string) ($row['vp_avec_corr'] ?? ''),
+            'sphere' => (string) ($row['sphere'] ?? ''),
+            'cylindre' => (string) ($row['cylindre'] ?? ''),
+            'axe' => (string) ($row['axe0'] ?? ''),
+            'addition' => (string) ($row['addition'] ?? ''),
+            'pio' => (string) ($row['pio_mmhg'] ?? ''),
+            'segment_anterieur' => (string) ($row['segment_anterieur'] ?? ''),
+            'fond_oeil' => (string) ($row['fond_oeil'] ?? ''),
+        ];
+    }
+
+    $id = (string) ($row['uid'] ?? $row['id'] ?? '');
+    $patientId = (string) ($row['idpatients'] ?? $row['id_patient'] ?? '');
+    $cat = (string) ($row['cat'] ?? $row['examen'] ?? '');
+    $rdvDate = substr((string) ($details['prochain_rdv_date'] ?? $row['prochain_rdv'] ?? ''), 0, 10);
+
     return [
-        'id' => (string) $row['id'],
-        'id_patient' => (string) ($row['id_patient'] ?? ''),
+        'id' => $id,
+        'id_patient' => $patientId,
         'patient_name' => (string) ($row['nom_prenoms_pat'] ?? ''),
-        'dossier_numero' => 'D-' . substr((string) ($row['id_patient'] ?? ''), 0, 8),
+        'dossier_numero' => 'D-' . substr($patientId, 0, 8),
         'datecons' => (string) ($row['datecons'] ?? ''),
         'diagnostic' => (string) ($row['diagnostic'] ?? ''),
         'examen_od' => array_merge(api_empty_oeil(), $od),
         'examen_og' => array_merge(api_empty_oeil(), $og),
         'ordonnance' => (string) ($row['ordonnance'] ?? ''),
         'prescription' => (string) ($row['prescription'] ?? ''),
-        'conduite_a_tenir' => (string) ($row['examen'] ?? ''),
-        'prochain_rdv_date' => substr((string) ($details['prochain_rdv_date'] ?? ''), 0, 10),
+        'conduite_a_tenir' => $cat,
+        'prochain_rdv_date' => $rdvDate,
         'prochain_rdv_delai' => (string) ($details['prochain_rdv_delai'] ?? ''),
         'statut' => $statut,
+    ];
+}
+
+function api_consultation_eye_columns(array $body): array
+{
+    $od = is_array($body['examen_od'] ?? null) ? $body['examen_od'] : [];
+
+    return [
+        (string) ($od['vl_sans'] ?? ''),
+        (string) ($od['vl_avec'] ?? ''),
+        (string) ($od['vp_sans'] ?? ''),
+        (string) ($od['vp_avec'] ?? ''),
+        (string) ($od['sphere'] ?? ''),
+        (string) ($od['cylindre'] ?? ''),
+        (string) ($od['axe'] ?? ''),
+        (string) ($od['pio'] ?? ''),
+        (string) ($od['addition'] ?? ''),
+        (string) ($od['segment_anterieur'] ?? ''),
+        (string) ($od['fond_oeil'] ?? ''),
     ];
 }
 

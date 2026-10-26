@@ -2,7 +2,7 @@
 
 function api_referentiel_ensure(PDO $pdo, string $table): void
 {
-    $allowed = ['t_professions', 't_assurances', 't_examens'];
+    $allowed = ['t_professions', 't_assurances', 't_examens', 't_sexes'];
     if (!in_array($table, $allowed, true)) {
         api_error('Référentiel inconnu', 500);
     }

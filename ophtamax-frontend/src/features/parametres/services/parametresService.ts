@@ -21,6 +21,12 @@ export async function updateSociete(payload: Partial<SocieteInfo>): Promise<Soci
   return data.data
 }
 
+export async function fetchGenres(): Promise<ReferentielItem[]> {
+  if (USE_MOCK) return mockStore.referentiels.genres()
+  const { data } = await apiClient.get<ApiResponse<ReferentielItem[]>>(ENDPOINTS.referentiels.genres)
+  return data.data
+}
+
 export async function fetchReferentiel(kind: ReferentielKind): Promise<ReferentielItem[]> {
   if (USE_MOCK) {
     if (kind === 'professions') return mockStore.referentiels.professions()

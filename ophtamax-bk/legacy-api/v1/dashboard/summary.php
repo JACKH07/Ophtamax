@@ -2,32 +2,34 @@
 require_once __DIR__ . '/../_bootstrap.php';
 require_once __DIR__ . '/../_docs.php';
 api_require_user($pdo);
+api_consultation_ensure($pdo);
 api_docs_ensure($pdo);
 
 $today = date('Y-m-d');
 $weekAgo = date('Y-m-d', strtotime('-7 days'));
 
 $consultationsToday = (int) $pdo->query(
-    "SELECT COUNT(*) FROM consultation WHERE DATE(datecons) = '{$today}'"
+    "SELECT COUNT(*) FROM t_consultations WHERE DATE(datecons) = '{$today}' AND uid IS NOT NULL AND uid <> ''"
 )->fetchColumn();
 
 $patientsTotal = (int) $pdo->query('SELECT COUNT(*) FROM patient')->fetchColumn();
 
 $newFromConsult = (int) $pdo->query(
-    "SELECT COUNT(DISTINCT id_patient) FROM consultation WHERE DATE(datecons) >= '{$weekAgo}'"
+    "SELECT COUNT(DISTINCT idpatients) FROM t_consultations
+     WHERE DATE(datecons) >= '{$weekAgo}' AND uid IS NOT NULL AND uid <> ''"
 )->fetchColumn();
 
 $planned = $pdo->prepare(
-    "SELECT COUNT(*) FROM t_ophtamax_docs
+    "SELECT COUNT(*) FROM t_agendas
      WHERE kind = 'rdv' AND DATE(event_at) = ?
-       AND JSON_UNQUOTE(JSON_EXTRACT(payload, '$.statut')) IN ('planifie', 'en_attente')"
+       AND statut IN ('planifie', 'en_attente')"
 );
 $planned->execute([$today]);
 
 $waiting = $pdo->prepare(
-    "SELECT COUNT(*) FROM t_ophtamax_docs
+    "SELECT COUNT(*) FROM t_agendas
      WHERE kind = 'file' AND DATE(event_at) = ?
-       AND JSON_UNQUOTE(JSON_EXTRACT(payload, '$.statut')) = 'en_attente'"
+       AND statut = 'en_attente'"
 );
 $waiting->execute([$today]);
 

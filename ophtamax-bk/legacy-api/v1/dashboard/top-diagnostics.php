@@ -2,10 +2,12 @@
 require_once __DIR__ . '/../_bootstrap.php';
 api_require_user($pdo);
 
+api_consultation_ensure($pdo);
+
 $rows = $pdo->query(
     "SELECT LEFT(diagnostic, 40) AS label, COUNT(*) AS total
-     FROM consultation
-     WHERE diagnostic IS NOT NULL AND diagnostic != ''
+     FROM t_consultations
+     WHERE diagnostic IS NOT NULL AND diagnostic != '' AND uid IS NOT NULL AND uid <> ''
      GROUP BY LEFT(diagnostic, 40)
      ORDER BY total DESC
      LIMIT 5"
