@@ -14,8 +14,10 @@ if ($login === '' || $password === '') {
 }
 
 $hash = sha1($password);
-$stmt = $pdo->prepare('SELECT * FROM user WHERE login_user = ? AND pswrd = ? LIMIT 1');
-$stmt->execute([$login, $hash]);
+$stmt = $pdo->prepare(
+    'SELECT * FROM user WHERE (login_user = ? OR LOWER(email) = LOWER(?)) AND pswrd = ? LIMIT 1'
+);
+$stmt->execute([$login, $login, $hash]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {

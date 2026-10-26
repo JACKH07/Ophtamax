@@ -79,7 +79,7 @@ export function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
             <div className="flex w-full flex-col gap-1">
               <label htmlFor="login" className="mb-1 text-label-md font-semibold tracking-wide text-on-surface-variant">
-                Identifiant
+                Identifiant ou e-mail
               </label>
               <div className="relative w-full">
                 <MaterialIcon
@@ -90,7 +90,7 @@ export function LoginPage() {
                   id="login"
                   type="text"
                   autoComplete="username"
-                  placeholder="Entrez votre identifiant"
+                  placeholder="Identifiant ou e-mail"
                   className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest py-3 pl-10 pr-4 text-body-md shadow-sm transition-all placeholder:text-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   {...register('login')}
                 />
