@@ -3,11 +3,14 @@ import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockStore } from '@/api/mock/dataStore'
 import type { ApiResponse } from '@/api/types/auth'
 import type { Ordonnance, OrdonnanceFormData } from '@/api/types/entities'
+import { PAGE_SIZE, pageFromResponse, slicePage, type PageResult } from '@/utils/pagination'
 
-export async function fetchOrdonnances(): Promise<Ordonnance[]> {
-  if (USE_MOCK) return mockStore.ordonnances.list()
-  const { data } = await apiClient.get<ApiResponse<Ordonnance[]>>(ENDPOINTS.ordonnances.list)
-  return data.data
+export async function fetchOrdonnances(page = 1, perPage = PAGE_SIZE): Promise<PageResult<Ordonnance>> {
+  if (USE_MOCK) return slicePage(mockStore.ordonnances.list(), page, perPage)
+  const { data } = await apiClient.get<ApiResponse<Ordonnance[]>>(ENDPOINTS.ordonnances.list, {
+    params: { page, per_page: perPage },
+  })
+  return pageFromResponse(data, page, perPage)
 }
 
 export async function fetchOrdonnance(id: string): Promise<Ordonnance> {
@@ -16,7 +19,8 @@ export async function fetchOrdonnance(id: string): Promise<Ordonnance> {
     if (!item) throw new Error('Ordonnance introuvable')
     return item
   }
-  throw new Error('Ordonnance introuvable')
+  const { data } = await apiClient.get<ApiResponse<Ordonnance>>(ENDPOINTS.ordonnances.detail(id))
+  return data.data
 }
 
 export async function createOrdonnance(data: OrdonnanceFormData): Promise<Ordonnance> {
@@ -27,7 +31,8 @@ export async function createOrdonnance(data: OrdonnanceFormData): Promise<Ordonn
       patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
     })
   }
-  throw new Error('Ordonnances : création non disponible')
+  const { data: created } = await apiClient.post<ApiResponse<Ordonnance>>(ENDPOINTS.ordonnances.list, data)
+  return created.data
 }
 
 export async function updateOrdonnance(id: string, data: OrdonnanceFormData): Promise<Ordonnance> {
@@ -38,7 +43,8 @@ export async function updateOrdonnance(id: string, data: OrdonnanceFormData): Pr
       patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
     })
   }
-  throw new Error('Ordonnances : mise à jour non disponible')
+  const { data: updated } = await apiClient.put<ApiResponse<Ordonnance>>(ENDPOINTS.ordonnances.detail(id), data)
+  return updated.data
 }
 
 export async function deleteOrdonnance(id: string): Promise<void> {
@@ -46,5 +52,5 @@ export async function deleteOrdonnance(id: string): Promise<void> {
     mockStore.ordonnances.remove(id)
     return
   }
-  throw new Error('Ordonnances : suppression non disponible')
+  await apiClient.delete(ENDPOINTS.ordonnances.detail(id))
 }

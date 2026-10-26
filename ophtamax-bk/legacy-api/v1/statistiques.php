@@ -3,6 +3,12 @@ require_once __DIR__ . '/_bootstrap.php';
 api_require_user($pdo);
 
 $monthStart = date('Y-m-01');
+$caMois = 0.0;
+if ($pdo->query("SHOW TABLES LIKE 't_factures'")->fetch()) {
+    $ca = $pdo->prepare("SELECT COALESCE(SUM(montantfact), 0) FROM t_factures WHERE statut = 'payee' AND date_fact >= ?");
+    $ca->execute([$monthStart]);
+    $caMois = (float) $ca->fetchColumn();
+}
 $consultationsMois = (int) $pdo->query(
     "SELECT COUNT(*) FROM consultation WHERE DATE(datecons) >= '{$monthStart}'"
 )->fetchColumn();
@@ -31,7 +37,7 @@ for ($i = 5; $i >= 0; $i--) {
 api_json([
     'consultations_mois' => $consultationsMois,
     'consultations_evolution' => 0,
-    'ca_mois' => 0,
+    'ca_mois' => $caMois,
     'ca_evolution' => 0,
     'nouveaux_patients' => $nouveaux,
     'taux_occupation' => 0,

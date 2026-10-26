@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { mockStore } from '@/api/mock/dataStore'
+import type { Patient } from '@/api/types/entities'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { fetchPatients } from '@/features/patients/services/patientService'
+import { formatDateFr } from '@/utils/date'
 import {
   createOrdonnance,
   fetchOrdonnance,
@@ -19,7 +21,15 @@ export function OrdonnanceFormPage() {
   const isEdit = Boolean(id)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const patients = mockStore.patients.list()
+  const [patientQuery, setPatientQuery] = useState('')
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false)
+  const [patientError, setPatientError] = useState('')
+
+  const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
+    queryKey: ['patients-search', patientQuery],
+    queryFn: () => fetchPatients(patientQuery.trim()),
+    enabled: suggestionsOpen && patientQuery.trim().length >= 2,
+  })
 
   const { data: existing } = useQuery({
     queryKey: ['ordonnance', id],
@@ -37,6 +47,7 @@ export function OrdonnanceFormPage() {
   useEffect(() => {
     if (!existing) return
     setPatientId(existing.patient_id)
+    setPatientQuery(existing.patient_name ?? '')
     setDate(existing.date.slice(0, 10))
     setContenu(existing.contenu)
     setDiagnostic(existing.diagnostic)
@@ -57,7 +68,7 @@ export function OrdonnanceFormPage() {
   })
 
   return (
-    <div className="flex flex-col gap-stack-lg">
+    <div className="flex min-h-0 flex-1 flex-col gap-stack-lg">
       <PageHeader
         title={isEdit ? 'Modifier l\'ordonnance' : 'Nouvelle ordonnance'}
         actions={
@@ -74,29 +85,71 @@ export function OrdonnanceFormPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!patientId || !contenu.trim()) return
+          if (!patientId) {
+            setPatientError('Choisissez un patient dans la liste')
+            return
+          }
+          if (!contenu.trim()) return
+          setPatientError('')
           mutation.mutate()
         }}
-        className="max-w-2xl space-y-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
+        className="flex w-full flex-1 flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
       >
-        <div>
+        <div className="relative">
           <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
-          <select
-            required
-            value={patientId}
-            onChange={(e) => setPatientId(e.target.value)}
+          <input
+            value={patientQuery}
+            onChange={(e) => {
+              setPatientQuery(e.target.value)
+              setPatientId('')
+              setPatientError('')
+              setSuggestionsOpen(true)
+            }}
+            onFocus={() => setSuggestionsOpen(true)}
+            placeholder="Saisir le nom, le prénom ou le contact"
+            autoComplete="off"
             className={inputClass}
-          >
-            <option value="">— Sélectionner —</option>
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>
-                {`${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`}
-              </option>
-            ))}
-          </select>
+          />
+          {patientError ? (
+            <p className="mt-1 text-label-sm text-error">{patientError}</p>
+          ) : patientId ? (
+            <p className="mt-1 text-label-sm text-primary">Patient sélectionné</p>
+          ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
+            <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
+          ) : null}
+          {suggestionsOpen && patientQuery.trim().length >= 2 && !patientId && (
+            <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
+              {patientsLoading && <li className="px-3 py-2 text-body-md text-secondary">Recherche…</li>}
+              {!patientsLoading && patientMatches.length === 0 && (
+                <li className="px-3 py-2 text-body-md text-secondary">Aucun patient trouvé</li>
+              )}
+              {patientMatches.map((p: Patient) => {
+                const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
+                return (
+                  <li key={p.id}>
+                    <button
+                      type="button"
+                      className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
+                      onClick={() => {
+                        setPatientId(p.id)
+                        setPatientQuery(label)
+                        setPatientError('')
+                        setSuggestionsOpen(false)
+                      }}
+                    >
+                      <span className="text-body-md text-on-surface">{label}</span>
+                      <span className="text-label-sm text-secondary">
+                        {[p.contact, formatDateFr(p.date_nais)].filter(Boolean).join(' · ')}
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1 block text-label-sm text-secondary">Date *</label>
             <input
@@ -123,26 +176,24 @@ export function OrdonnanceFormPage() {
           />
         </div>
 
-        <div>
+        <div className="flex min-h-48 flex-1 flex-col">
           <label className="mb-1 block text-label-sm text-secondary">Ordonnance (médicaments) *</label>
           <textarea
             required
-            rows={5}
             value={contenu}
             onChange={(e) => setContenu(e.target.value)}
             placeholder="Traitement prescrit..."
-            className={inputClass}
+            className={`${inputClass} min-h-48 flex-1 resize-y`}
           />
         </div>
 
-        <div>
+        <div className="flex min-h-24 flex-col">
           <label className="mb-1 block text-label-sm text-secondary">Notes</label>
           <textarea
-            rows={2}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Instructions particulières..."
-            className={inputClass}
+            className={`${inputClass} min-h-24 flex-1 resize-y`}
           />
         </div>
 

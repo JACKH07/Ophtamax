@@ -37,16 +37,23 @@ export async function fetchReferentiel(kind: ReferentielKind): Promise<Referenti
   return data.data
 }
 
+function referentielUrl(kind: ReferentielKind): string {
+  if (kind === 'professions') return ENDPOINTS.referentiels.professions
+  if (kind === 'assurances') return ENDPOINTS.referentiels.assurances
+  return ENDPOINTS.referentiels.examens
+}
+
 export async function addReferentiel(
   kind: ReferentielKind,
-  data: { code: string; libelle: string },
+  payload: { code: string; libelle: string },
 ): Promise<ReferentielItem> {
   if (USE_MOCK) {
-    if (kind === 'professions') return mockStore.referentiels.addProfession(data)
-    if (kind === 'assurances') return mockStore.referentiels.addAssurance(data)
-    return mockStore.referentiels.addExamen(data)
+    if (kind === 'professions') return mockStore.referentiels.addProfession(payload)
+    if (kind === 'assurances') return mockStore.referentiels.addAssurance(payload)
+    return mockStore.referentiels.addExamen(payload)
   }
-  throw new Error('Ajout référentiel non disponible via API pour le moment')
+  const { data } = await apiClient.post<ApiResponse<ReferentielItem>>(referentielUrl(kind), payload)
+  return data.data
 }
 
 export async function removeReferentiel(kind: ReferentielKind, id: string): Promise<void> {
@@ -56,5 +63,5 @@ export async function removeReferentiel(kind: ReferentielKind, id: string): Prom
     else mockStore.referentiels.removeExamen(id)
     return
   }
-  throw new Error('Suppression référentiel non disponible via API pour le moment')
+  await apiClient.delete(`${referentielUrl(kind)}/${id}`)
 }

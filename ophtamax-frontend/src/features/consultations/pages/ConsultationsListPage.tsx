@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Pagination } from '@/components/common/Pagination'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import {
   deleteConsultation,
@@ -14,10 +16,12 @@ import { formatDateFr } from '@/utils/date'
 export function ConsultationsListPage() {
   const { can } = usePermissions()
   const queryClient = useQueryClient()
-  const { data: consultations = [], isLoading } = useQuery({
-    queryKey: ['consultations'],
-    queryFn: fetchConsultations,
+  const [page, setPage] = useState(1)
+  const { data, isLoading } = useQuery({
+    queryKey: ['consultations', page],
+    queryFn: () => fetchConsultations(page),
   })
+  const consultations = data?.items ?? []
 
   const removeMutation = useMutation({
     mutationFn: deleteConsultation,
@@ -141,6 +145,7 @@ export function ConsultationsListPage() {
             )}
           </tbody>
         </table>
+        <Pagination page={page} perPage={data?.perPage ?? 20} total={data?.total ?? 0} onPageChange={setPage} />
       </div>
     </div>
   )

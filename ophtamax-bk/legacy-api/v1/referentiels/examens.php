@@ -1,11 +1,15 @@
 <?php
 require_once __DIR__ . '/../_bootstrap.php';
+require_once __DIR__ . '/_store.php';
 api_require_user($pdo);
+api_referentiel_ensure($pdo, 't_examens');
 
-api_json([
-    ['id' => 'e1', 'code' => 'CV', 'libelle' => 'Champ visuel'],
-    ['id' => 'e2', 'code' => 'RET', 'libelle' => 'Rétinographie'],
-    ['id' => 'e3', 'code' => 'REF', 'libelle' => 'Réfractométrie'],
-    ['id' => 'e4', 'code' => 'OCT', 'libelle' => 'OCT maculaire'],
-    ['id' => 'e5', 'code' => 'FO', 'libelle' => "Fond d'œil dilaté"],
+api_referentiel_seed($pdo, 't_examens', [
+    ['code' => 'CV', 'libelle' => 'Champ visuel'],
+    ['code' => 'RET', 'libelle' => 'Rétinographie'],
+    ['code' => 'REF', 'libelle' => 'Réfractométrie'],
+    ['code' => 'OCT', 'libelle' => 'OCT maculaire'],
+    ['code' => 'FO', 'libelle' => "Fond d'œil dilaté"],
 ]);
+
+api_referentiel_handle($pdo, 't_examens');

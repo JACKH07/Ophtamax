@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Pagination } from '@/components/common/Pagination'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { FactureModal } from '@/features/facturation/components/FactureModal'
 import { fetchCaisseJour, fetchFactures } from '@/features/facturation/services/facturationService'
@@ -19,10 +20,11 @@ function formatFcfa(n: number) {
 
 export function FacturationPage() {
   const [modalOpen, setModalOpen] = useState(false)
-  const { data: factures = [] } = useQuery({ queryKey: ['factures'], queryFn: fetchFactures })
+  const [page, setPage] = useState(1)
+  const { data } = useQuery({ queryKey: ['factures', page], queryFn: () => fetchFactures(page) })
   const { data: caisse } = useQuery({ queryKey: ['caisse'], queryFn: fetchCaisseJour })
-
-  const totalImpaye = factures.filter((f) => f.statut === 'impayee').reduce((s, f) => s + f.montant_ttc, 0)
+  const factures = data?.items ?? []
+  const totalImpaye = data?.impayes ?? factures.filter((f) => f.statut === 'impayee').reduce((s, f) => s + f.montant_ttc, 0)
 
   return (
     <div className="flex flex-col gap-stack-lg">
@@ -93,6 +95,7 @@ export function FacturationPage() {
             </tbody>
           </table>
         )}
+        <Pagination page={page} perPage={data?.perPage ?? 20} total={data?.total ?? 0} onPageChange={setPage} />
       </div>
 
       {modalOpen && <FactureModal onClose={() => setModalOpen(false)} />}

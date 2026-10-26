@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { mockStore } from '@/api/mock/dataStore'
 import type { PrescriptionLunettes } from '@/api/types/entities'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PrintSheet } from '@/components/common/PrintDocumentHeader'
+import { fetchSociete } from '@/features/parametres/services/parametresService'
 import { fetchPrescriptionLunettes } from '@/features/prescription-lunettes/services/prescriptionLunettesService'
 import { PATHS } from '@/routes/paths'
 import { formatDateFr } from '@/utils/date'
@@ -65,7 +65,8 @@ function vpSphere(item: PrescriptionLunettes, side: 'od' | 'og') {
 }
 
 function OrdonnanceLunettesBody({ item }: { item: PrescriptionLunettes }) {
-  const societe = mockStore.referentiels.societe()
+  const { data: societe } = useQuery({ queryKey: ['societe'], queryFn: fetchSociete })
+  const cabinet = societe ?? { nom: '', adresse: '', contact: '', slogan: '' }
   const dateLabel = formatDateFr(item.date)
   const foyer = (item.type_foyer || '').toLowerCase()
   const traitements = item.traitements ?? []
@@ -84,15 +85,15 @@ function OrdonnanceLunettesBody({ item }: { item: PrescriptionLunettes }) {
       <div className="mb-2 flex flex-col items-center text-center">
         <img
           src={LOGO_SRC}
-          alt={societe.nom}
+          alt={cabinet.nom}
           className="mb-2 h-16 w-auto object-contain print:h-20"
         />
-        <p className="text-xl font-bold tracking-wide text-[#1e3a5f]">{societe.nom}</p>
-        {societe.slogan && (
-          <p className="text-sm italic text-[#555]">{societe.slogan}</p>
+        <p className="text-xl font-bold tracking-wide text-[#1e3a5f]">{cabinet.nom}</p>
+        {cabinet.slogan && (
+          <p className="text-sm italic text-[#555]">{cabinet.slogan}</p>
         )}
         <p className="mt-1 text-xs leading-relaxed text-[#444]">
-          {[societe.adresse, societe.contact].filter(Boolean).join(' · ')}
+          {[cabinet.adresse, cabinet.contact].filter(Boolean).join(' · ')}
         </p>
       </div>
 

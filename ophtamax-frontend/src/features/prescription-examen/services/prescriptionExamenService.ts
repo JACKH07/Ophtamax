@@ -3,13 +3,18 @@ import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockStore } from '@/api/mock/dataStore'
 import type { ApiResponse } from '@/api/types/auth'
 import type { PrescriptionExamen, PrescriptionExamenFormData } from '@/api/types/entities'
+import { PAGE_SIZE, pageFromResponse, slicePage, type PageResult } from '@/utils/pagination'
 
-export async function fetchPrescriptionsExamen(): Promise<PrescriptionExamen[]> {
-  if (USE_MOCK) return mockStore.prescriptionsExamen.list()
+export async function fetchPrescriptionsExamen(
+  page = 1,
+  perPage = PAGE_SIZE,
+): Promise<PageResult<PrescriptionExamen>> {
+  if (USE_MOCK) return slicePage(mockStore.prescriptionsExamen.list(), page, perPage)
   const { data } = await apiClient.get<ApiResponse<PrescriptionExamen[]>>(
     ENDPOINTS.prescriptionsExamen.list,
+    { params: { page, per_page: perPage } },
   )
-  return data.data
+  return pageFromResponse(data, page, perPage)
 }
 
 export async function fetchPrescriptionExamen(id: string): Promise<PrescriptionExamen> {
@@ -18,7 +23,8 @@ export async function fetchPrescriptionExamen(id: string): Promise<PrescriptionE
     if (!item) throw new Error('Prescription examen introuvable')
     return item
   }
-  throw new Error('Prescription examen introuvable')
+  const { data } = await apiClient.get<ApiResponse<PrescriptionExamen>>(ENDPOINTS.prescriptionsExamen.detail(id))
+  return data.data
 }
 
 export async function createPrescriptionExamen(
@@ -31,7 +37,11 @@ export async function createPrescriptionExamen(
       patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
     })
   }
-  throw new Error('Prescriptions examen : création non disponible')
+  const { data: created } = await apiClient.post<ApiResponse<PrescriptionExamen>>(
+    ENDPOINTS.prescriptionsExamen.list,
+    data,
+  )
+  return created.data
 }
 
 export async function updatePrescriptionExamen(
@@ -45,7 +55,11 @@ export async function updatePrescriptionExamen(
       patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
     })
   }
-  throw new Error('Prescriptions examen : mise à jour non disponible')
+  const { data: updated } = await apiClient.put<ApiResponse<PrescriptionExamen>>(
+    ENDPOINTS.prescriptionsExamen.detail(id),
+    data,
+  )
+  return updated.data
 }
 
 export async function deletePrescriptionExamen(id: string): Promise<void> {
@@ -53,5 +67,5 @@ export async function deletePrescriptionExamen(id: string): Promise<void> {
     mockStore.prescriptionsExamen.remove(id)
     return
   }
-  throw new Error('Prescriptions examen : suppression non disponible')
+  await apiClient.delete(ENDPOINTS.prescriptionsExamen.detail(id))
 }

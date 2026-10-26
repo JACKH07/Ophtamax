@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
 api_require_user($pdo);
+api_consultation_ensure($pdo);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = api_route_id();
@@ -28,11 +29,19 @@ if ($method === 'GET' && !$id) {
         $params[] = $to;
     }
     $sqlWhere = implode(' AND ', $where);
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM consultation WHERE {$sqlWhere}");
+    $countStmt->execute($params);
+    $total = (int) $countStmt->fetchColumn();
+
     $stmt = $pdo->prepare(
         "SELECT * FROM consultation WHERE {$sqlWhere} ORDER BY datecons DESC LIMIT {$perPage} OFFSET {$offset}"
     );
     $stmt->execute($params);
-    api_json(array_map('api_map_consultation', $stmt->fetchAll(PDO::FETCH_ASSOC)));
+    api_json(array_map('api_map_consultation', $stmt->fetchAll(PDO::FETCH_ASSOC)), 200, null, [
+        'page' => $page,
+        'per_page' => $perPage,
+        'total' => $total,
+    ]);
 }
 
 if ($method === 'GET' && $id) {
@@ -60,8 +69,8 @@ if ($method === 'POST' && !$id) {
     }
     $newId = api_new_id();
     $stmt = $pdo->prepare(
-        'INSERT INTO consultation (id, id_patient, nom_prenoms_pat, datecons, diagnostic, examen, ordonnance, prescription)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO consultation (id, id_patient, nom_prenoms_pat, datecons, diagnostic, examen, ordonnance, prescription, details_json)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $newId, $patientId, $patientName, date('Y-m-d H:i:s'),
@@ -69,6 +78,7 @@ if ($method === 'POST' && !$id) {
         (string) ($body['conduite_a_tenir'] ?? ''),
         (string) ($body['ordonnance'] ?? ''),
         (string) ($body['prescription'] ?? ''),
+        api_consultation_details_json($body),
     ]);
     $stmt = $pdo->prepare('SELECT * FROM consultation WHERE id = ?');
     $stmt->execute([$newId]);
@@ -83,7 +93,7 @@ if ($method === 'PUT' && $id) {
         api_error('Consultation introuvable', 404);
     }
     $upd = $pdo->prepare(
-        'UPDATE consultation SET id_patient=?, nom_prenoms_pat=?, diagnostic=?, examen=?, ordonnance=?, prescription=? WHERE id=?'
+        'UPDATE consultation SET id_patient=?, nom_prenoms_pat=?, diagnostic=?, examen=?, ordonnance=?, prescription=?, details_json=? WHERE id=?'
     );
     $upd->execute([
         (string) ($body['id_patient'] ?? ''),
@@ -92,6 +102,7 @@ if ($method === 'PUT' && $id) {
         (string) ($body['conduite_a_tenir'] ?? ''),
         (string) ($body['ordonnance'] ?? ''),
         (string) ($body['prescription'] ?? ''),
+        api_consultation_details_json($body),
         $id,
     ]);
     $stmt = $pdo->prepare('SELECT * FROM consultation WHERE id = ?');

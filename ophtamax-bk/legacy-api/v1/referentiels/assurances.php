@@ -1,15 +1,13 @@
 <?php
 require_once __DIR__ . '/../_bootstrap.php';
+require_once __DIR__ . '/_store.php';
 api_require_user($pdo);
+api_referentiel_ensure($pdo, 't_assurances');
 
 $rows = $pdo->query(
     "SELECT DISTINCT assurance AS libelle FROM patient
-     WHERE assurance IS NOT NULL AND assurance != ''
-     ORDER BY assurance LIMIT 100"
+     WHERE assurance IS NOT NULL AND assurance <> ''"
 )->fetchAll(PDO::FETCH_ASSOC);
+api_referentiel_seed($pdo, 't_assurances', $rows);
 
-api_json(array_map(static fn ($r, $i) => [
-    'id' => (string) ($i + 1),
-    'code' => strtoupper(substr(preg_replace('/\s+/', '', (string) $r['libelle']), 0, 10)),
-    'libelle' => (string) $r['libelle'],
-], $rows, array_keys($rows)));
+api_referentiel_handle($pdo, 't_assurances');

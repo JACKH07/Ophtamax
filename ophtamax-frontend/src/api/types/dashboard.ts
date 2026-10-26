@@ -7,6 +7,7 @@ export interface DashboardSummary {
   revenue_status: string
   new_patients_week: number
   new_patients_trend_percent: number
+  patients_total: number
 }
 
 export type WaitingStatus = 'en_consultation' | 'en_attente' | 'termine'

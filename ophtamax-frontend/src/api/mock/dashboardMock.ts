@@ -19,6 +19,7 @@ export const mockDashboardSummary: DashboardSummary = {
   revenue_status: 'À jour',
   new_patients_week: 0,
   new_patients_trend_percent: 0,
+  patients_total: 0,
 }
 
 export const mockWaitingQueue: WaitingQueueItem[] = []

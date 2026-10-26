@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { mockStore } from '@/api/mock/dataStore'
 import type { Patient } from '@/api/types/entities'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { fetchReferentiel } from '@/features/parametres/services/parametresService'
 import { fetchPatients } from '@/features/patients/services/patientService'
 import {
   createPrescriptionExamen,
@@ -22,7 +22,10 @@ export function PrescriptionExamenFormPage() {
   const isEdit = Boolean(id)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const examensRef = mockStore.referentiels.examens()
+  const { data: examensRef = [] } = useQuery({
+    queryKey: ['referentiel', 'examens'],
+    queryFn: () => fetchReferentiel('examens'),
+  })
   const [patientQuery, setPatientQuery] = useState('')
   const [suggestionsOpen, setSuggestionsOpen] = useState(false)
   const [patientError, setPatientError] = useState('')

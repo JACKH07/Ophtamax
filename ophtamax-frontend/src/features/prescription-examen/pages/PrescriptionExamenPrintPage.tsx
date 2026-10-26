@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { mockStore } from '@/api/mock/dataStore'
 import type { PrescriptionExamen } from '@/api/types/entities'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PrintSheet } from '@/components/common/PrintDocumentHeader'
+import { fetchSociete } from '@/features/parametres/services/parametresService'
+import { fetchPatient } from '@/features/patients/services/patientService'
 import { fetchPrescriptionExamen } from '@/features/prescription-examen/services/prescriptionExamenService'
 import { PATHS } from '@/routes/paths'
 import { formatDateFr } from '@/utils/date'
@@ -25,8 +26,13 @@ function patientAgeLabel(dateNais?: string) {
 }
 
 function BulletinExamenBody({ item }: { item: PrescriptionExamen }) {
-  const societe = mockStore.referentiels.societe()
-  const patient = mockStore.patients.get(item.patient_id)
+  const { data: societe } = useQuery({ queryKey: ['societe'], queryFn: fetchSociete })
+  const { data: patient } = useQuery({
+    queryKey: ['patient', item.patient_id],
+    queryFn: () => fetchPatient(item.patient_id),
+    enabled: Boolean(item.patient_id),
+  })
+  const cabinet = societe ?? { nom: '', adresse: '', contact: '', slogan: '' }
   const dateLabel = formatDateFr(item.date)
   const sexe =
     patient?.sexe === 'M' ? 'Masculin' : patient?.sexe === 'F' ? 'Féminin' : ''
@@ -37,11 +43,11 @@ function BulletinExamenBody({ item }: { item: PrescriptionExamen }) {
       <div className="mb-4 grid grid-cols-[1fr_auto_1fr] items-start gap-2 border-b-2 border-[#1e3a5f] pb-3">
         <div className="text-[9px] leading-snug text-[#444]">
           <p className="font-bold uppercase text-[#1e3a5f]">
-            {societe.nom || 'New Cabinet médical d\'ophtalmologue'}
+            {cabinet.nom || 'New Cabinet médical d\'ophtalmologue'}
           </p>
           <p className="mt-0.5 italic">Consultation des maladies des yeux</p>
-          <p className="mt-1">{societe.adresse}</p>
-          <p>{societe.contact}</p>
+          <p className="mt-1">{cabinet.adresse}</p>
+          <p>{cabinet.contact}</p>
         </div>
 
         <div className="flex flex-col items-center px-2">
@@ -111,7 +117,7 @@ function BulletinExamenBody({ item }: { item: PrescriptionExamen }) {
           <p className="text-sm font-semibold">{item.medecin || 'Médecin'}</p>
           <p className="text-xs text-[#555]">Ophtalmologiste</p>
           <p className="mt-1 max-w-48 text-[9px] leading-snug text-[#666]">
-            {societe.nom}
+            {cabinet.nom}
           </p>
           <div className="ml-auto mt-8 h-10 w-44 border-b border-[#999]" />
           <p className="mt-1 text-[10px] uppercase tracking-wider text-[#999]">

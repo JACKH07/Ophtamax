@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { getErrorMessage } from '@/api/client'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
 import {
@@ -56,6 +57,7 @@ export function ReferentielPage({ kind }: ReferentielPageProps) {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parametres', kind] })
+      queryClient.invalidateQueries({ queryKey: ['referentiel', kind] })
       setCode('')
       setLibelle('')
     },
@@ -63,7 +65,10 @@ export function ReferentielPage({ kind }: ReferentielPageProps) {
 
   const removeMutation = useMutation({
     mutationFn: (id: string) => removeReferentiel(kind, id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['parametres', kind] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['parametres', kind] })
+      queryClient.invalidateQueries({ queryKey: ['referentiel', kind] })
+    },
   })
 
   return (
@@ -111,6 +116,9 @@ export function ReferentielPage({ kind }: ReferentielPageProps) {
             </button>
           </div>
         </div>
+        {addMutation.isError && (
+          <p className="mt-3 text-label-sm text-error">{getErrorMessage(addMutation.error)}</p>
+        )}
       </form>
 
       <div className="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm">

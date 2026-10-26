@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { mockStore } from '@/api/mock/dataStore'
+import { useQuery } from '@tanstack/react-query'
+import { fetchSociete } from '@/features/parametres/services/parametresService'
 import { formatDateFr } from '@/utils/date'
 
 const LOGO_SRC = '/logo-kahydara.jpg'
@@ -33,7 +34,8 @@ export function PrintDocumentHeader({
   message,
   columns,
 }: PrintDocumentHeaderProps) {
-  const societe = mockStore.referentiels.societe()
+  const { data: societe } = useQuery({ queryKey: ['societe'], queryFn: fetchSociete })
+  const cabinet = societe ?? { nom: '', adresse: '', contact: '', slogan: '' }
   const emission = formatDateFr(date) || formatDateFr(new Date())
 
   return (
@@ -42,11 +44,11 @@ export function PrintDocumentHeader({
       <div className="mb-3 flex flex-col items-center text-center">
         <img
           src={LOGO_SRC}
-          alt={societe.nom || 'Logo'}
+          alt={cabinet.nom || 'Logo'}
           className="mb-2 h-20 w-auto object-contain print:h-24"
         />
         <p className="text-[11px] leading-snug text-[#555]">
-          {[societe.adresse, societe.contact].filter(Boolean).join(' · ')}
+          {[cabinet.adresse, cabinet.contact].filter(Boolean).join(' · ')}
         </p>
       </div>
 
@@ -70,10 +72,10 @@ export function PrintDocumentHeader({
       {/* Nom société + message */}
       <div className="mb-5">
         <h2 className="text-2xl font-bold tracking-tight text-[#222]">
-          {societe.nom}
+          {cabinet.nom}
         </h2>
         <p className="mt-1 text-sm text-[#666]">
-          {message || societe.slogan || 'Votre vision, notre priorité.'}
+          {message || cabinet.slogan || 'Votre vision, notre priorité.'}
         </p>
       </div>
 
@@ -107,13 +109,14 @@ type PrintSheetProps = {
 
 /** Conteneur commun des fiches à imprimer (aperçu + print). */
 export function PrintSheet({ toolbar, children }: PrintSheetProps) {
+  const { data: societe } = useQuery({ queryKey: ['societe'], queryFn: fetchSociete })
   return (
     <div>
       <div className="no-print mb-6">{toolbar}</div>
       <article className="print-sheet mx-auto max-w-200 bg-white p-8 text-[#222] shadow-sm print:max-w-none print:p-0 print:shadow-none">
         {children}
         <footer className="mt-10 flex items-end justify-between border-t border-[#ddd] pt-3 text-[10px] text-[#888]">
-          <p>{mockStore.referentiels.societe().nom}</p>
+          <p>{societe?.nom ?? ''}</p>
           <p>Page 1</p>
         </footer>
       </article>

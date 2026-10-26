@@ -33,6 +33,17 @@ class LegacyApiController extends Controller
         }
 
         $parts = explode('/', $relative);
+        if (count($parts) >= 2) {
+            $nested = $base.'/'.$parts[0].'/'.$parts[1].'.php';
+            if (is_file($nested)) {
+                $GLOBALS['_API_RESOURCE'] = $parts[0].'/'.$parts[1];
+                $GLOBALS['_API_ID'] = $parts[2] ?? null;
+                $GLOBALS['_API_ACTION'] = $parts[3] ?? null;
+
+                return $this->runScript($nested);
+            }
+        }
+
         $resource = $parts[0] ?? '';
         $id = $parts[1] ?? null;
         $action = $parts[2] ?? null;

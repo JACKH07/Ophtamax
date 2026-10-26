@@ -9,8 +9,20 @@ $method = $_SERVER['REQUEST_METHOD'];
 $id = api_route_id();
 
 if ($method === 'GET' && !$id) {
-    $rows = $pdo->query(api_facture_select_sql() . ' ORDER BY f.date_fact DESC, f.id DESC')->fetchAll(PDO::FETCH_ASSOC);
-    api_json(array_map(static fn ($row) => api_map_facture($pdo, $row), $rows));
+    $page = max(1, (int) ($_GET['page'] ?? 1));
+    $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 20)));
+    $offset = ($page - 1) * $perPage;
+    $total = (int) $pdo->query('SELECT COUNT(*) FROM t_factures')->fetchColumn();
+    $impayes = (float) $pdo->query("SELECT COALESCE(SUM(montantfact), 0) FROM t_factures WHERE statut = 'impayee'")->fetchColumn();
+    $rows = $pdo->query(
+        api_facture_select_sql() . " ORDER BY f.date_fact DESC, f.id DESC LIMIT {$perPage} OFFSET {$offset}"
+    )->fetchAll(PDO::FETCH_ASSOC);
+    api_json(array_map(static fn ($row) => api_map_facture($pdo, $row), $rows), 200, null, [
+        'page' => $page,
+        'per_page' => $perPage,
+        'total' => $total,
+        'impayes' => $impayes,
+    ]);
 }
 
 if ($method === 'GET' && $id) {

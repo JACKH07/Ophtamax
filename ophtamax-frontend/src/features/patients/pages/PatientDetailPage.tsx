@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { mockStore } from '@/api/mock/dataStore'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { fetchConsultationsByPatient } from '@/features/consultations/services/consultationService'
 import { fetchPatient } from '@/features/patients/services/patientService'
 import { usePermissions } from '@/hooks/usePermissions'
 import { PATHS } from '@/routes/paths'
@@ -19,7 +19,11 @@ export function PatientDetailPage() {
     enabled: Boolean(id),
   })
 
-  const consultations = id ? mockStore.consultations.byPatient(id) : []
+  const { data: consultations = [], isLoading: consultationsLoading } = useQuery({
+    queryKey: ['patient', id, 'consultations'],
+    queryFn: () => fetchConsultationsByPatient(id!),
+    enabled: Boolean(id),
+  })
 
   if (isLoading || !patient) {
     return <div className="py-12 text-center text-secondary">Chargement...</div>
@@ -50,42 +54,52 @@ export function PatientDetailPage() {
         }
       />
 
-      <div className="grid gap-gutter lg:grid-cols-3">
-        <div className="space-y-4 lg:col-span-1">
-          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
-            <h3 className="mb-4 text-headline-sm font-semibold text-on-surface">Informations</h3>
-            <dl className="space-y-3 text-body-sm">
-              <div><dt className="text-label-sm text-secondary">Date de naissance</dt><dd className="font-medium">{formatDateFr(patient.date_nais) || '—'}</dd></div>
-              <div><dt className="text-label-sm text-secondary">Profession</dt><dd className="font-medium">{patient.profession}</dd></div>
-              <div><dt className="text-label-sm text-secondary">Assurance</dt><dd>{patient.assurance ? <StatusBadge label={patient.assurance} /> : '—'}</dd></div>
-              <div><dt className="text-label-sm text-secondary">Antécédents</dt><dd className="font-medium">{patient.antecedents || 'Aucun'}</dd></div>
-            </dl>
-          </div>
+      <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm">
+        <div className="border-b border-outline-variant px-5 py-4">
+          <h3 className="text-headline-sm font-semibold text-on-surface">Informations</h3>
         </div>
+        <dl className="grid gap-4 px-5 py-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt className="text-label-sm text-secondary">Date de naissance</dt>
+            <dd className="font-medium">{formatDateFr(patient.date_nais) || '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-label-sm text-secondary">Profession</dt>
+            <dd className="font-medium">{patient.profession || '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-label-sm text-secondary">Assurance</dt>
+            <dd>{patient.assurance ? <StatusBadge label={patient.assurance} /> : '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-label-sm text-secondary">Antécédents</dt>
+            <dd className="font-medium">{patient.antecedents || 'Aucun'}</dd>
+          </div>
+        </dl>
 
-        <div className="lg:col-span-2">
-          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm">
-            <div className="border-b border-outline-variant px-5 py-4">
-              <h3 className="text-headline-sm font-semibold text-on-surface">Historique des consultations</h3>
-            </div>
-            {consultations.length === 0 ? (
-              <p className="px-5 py-8 text-center text-secondary">Aucune consultation enregistrée</p>
-            ) : (
-              <ul className="divide-y divide-outline-variant">
-                {consultations.map((c) => (
-                  <li key={c.id} className="flex items-center justify-between px-5 py-4 hover:bg-surface-container-low/50">
-                    <div>
-                      <p className="font-medium text-on-surface">{c.diagnostic || 'Consultation'}</p>
-                      <p className="text-label-sm text-secondary">{formatDateFr(c.datecons) || '—'}</p>
-                    </div>
-                    <Link to={`${PATHS.consultations}/${c.id}`} className="text-label-md text-primary hover:underline">Voir</Link>
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className="border-t border-outline-variant">
+          <div className="border-b border-outline-variant px-5 py-4">
+            <h3 className="text-headline-sm font-semibold text-on-surface">Historique des consultations</h3>
           </div>
+          {consultationsLoading ? (
+            <p className="px-5 py-8 text-center text-secondary">Chargement...</p>
+          ) : consultations.length === 0 ? (
+            <p className="px-5 py-8 text-center text-secondary">Aucune consultation enregistrée</p>
+          ) : (
+            <ul className="divide-y divide-outline-variant">
+              {consultations.map((c) => (
+                <li key={c.id} className="flex items-center justify-between px-5 py-4 hover:bg-surface-container-low/50">
+                  <div>
+                    <p className="font-medium text-on-surface">{c.diagnostic || 'Consultation'}</p>
+                    <p className="text-label-sm text-secondary">{formatDateFr(c.datecons) || '—'}</p>
+                  </div>
+                  <Link to={`${PATHS.consultations}/${c.id}`} className="text-label-md text-primary hover:underline">Voir</Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      </div>
+      </section>
     </div>
   )
 }

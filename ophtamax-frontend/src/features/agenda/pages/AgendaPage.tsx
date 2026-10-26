@@ -9,6 +9,11 @@ import { fetchRendezVous } from '@/features/agenda/services/agendaService'
 import type { RendezVous } from '@/api/types/entities'
 import { formatDateFr } from '@/utils/date'
 
+function dayKey(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
 // ── Composant principal ───────────────────────────────────────────────────────
 
 export function AgendaPage() {
@@ -22,9 +27,16 @@ export function AgendaPage() {
   const [defaultSlot, setDefaultSlot] = useState<string | undefined>(undefined)
 
   // ── Données ──
+  const rangeStart = new Date(currentDate)
+  rangeStart.setDate(rangeStart.getDate() - 7)
+  const rangeEnd = new Date(currentDate)
+  rangeEnd.setDate(rangeEnd.getDate() + 14)
+  const from = dayKey(rangeStart)
+  const to = dayKey(rangeEnd)
+
   const { data: rdvs = [] } = useQuery({
-    queryKey: ['agenda'],
-    queryFn: () => fetchRendezVous(),
+    queryKey: ['agenda', from, to],
+    queryFn: () => fetchRendezVous({ from, to }),
     refetchInterval: 60_000,
   })
 

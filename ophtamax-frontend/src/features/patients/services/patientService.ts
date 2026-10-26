@@ -3,6 +3,7 @@ import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockStore } from '@/api/mock/dataStore'
 import type { ApiResponse } from '@/api/types/auth'
 import type { Patient, PatientFormData } from '@/api/types/entities'
+import { PAGE_SIZE, pageFromResponse, slicePage, type PageResult } from '@/utils/pagination'
 
 export async function fetchPatients(search?: string): Promise<Patient[]> {
   if (USE_MOCK) {
@@ -23,6 +24,31 @@ export async function fetchPatients(search?: string): Promise<Patient[]> {
     params: { search, per_page: 100 },
   })
   return data.data
+}
+
+export async function fetchPatientsPage(
+  search: string | undefined,
+  page: number,
+  perPage = PAGE_SIZE,
+): Promise<PageResult<Patient>> {
+  if (USE_MOCK) {
+    let list = mockStore.patients.list()
+    if (search) {
+      const q = search.toLowerCase()
+      list = list.filter(
+        (p) =>
+          p.nom.toLowerCase().includes(q) ||
+          p.prenom.toLowerCase().includes(q) ||
+          p.contact.includes(q),
+      )
+    }
+    return slicePage(list, page, perPage)
+  }
+
+  const { data } = await apiClient.get<ApiResponse<Patient[]>>(ENDPOINTS.patients.list, {
+    params: { search: search || undefined, page, per_page: perPage },
+  })
+  return pageFromResponse(data, page, perPage)
 }
 
 export async function fetchPatient(id: string): Promise<Patient> {

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Pagination } from '@/components/common/Pagination'
 import {
   deleteOrdonnance,
   fetchOrdonnances,
@@ -13,11 +14,13 @@ import { formatDateFr } from '@/utils/date'
 export function OrdonnancesListPage() {
   const queryClient = useQueryClient()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
-  const { data: items = [] } = useQuery({
-    queryKey: ['ordonnances'],
-    queryFn: fetchOrdonnances,
+  const { data } = useQuery({
+    queryKey: ['ordonnances', page],
+    queryFn: () => fetchOrdonnances(page),
   })
+  const items = data?.items ?? []
 
   const deleteMutation = useMutation({
     mutationFn: deleteOrdonnance,
@@ -93,6 +96,7 @@ export function OrdonnancesListPage() {
           ))
         )}
       </div>
+      <Pagination page={page} perPage={data?.perPage ?? 20} total={data?.total ?? 0} onPageChange={setPage} />
     </div>
   )
 }

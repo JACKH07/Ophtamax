@@ -3,13 +3,14 @@ import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { dossierNumero, mockStore } from '@/api/mock/dataStore'
 import type { ApiResponse } from '@/api/types/auth'
 import type { Consultation, ExamenOeil } from '@/api/types/entities'
+import { PAGE_SIZE, pageFromResponse, slicePage, type PageResult } from '@/utils/pagination'
 
-export async function fetchConsultations(): Promise<Consultation[]> {
-  if (USE_MOCK) return mockStore.consultations.list()
+export async function fetchConsultations(page = 1, perPage = PAGE_SIZE): Promise<PageResult<Consultation>> {
+  if (USE_MOCK) return slicePage(mockStore.consultations.list(), page, perPage)
   const { data } = await apiClient.get<ApiResponse<Consultation[]>>(ENDPOINTS.consultations.list, {
-    params: { per_page: 100 },
+    params: { page, per_page: perPage },
   })
-  return data.data
+  return pageFromResponse(data, page, perPage)
 }
 
 export async function fetchConsultation(id: string): Promise<Consultation> {

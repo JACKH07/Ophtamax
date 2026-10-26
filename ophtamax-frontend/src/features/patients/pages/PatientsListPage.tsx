@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Pagination } from '@/components/common/Pagination'
 import { StatusBadge } from '@/components/common/StatusBadge'
-import { deletePatient, fetchPatients } from '@/features/patients/services/patientService'
+import { deletePatient, fetchPatientsPage } from '@/features/patients/services/patientService'
 import { usePermissions } from '@/hooks/usePermissions'
 import { PATHS } from '@/routes/paths'
 import { formatDateFr } from '@/utils/date'
@@ -15,13 +16,15 @@ function initials(nom: string, prenom: string) {
 
 export function PatientsListPage() {
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
   const { can } = usePermissions()
   const queryClient = useQueryClient()
 
-  const { data: patients = [], isLoading } = useQuery({
-    queryKey: ['patients', search],
-    queryFn: () => fetchPatients(search),
+  const { data, isLoading } = useQuery({
+    queryKey: ['patients', search, page],
+    queryFn: () => fetchPatientsPage(search, page),
   })
+  const patients = data?.items ?? []
 
   const removeMutation = useMutation({
     mutationFn: deletePatient,
@@ -54,7 +57,10 @@ export function PatientsListPage() {
               <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setPage(1)
+                }}
                 placeholder="Nom, contact, date de naissance..."
                 className="w-full rounded-lg border border-outline-variant bg-surface py-2 pl-10 pr-4 text-body-md focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
@@ -146,6 +152,7 @@ export function PatientsListPage() {
             )}
           </tbody>
         </table>
+        <Pagination page={page} perPage={data?.perPage ?? 20} total={data?.total ?? 0} onPageChange={setPage} />
       </div>
     </div>
   )

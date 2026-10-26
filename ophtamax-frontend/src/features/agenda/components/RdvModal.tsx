@@ -1,11 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { createRendezVous, updateRendezVous } from '@/features/agenda/services/agendaService'
-import { mockStore } from '@/api/mock/dataStore'
+import { fetchPatients } from '@/features/patients/services/patientService'
+import { fetchUsers } from '@/features/utilisateurs/services/userService'
+import { formatDateFr } from '@/utils/date'
 import type { RendezVous } from '@/api/types/entities'
 
 const DEFAULT_DUREE_MIN = 30
@@ -28,20 +30,31 @@ interface RdvModalProps {
 
 export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
   const queryClient = useQueryClient()
+  const [patientQuery, setPatientQuery] = useState(rdv?.patient_name ?? '')
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false)
 
-  const patients = mockStore.patients.list()
-  const medecins = mockStore.users.list().filter((u) => u.id_role === 'OPHT')
+  const { data: users = [] } = useQuery({ queryKey: ['users'], queryFn: fetchUsers })
+  const medecins = users.filter((u) => u.id_role === 'OPHT')
+  const medecinOptions = medecins.length > 0 ? medecins : users
+
+  const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
+    queryKey: ['patients-search', patientQuery],
+    queryFn: () => fetchPatients(patientQuery.trim()),
+    enabled: suggestionsOpen && patientQuery.trim().length >= 2,
+  })
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues, unknown, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       patient_id: rdv?.patient_id ?? '',
-      medecin_id: rdv?.medecin_id ?? (medecins[0]?.id ?? ''),
+      medecin_id: rdv?.medecin_id ?? (medecinOptions[0]?.id ?? ''),
       date_heure: rdv?.date_heure
         ? rdv.date_heure.slice(0, 16)
         : (defaultDate ?? new Date().toISOString().slice(0, 16)),
@@ -53,14 +66,15 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
   useEffect(() => {
     reset({
       patient_id: rdv?.patient_id ?? '',
-      medecin_id: rdv?.medecin_id ?? (medecins[0]?.id ?? ''),
+      medecin_id: rdv?.medecin_id ?? (medecinOptions[0]?.id ?? ''),
       date_heure: rdv?.date_heure
         ? rdv.date_heure.slice(0, 16)
         : (defaultDate ?? new Date().toISOString().slice(0, 16)),
       motif: rdv?.motif ?? '',
       statut: rdv?.statut ?? 'planifie',
     })
-  }, [rdv, defaultDate])
+    setPatientQuery(rdv?.patient_name ?? '')
+  }, [rdv, defaultDate, users])
 
   const mutation = useMutation({
     mutationFn: (values: FormValues) => {
@@ -95,21 +109,55 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
         </div>
 
         <form onSubmit={handleSubmit((values) => mutation.mutate(values))} className="space-y-4 px-6 py-5">
-          <div>
+          <div className="relative">
             <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
-            <select
-              {...register('patient_id')}
+            <input type="hidden" {...register('patient_id')} />
+            <input
+              value={patientQuery}
+              onChange={(e) => {
+                setPatientQuery(e.target.value)
+                setValue('patient_id', '', { shouldValidate: true })
+                setSuggestionsOpen(true)
+              }}
+              onFocus={() => setSuggestionsOpen(true)}
+              placeholder="Saisir le nom, le prénom ou le contact"
+              autoComplete="off"
               className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="">— Sélectionner —</option>
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {`${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`}
-                </option>
-              ))}
-            </select>
+            />
+            {watch('patient_id') ? (
+              <p className="mt-1 text-label-sm text-primary">Patient sélectionné</p>
+            ) : null}
             {errors.patient_id && (
               <p className="mt-1 text-label-sm text-error">{errors.patient_id.message}</p>
+            )}
+            {suggestionsOpen && patientQuery.trim().length >= 2 && !watch('patient_id') && (
+              <ul className="absolute z-20 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
+                {patientsLoading && <li className="px-3 py-2 text-body-sm text-secondary">Recherche…</li>}
+                {!patientsLoading && patientMatches.length === 0 && (
+                  <li className="px-3 py-2 text-body-sm text-secondary">Aucun patient trouvé</li>
+                )}
+                {patientMatches.map((p) => {
+                  const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
+                  return (
+                    <li key={p.id}>
+                      <button
+                        type="button"
+                        className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
+                        onClick={() => {
+                          setValue('patient_id', p.id, { shouldValidate: true })
+                          setPatientQuery(label)
+                          setSuggestionsOpen(false)
+                        }}
+                      >
+                        <span className="text-body-sm text-on-surface">{label}</span>
+                        <span className="text-label-sm text-secondary">
+                          {[p.contact, formatDateFr(p.date_nais)].filter(Boolean).join(' · ')}
+                        </span>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
             )}
           </div>
 
@@ -119,9 +167,9 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
               {...register('medecin_id')}
               className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              {medecins.map((u) => (
+              {medecinOptions.map((u) => (
                 <option key={u.id} value={u.id}>
-                  {u.fonction || u.login_user}
+                  {`${u.prenoms} ${u.nom}`.trim() || u.fonction || u.login_user}
                 </option>
               ))}
             </select>

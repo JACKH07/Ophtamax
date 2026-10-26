@@ -38,10 +38,8 @@ export async function fetchRendezVousById(id: string): Promise<RendezVous> {
     if (!rdv) throw new Error(`RDV ${id} introuvable`)
     return rdv
   }
-  const list = await fetchRendezVous()
-  const rdv = list.find((item) => item.id === id)
-  if (!rdv) throw new Error(`RDV ${id} introuvable`)
-  return rdv
+  const { data } = await apiClient.get<ApiResponse<RendezVous>>(`${ENDPOINTS.agenda.rendezVous}/${id}`)
+  return data.data
 }
 
 export async function createRendezVous(payload: RendezVousFormData): Promise<RendezVous> {
@@ -49,7 +47,8 @@ export async function createRendezVous(payload: RendezVousFormData): Promise<Ren
     const names = resolveNames(payload)
     return mockStore.rendezVous.create({ ...payload, ...names })
   }
-  throw new Error('Agenda : création non disponible (pas de table RDV en BDD v1)')
+  const { data } = await apiClient.post<ApiResponse<RendezVous>>(ENDPOINTS.agenda.rendezVous, payload)
+  return data.data
 }
 
 export async function updateRendezVous(
@@ -57,12 +56,14 @@ export async function updateRendezVous(
   payload: Partial<RendezVousFormData>,
 ): Promise<RendezVous> {
   if (USE_MOCK) return mockStore.rendezVous.update(id, payload)
-  throw new Error('Agenda : mise à jour non disponible')
+  const { data } = await apiClient.put<ApiResponse<RendezVous>>(`${ENDPOINTS.agenda.rendezVous}/${id}`, payload)
+  return data.data
 }
 
 export async function updateRdvStatut(id: string, statut: StatutRdv): Promise<RendezVous> {
   if (USE_MOCK) return mockStore.rendezVous.updateStatut(id, statut)
-  throw new Error('Agenda : mise à jour non disponible')
+  const { data } = await apiClient.put<ApiResponse<RendezVous>>(`${ENDPOINTS.agenda.rendezVous}/${id}`, { statut })
+  return data.data
 }
 
 export async function deleteRendezVous(id: string): Promise<{ message: string }> {
@@ -70,7 +71,8 @@ export async function deleteRendezVous(id: string): Promise<{ message: string }>
     mockStore.rendezVous.remove(id)
     return { message: 'Rendez-vous supprimé.' }
   }
-  throw new Error('Agenda : suppression non disponible')
+  await apiClient.delete(`${ENDPOINTS.agenda.rendezVous}/${id}`)
+  return { message: 'Rendez-vous supprimé.' }
 }
 
 export async function fetchFileAttente(date?: string): Promise<FileAttenteItem[]> {
@@ -100,7 +102,8 @@ export async function addToFileAttente(payload: {
       payload.priorite,
     )
   }
-  throw new Error('File d\'attente : ajout non disponible')
+  const { data } = await apiClient.post<ApiResponse<FileAttenteItem>>(ENDPOINTS.agenda.fileAttente, payload)
+  return data.data
 }
 
 export async function updateFileAttenteStatut(
@@ -108,5 +111,9 @@ export async function updateFileAttenteStatut(
   statut: StatutFileAttente,
 ): Promise<FileAttenteItem> {
   if (USE_MOCK) return mockStore.fileAttente.updateStatut(id, statut)
-  throw new Error('File d\'attente : mise à jour non disponible')
+  const { data } = await apiClient.put<ApiResponse<FileAttenteItem>>(
+    `${ENDPOINTS.agenda.fileAttente}/${id}`,
+    { statut },
+  )
+  return data.data
 }

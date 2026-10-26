@@ -34,11 +34,14 @@ function api_respond(array $payload, int $status = 200): void
     exit;
 }
 
-function api_json($data, int $status = 200, ?string $message = null): void
+function api_json($data, int $status = 200, ?string $message = null, ?array $meta = null): void
 {
     $payload = ['data' => $data];
     if ($message !== null) {
         $payload['message'] = $message;
+    }
+    if ($meta !== null) {
+        $payload['meta'] = $meta;
     }
     api_respond($payload, $status);
 }
@@ -199,6 +202,74 @@ function api_empty_oeil(): array
     ];
 }
 
+function api_consultation_ensure(PDO $pdo): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
+
+    $col = $pdo->query("SHOW COLUMNS FROM consultation LIKE 'details_json'")->fetch();
+    if (!$col) {
+        $pdo->exec('ALTER TABLE consultation ADD COLUMN details_json LONGTEXT NULL');
+    }
+
+    $examen = $pdo->query("SHOW COLUMNS FROM consultation LIKE 'examen'")->fetch();
+    if ($examen && stripos((string) ($examen['Type'] ?? ''), 'varchar') !== false) {
+        $pdo->exec(
+            'ALTER TABLE consultation
+                MODIFY diagnostic TEXT NOT NULL,
+                MODIFY examen TEXT NOT NULL,
+                MODIFY ordonnance TEXT NOT NULL,
+                MODIFY prescription TEXT NOT NULL'
+        );
+    }
+}
+
+function api_consultation_details_json(array $body): string
+{
+    $statut = (string) ($body['statut'] ?? 'terminee');
+    if (!in_array($statut, ['brouillon', 'terminee'], true)) {
+        $statut = 'terminee';
+    }
+    $od = is_array($body['examen_od'] ?? null) ? $body['examen_od'] : [];
+    $og = is_array($body['examen_og'] ?? null) ? $body['examen_og'] : [];
+
+    return json_encode([
+        'examen_od' => array_merge(api_empty_oeil(), $od),
+        'examen_og' => array_merge(api_empty_oeil(), $og),
+        'prochain_rdv_date' => substr((string) ($body['prochain_rdv_date'] ?? ''), 0, 10),
+        'prochain_rdv_delai' => (string) ($body['prochain_rdv_delai'] ?? ''),
+        'statut' => $statut,
+    ], JSON_UNESCAPED_UNICODE);
+}
+
+function api_patient_label(PDO $pdo, string $id): string
+{
+    $stmt = $pdo->prepare('SELECT nom, prenom FROM patient WHERE id = ? LIMIT 1');
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        return '';
+    }
+
+    return trim(((string) ($row['nom'] ?? '')) . ' ' . ((string) ($row['prenom'] ?? '')));
+}
+
+function api_user_label(PDO $pdo, string $id): string
+{
+    $stmt = $pdo->prepare('SELECT nom, prenoms, fonction, login_user FROM user WHERE id = ? LIMIT 1');
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        return '';
+    }
+    $name = trim(((string) ($row['nom'] ?? '')) . ' ' . ((string) ($row['prenoms'] ?? '')));
+
+    return $name !== '' ? $name : (string) ($row['fonction'] ?: $row['login_user']);
+}
+
 function api_map_patient(array $row): array
 {
     $sexe = strtoupper(substr((string) ($row['sexe'] ?? 'M'), 0, 1));
@@ -222,6 +293,20 @@ function api_map_patient(array $row): array
 
 function api_map_consultation(array $row): array
 {
+    $details = [];
+    if (!empty($row['details_json'])) {
+        $decoded = json_decode((string) $row['details_json'], true);
+        if (is_array($decoded)) {
+            $details = $decoded;
+        }
+    }
+    $statut = (string) ($details['statut'] ?? 'terminee');
+    if (!in_array($statut, ['brouillon', 'terminee'], true)) {
+        $statut = 'terminee';
+    }
+    $od = is_array($details['examen_od'] ?? null) ? $details['examen_od'] : [];
+    $og = is_array($details['examen_og'] ?? null) ? $details['examen_og'] : [];
+
     return [
         'id' => (string) $row['id'],
         'id_patient' => (string) ($row['id_patient'] ?? ''),
@@ -229,14 +314,14 @@ function api_map_consultation(array $row): array
         'dossier_numero' => 'D-' . substr((string) ($row['id_patient'] ?? ''), 0, 8),
         'datecons' => (string) ($row['datecons'] ?? ''),
         'diagnostic' => (string) ($row['diagnostic'] ?? ''),
-        'examen_od' => api_empty_oeil(),
-        'examen_og' => api_empty_oeil(),
+        'examen_od' => array_merge(api_empty_oeil(), $od),
+        'examen_og' => array_merge(api_empty_oeil(), $og),
         'ordonnance' => (string) ($row['ordonnance'] ?? ''),
         'prescription' => (string) ($row['prescription'] ?? ''),
         'conduite_a_tenir' => (string) ($row['examen'] ?? ''),
-        'prochain_rdv_date' => '',
-        'prochain_rdv_delai' => '',
-        'statut' => 'terminee',
+        'prochain_rdv_date' => substr((string) ($details['prochain_rdv_date'] ?? ''), 0, 10),
+        'prochain_rdv_delai' => (string) ($details['prochain_rdv_delai'] ?? ''),
+        'statut' => $statut,
     ];
 }
 

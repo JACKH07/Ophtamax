@@ -3,13 +3,18 @@ import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockStore } from '@/api/mock/dataStore'
 import type { ApiResponse } from '@/api/types/auth'
 import type { PrescriptionLunettes, PrescriptionLunettesFormData } from '@/api/types/entities'
+import { PAGE_SIZE, pageFromResponse, slicePage, type PageResult } from '@/utils/pagination'
 
-export async function fetchPrescriptionsLunettes(): Promise<PrescriptionLunettes[]> {
-  if (USE_MOCK) return mockStore.prescriptionsLunettes.list()
+export async function fetchPrescriptionsLunettes(
+  page = 1,
+  perPage = PAGE_SIZE,
+): Promise<PageResult<PrescriptionLunettes>> {
+  if (USE_MOCK) return slicePage(mockStore.prescriptionsLunettes.list(), page, perPage)
   const { data } = await apiClient.get<ApiResponse<PrescriptionLunettes[]>>(
     ENDPOINTS.prescriptionsLunettes.list,
+    { params: { page, per_page: perPage } },
   )
-  return data.data
+  return pageFromResponse(data, page, perPage)
 }
 
 export async function fetchPrescriptionLunettes(id: string): Promise<PrescriptionLunettes> {
@@ -18,7 +23,10 @@ export async function fetchPrescriptionLunettes(id: string): Promise<Prescriptio
     if (!item) throw new Error('Prescription lunettes introuvable')
     return item
   }
-  throw new Error('Prescription lunettes introuvable')
+  const { data } = await apiClient.get<ApiResponse<PrescriptionLunettes>>(
+    ENDPOINTS.prescriptionsLunettes.detail(id),
+  )
+  return data.data
 }
 
 export async function createPrescriptionLunettes(
@@ -31,7 +39,11 @@ export async function createPrescriptionLunettes(
       patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
     })
   }
-  throw new Error('Prescriptions lunettes : création non disponible')
+  const { data: created } = await apiClient.post<ApiResponse<PrescriptionLunettes>>(
+    ENDPOINTS.prescriptionsLunettes.list,
+    data,
+  )
+  return created.data
 }
 
 export async function updatePrescriptionLunettes(
@@ -45,7 +57,11 @@ export async function updatePrescriptionLunettes(
       patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
     })
   }
-  throw new Error('Prescriptions lunettes : mise à jour non disponible')
+  const { data: updated } = await apiClient.put<ApiResponse<PrescriptionLunettes>>(
+    ENDPOINTS.prescriptionsLunettes.detail(id),
+    data,
+  )
+  return updated.data
 }
 
 export async function deletePrescriptionLunettes(id: string): Promise<void> {
@@ -53,5 +69,5 @@ export async function deletePrescriptionLunettes(id: string): Promise<void> {
     mockStore.prescriptionsLunettes.remove(id)
     return
   }
-  throw new Error('Prescriptions lunettes : suppression non disponible')
+  await apiClient.delete(ENDPOINTS.prescriptionsLunettes.detail(id))
 }

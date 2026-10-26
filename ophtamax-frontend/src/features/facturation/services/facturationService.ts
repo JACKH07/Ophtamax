@@ -3,11 +3,20 @@ import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockStore } from '@/api/mock/dataStore'
 import type { ApiResponse } from '@/api/types/auth'
 import type { Facture, FactureFormData } from '@/api/types/entities'
+import { PAGE_SIZE, pageFromResponse, slicePage, type PageResult } from '@/utils/pagination'
 
-export async function fetchFactures(): Promise<Facture[]> {
-  if (USE_MOCK) return mockStore.factures.list()
-  const { data } = await apiClient.get<ApiResponse<Facture[]>>(ENDPOINTS.facturation.factures)
-  return data.data
+export async function fetchFactures(page = 1, perPage = PAGE_SIZE): Promise<PageResult<Facture>> {
+  if (USE_MOCK) {
+    const pageResult = slicePage(mockStore.factures.list(), page, perPage)
+    const impayes = mockStore.factures.list()
+      .filter((f) => f.statut === 'impayee')
+      .reduce((sum, f) => sum + f.montant_ttc, 0)
+    return { ...pageResult, impayes }
+  }
+  const { data } = await apiClient.get<ApiResponse<Facture[]>>(ENDPOINTS.facturation.factures, {
+    params: { page, per_page: perPage },
+  })
+  return pageFromResponse(data, page, perPage)
 }
 
 export async function fetchFacture(id: string): Promise<Facture> {

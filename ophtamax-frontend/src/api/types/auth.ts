@@ -27,7 +27,15 @@ export interface AuthResponse {
   permissions: Permission[]
 }
 
+export interface PageMeta {
+  page: number
+  per_page: number
+  total: number
+  impayes?: number
+}
+
 export interface ApiResponse<T> {
   data: T
   message?: string
+  meta?: PageMeta
 }

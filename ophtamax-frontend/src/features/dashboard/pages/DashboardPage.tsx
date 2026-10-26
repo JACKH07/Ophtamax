@@ -80,7 +80,14 @@ export function DashboardPage() {
       </div>
 
       {summary && (
-        <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-gutter sm:grid-cols-2 xl:grid-cols-5">
+          <StatCard
+            title="Patients enregistrés"
+            value={summary.patients_total.toLocaleString('fr-FR')}
+            subtitle="Total en base"
+            icon="groups"
+            decorativeIcon="personal_injury"
+          />
           <StatCard
             title="Consultations du jour"
             value={summary.consultations_today}

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
 api_require_user($pdo);
+api_consultation_ensure($pdo);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $id = api_route_id();
@@ -47,7 +48,11 @@ if ($method === 'GET' && !$id) {
       LIMIT {$perPage} OFFSET {$offset}";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    api_json(array_map('api_map_patient', $stmt->fetchAll(PDO::FETCH_ASSOC)), 200, 'ok');
+    api_json(array_map('api_map_patient', $stmt->fetchAll(PDO::FETCH_ASSOC)), 200, 'ok', [
+        'page' => $page,
+        'per_page' => $perPage,
+        'total' => $total,
+    ]);
 }
 
 if ($method === 'GET' && $id) {

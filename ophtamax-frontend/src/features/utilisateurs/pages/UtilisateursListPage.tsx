@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Pagination } from '@/components/common/Pagination'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { deleteUser, fetchUsers } from '@/features/utilisateurs/services/userService'
 import { usePermissions } from '@/hooks/usePermissions'
+import { slicePage } from '@/utils/pagination'
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Administrateur',
@@ -16,7 +19,9 @@ const ROLE_LABELS: Record<string, string> = {
 export function UtilisateursListPage() {
   const { can } = usePermissions()
   const queryClient = useQueryClient()
+  const [page, setPage] = useState(1)
   const { data: users = [] } = useQuery({ queryKey: ['users'], queryFn: fetchUsers })
+  const paged = slicePage(users, page)
 
   const removeMutation = useMutation({
     mutationFn: deleteUser,
@@ -44,7 +49,7 @@ export function UtilisateursListPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant">
-            {users.map((u) => {
+            {paged.items.map((u) => {
               const label = `${u.prenoms} ${u.nom}`.trim() || u.login_user
               return (
                 <tr key={u.id} className="hover:bg-surface-container-low/50">
@@ -80,6 +85,7 @@ export function UtilisateursListPage() {
             })}
           </tbody>
         </table>
+        <Pagination page={paged.page} perPage={paged.perPage} total={paged.total} onPageChange={setPage} />
       </div>
     </div>
   )

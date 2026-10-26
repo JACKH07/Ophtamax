@@ -3,9 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { mockStore } from '@/api/mock/dataStore'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { fetchReferentiel } from '@/features/parametres/services/parametresService'
 import { patientSchema, type PatientFormValues } from '@/features/patients/schemas/patientSchema'
 import { createPatient, fetchPatient, updatePatient } from '@/features/patients/services/patientService'
 import { PATHS } from '@/routes/paths'
@@ -15,8 +15,14 @@ export function PatientFormPage() {
   const isEdit = Boolean(id)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const professions = mockStore.referentiels.professions()
-  const assurances = mockStore.referentiels.assurances()
+  const { data: professions = [] } = useQuery({
+    queryKey: ['referentiel', 'professions'],
+    queryFn: () => fetchReferentiel('professions'),
+  })
+  const { data: assurances = [] } = useQuery({
+    queryKey: ['referentiel', 'assurances'],
+    queryFn: () => fetchReferentiel('assurances'),
+  })
 
   const { data: patient } = useQuery({
     queryKey: ['patient', id],
