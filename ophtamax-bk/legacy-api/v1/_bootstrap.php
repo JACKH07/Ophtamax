@@ -174,7 +174,7 @@ function api_require_user(PDO $pdo): array
     if (!$parsed) {
         api_error('Non authentifié', 401);
     }
-    $stmt = $pdo->prepare('SELECT * FROM user WHERE id = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ? LIMIT 1');
     $stmt->execute([$parsed['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$user) {
@@ -216,15 +216,6 @@ function api_consultation_ensure(PDO $pdo): void
         return;
     }
     $done = true;
-
-    // Legacy table: keep details_json for read fallback / migration source
-    $legacyExists = (bool) $pdo->query("SHOW TABLES LIKE 'consultation'")->fetch();
-    if ($legacyExists) {
-        $col = $pdo->query("SHOW COLUMNS FROM consultation LIKE 'details_json'")->fetch();
-        if (!$col) {
-            $pdo->exec('ALTER TABLE consultation ADD COLUMN details_json LONGTEXT NULL');
-        }
-    }
 
     if (!api_consultation_has_column($pdo, 'uid')) {
         $pdo->exec('ALTER TABLE t_consultations ADD COLUMN uid VARCHAR(64) NULL');
@@ -355,19 +346,19 @@ function api_consultation_details_json(array $body): string
 
 function api_patient_label(PDO $pdo, string $id): string
 {
-    $stmt = $pdo->prepare('SELECT nom, prenom FROM patient WHERE id = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT nom, prenoms FROM t_patients WHERE id = ? LIMIT 1');
     $stmt->execute([$id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
         return '';
     }
 
-    return trim(((string) ($row['nom'] ?? '')) . ' ' . ((string) ($row['prenom'] ?? '')));
+    return trim(((string) ($row['nom'] ?? '')) . ' ' . ((string) ($row['prenoms'] ?? '')));
 }
 
 function api_user_label(PDO $pdo, string $id): string
 {
-    $stmt = $pdo->prepare('SELECT nom, prenoms, fonction, login_user FROM user WHERE id = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT nom, prenoms, fonction, login_user FROM users WHERE id = ? LIMIT 1');
     $stmt->execute([$id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
@@ -388,9 +379,9 @@ function api_map_patient(array $row): array
     return [
         'id' => (string) $row['id'],
         'nom' => (string) ($row['nom'] ?? ''),
-        'prenom' => (string) ($row['prenom'] ?? ''),
+        'prenom' => (string) ($row['prenoms'] ?? $row['prenom'] ?? ''),
         'sexe' => $sexe,
-        'date_nais' => (string) ($row['date_nais'] ?? ''),
+        'date_nais' => (string) ($row['datenaissance'] ?? $row['date_nais'] ?? ''),
         'profession' => (string) ($row['profession'] ?? ''),
         'contact' => (string) ($row['contact'] ?? ''),
         'assurance' => (string) ($row['assurance'] ?? ''),

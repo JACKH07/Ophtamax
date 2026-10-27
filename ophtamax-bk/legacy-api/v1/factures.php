@@ -50,7 +50,7 @@ if ($method === 'POST' && !$id) {
         api_error('Statut invalide', 422);
     }
 
-    $patient = $pdo->prepare('SELECT id FROM patient WHERE id = ? LIMIT 1');
+    $patient = $pdo->prepare('SELECT id FROM t_patients WHERE id = ? LIMIT 1');
     $patient->execute([$patientId]);
     if (!$patient->fetch()) {
         api_error('Patient introuvable', 422);

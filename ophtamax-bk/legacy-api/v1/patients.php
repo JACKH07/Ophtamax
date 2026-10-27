@@ -25,7 +25,7 @@ if ($method === 'GET' && !$id) {
     $where = ['1=1'];
     $params = [];
     if ($search !== '') {
-        $where[] = '(nom LIKE ? OR prenom LIKE ? OR contact LIKE ?)';
+        $where[] = '(nom LIKE ? OR prenoms LIKE ? OR contact LIKE ?)';
         $like = '%' . $search . '%';
         $params[] = $like;
         $params[] = $like;
@@ -37,16 +37,16 @@ if ($method === 'GET' && !$id) {
     }
     $sqlWhere = implode(' AND ', $where);
 
-    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM patient WHERE {$sqlWhere}");
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM t_patients WHERE {$sqlWhere}");
     $countStmt->execute($params);
     $total = (int) $countStmt->fetchColumn();
 
     $sql = "SELECT p.*, (
         SELECT MAX(c.datecons) FROM t_consultations c WHERE c.idpatients = p.id
       ) AS derniere_visite
-      FROM patient p
+      FROM t_patients p
       WHERE {$sqlWhere}
-      ORDER BY p.nom ASC, p.prenom ASC
+      ORDER BY p.nom ASC, p.prenoms ASC
       LIMIT {$perPage} OFFSET {$offset}";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -58,7 +58,7 @@ if ($method === 'GET' && !$id) {
 }
 
 if ($method === 'GET' && $id) {
-    $stmt = $pdo->prepare('SELECT * FROM patient WHERE id = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT * FROM t_patients WHERE id = ? LIMIT 1');
     $stmt->execute([$id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
@@ -75,9 +75,10 @@ if ($method === 'POST' && !$id) {
         }
     }
     $newId = api_new_id();
+    $now = date('Y-m-d H:i:s');
     $stmt = $pdo->prepare(
-        'INSERT INTO patient (id, nom, prenom, sexe, date_nais, profession, contact, assurance, antecedents)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO t_patients (id, nom, prenoms, sexe, datenaissance, profession, contact, assurance, antecedents, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $newId,
@@ -89,21 +90,24 @@ if ($method === 'POST' && !$id) {
         (string) $body['contact'],
         (string) ($body['assurance'] ?? ''),
         (string) ($body['antecedents'] ?? ''),
+        $now,
+        $now,
     ]);
-    $stmt = $pdo->prepare('SELECT * FROM patient WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM t_patients WHERE id = ?');
     $stmt->execute([$newId]);
     api_json(api_map_patient($stmt->fetch(PDO::FETCH_ASSOC)), 201, 'Patient créé');
 }
 
 if ($method === 'PUT' && $id) {
     $body = api_body();
-    $stmt = $pdo->prepare('SELECT id FROM patient WHERE id = ? LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id FROM t_patients WHERE id = ? LIMIT 1');
     $stmt->execute([$id]);
     if (!$stmt->fetch()) {
         api_error('Patient introuvable', 404);
     }
+    $now = date('Y-m-d H:i:s');
     $upd = $pdo->prepare(
-        'UPDATE patient SET nom=?, prenom=?, sexe=?, date_nais=?, profession=?, contact=?, assurance=?, antecedents=? WHERE id=?'
+        'UPDATE t_patients SET nom=?, prenoms=?, sexe=?, datenaissance=?, profession=?, contact=?, assurance=?, antecedents=?, updated_at=? WHERE id=?'
     );
     $upd->execute([
         trim((string) ($body['nom'] ?? '')),
@@ -114,15 +118,16 @@ if ($method === 'PUT' && $id) {
         (string) ($body['contact'] ?? ''),
         (string) ($body['assurance'] ?? ''),
         (string) ($body['antecedents'] ?? ''),
+        $now,
         $id,
     ]);
-    $stmt = $pdo->prepare('SELECT * FROM patient WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM t_patients WHERE id = ?');
     $stmt->execute([$id]);
     api_json(api_map_patient($stmt->fetch(PDO::FETCH_ASSOC)), 200, 'Patient mis à jour');
 }
 
 if ($method === 'DELETE' && $id) {
-    $stmt = $pdo->prepare('DELETE FROM patient WHERE id = ?');
+    $stmt = $pdo->prepare('DELETE FROM t_patients WHERE id = ?');
     $stmt->execute([$id]);
     api_json(null, 200, 'Patient supprimé');
 }

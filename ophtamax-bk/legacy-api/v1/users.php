@@ -6,7 +6,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $id = api_route_id();
 
 if ($method === 'GET' && !$id) {
-    $rows = $pdo->query('SELECT * FROM user ORDER BY nom, prenoms')->fetchAll(PDO::FETCH_ASSOC);
+    $rows = $pdo->query('SELECT * FROM users ORDER BY nom, prenoms')->fetchAll(PDO::FETCH_ASSOC);
     $data = array_map(static function ($row) {
         $payload = api_user_payload($row);
         $payload['actif'] = true;
@@ -16,7 +16,7 @@ if ($method === 'GET' && !$id) {
 }
 
 if ($method === 'GET' && $id) {
-    $stmt = $pdo->prepare('SELECT * FROM user WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
     $stmt->execute([$id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
@@ -28,7 +28,7 @@ if ($method === 'GET' && $id) {
 }
 
 if ($method === 'DELETE' && $id) {
-    $stmt = $pdo->prepare('DELETE FROM user WHERE id = ?');
+    $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?');
     $stmt->execute([$id]);
     api_json(null, 200, 'Utilisateur supprimé');
 }

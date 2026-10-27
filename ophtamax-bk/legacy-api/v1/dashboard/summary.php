@@ -12,7 +12,7 @@ $consultationsToday = (int) $pdo->query(
     "SELECT COUNT(*) FROM t_consultations WHERE DATE(datecons) = '{$today}' AND uid IS NOT NULL AND uid <> ''"
 )->fetchColumn();
 
-$patientsTotal = (int) $pdo->query('SELECT COUNT(*) FROM patient')->fetchColumn();
+$patientsTotal = (int) $pdo->query('SELECT COUNT(*) FROM t_patients')->fetchColumn();
 
 $newFromConsult = (int) $pdo->query(
     "SELECT COUNT(DISTINCT idpatients) FROM t_consultations

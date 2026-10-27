@@ -5,7 +5,7 @@ api_require_user($pdo);
 api_referentiel_ensure($pdo, 't_professions');
 
 $rows = $pdo->query(
-    "SELECT DISTINCT profession AS libelle FROM patient
+    "SELECT DISTINCT profession AS libelle FROM t_patients
      WHERE profession IS NOT NULL AND profession <> ''"
 )->fetchAll(PDO::FETCH_ASSOC);
 api_referentiel_seed($pdo, 't_professions', $rows);

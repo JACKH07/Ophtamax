@@ -66,7 +66,7 @@ function api_map_facture(PDO $pdo, array $row): array
 
 function api_facture_select_sql(): string
 {
-    return 'SELECT f.*, TRIM(CONCAT(COALESCE(p.nom, ""), " ", COALESCE(p.prenom, ""))) AS patient_name
+    return 'SELECT f.*, TRIM(CONCAT(COALESCE(p.nom, ""), " ", COALESCE(p.prenoms, ""))) AS patient_name
             FROM t_factures f
-            LEFT JOIN patient p ON p.id = f.idpatients';
+            LEFT JOIN t_patients p ON p.id = f.idpatients';
 }

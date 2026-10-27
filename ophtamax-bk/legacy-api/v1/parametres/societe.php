@@ -4,43 +4,50 @@ api_require_user($pdo);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-if ($method === 'GET') {
-    $row = $pdo->query('SELECT * FROM societe LIMIT 1')->fetch(PDO::FETCH_ASSOC) ?: [];
-    api_json([
-        'nom' => (string) ($row['nom'] ?? "Centre d'Ophtalmologie"),
+function api_societe_map(?array $row): array
+{
+    $row = $row ?: [];
+    return [
+        'nom' => (string) ($row['nom'] ?? $row['raison_sociale'] ?? "Centre d'Ophtalmologie"),
         'adresse' => (string) ($row['adresse'] ?? ''),
-        'contact' => (string) ($row['contact'] ?? ''),
+        'contact' => (string) ($row['contact'] ?? $row['telephone'] ?? ''),
         'slogan' => (string) ($row['slogan'] ?? 'Ophtamax'),
-    ]);
+    ];
+}
+
+if ($method === 'GET') {
+    $row = $pdo->query('SELECT * FROM societes ORDER BY id ASC LIMIT 1')->fetch(PDO::FETCH_ASSOC) ?: [];
+    api_json(api_societe_map($row));
 }
 
 if ($method === 'PUT') {
     $body = api_body();
-    $exists = $pdo->query('SELECT id FROM societe LIMIT 1')->fetchColumn();
+    $nom = (string) ($body['nom'] ?? '');
+    $adresse = (string) ($body['adresse'] ?? '');
+    $contact = (string) ($body['contact'] ?? '');
+    $slogan = (string) ($body['slogan'] ?? '');
+    $now = date('Y-m-d H:i:s');
+
+    $exists = $pdo->query('SELECT id FROM societes ORDER BY id ASC LIMIT 1')->fetchColumn();
     if ($exists) {
-        $stmt = $pdo->prepare('UPDATE societe SET nom=?, adresse=?, contact=?, slogan=? WHERE id=?');
-        $stmt->execute([
-            (string) ($body['nom'] ?? ''),
-            (string) ($body['adresse'] ?? ''),
-            (string) ($body['contact'] ?? ''),
-            (string) ($body['slogan'] ?? ''),
-            $exists,
-        ]);
+        $stmt = $pdo->prepare(
+            'UPDATE societes SET nom=?, raison_sociale=?, adresse=?, contact=?, telephone=?, slogan=?, updated_at=? WHERE id=?'
+        );
+        $stmt->execute([$nom, $nom, $adresse, $contact, $contact, $slogan, $now, $exists]);
     } else {
-        $stmt = $pdo->prepare('INSERT INTO societe (id, nom, adresse, contact, slogan) VALUES (?, ?, ?, ?, ?)');
-        $stmt->execute([
-            api_new_id(),
-            (string) ($body['nom'] ?? ''),
-            (string) ($body['adresse'] ?? ''),
-            (string) ($body['contact'] ?? ''),
-            (string) ($body['slogan'] ?? ''),
-        ]);
+        $code = 'SOC' . strtoupper(substr(api_new_id(), 0, 8));
+        $stmt = $pdo->prepare(
+            'INSERT INTO societes (code, raison_sociale, nom, adresse, telephone, contact, slogan, devise, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([$code, $nom ?: "Centre d'Ophtalmologie", $nom, $adresse, $contact, $contact, $slogan, 'XOF', $now, $now]);
     }
+
     api_json([
-        'nom' => (string) ($body['nom'] ?? ''),
-        'adresse' => (string) ($body['adresse'] ?? ''),
-        'contact' => (string) ($body['contact'] ?? ''),
-        'slogan' => (string) ($body['slogan'] ?? ''),
+        'nom' => $nom,
+        'adresse' => $adresse,
+        'contact' => $contact,
+        'slogan' => $slogan,
     ], 200, 'Société mise à jour');
 }
 
