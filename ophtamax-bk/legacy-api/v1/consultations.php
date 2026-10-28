@@ -11,7 +11,7 @@ if ($method === 'GET' && !$id) {
     $from = trim((string) ($_GET['from'] ?? ''));
     $to = trim((string) ($_GET['to'] ?? ''));
     $page = max(1, (int) ($_GET['page'] ?? 1));
-    $perPage = min(200, max(1, (int) ($_GET['per_page'] ?? 50)));
+    $perPage = min(200, max(1, (int) ($_GET['per_page'] ?? 10)));
     $offset = ($page - 1) * $perPage;
 
     $where = ["uid IS NOT NULL AND uid <> ''"];

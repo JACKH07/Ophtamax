@@ -10,7 +10,7 @@ $id = api_route_id();
 
 if ($method === 'GET' && !$id) {
     $page = max(1, (int) ($_GET['page'] ?? 1));
-    $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 20)));
+    $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 10)));
     $offset = ($page - 1) * $perPage;
     $total = (int) $pdo->query('SELECT COUNT(*) FROM t_factures')->fetchColumn();
     $impayes = (float) $pdo->query("SELECT COALESCE(SUM(montantfact), 0) FROM t_factures WHERE statut = 'impayee'")->fetchColumn();
@@ -90,12 +90,34 @@ if ($method === 'POST' && !$id) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
-        api_error('Impossible d\'enregistrer la facture', 500);
+        api_error('Impossible d\'enregistrer la facture: ' . $e->getMessage(), 500);
     }
 
     $stmt = $pdo->prepare(api_facture_select_sql() . ' WHERE f.id = ? LIMIT 1');
     $stmt->execute([$factureId]);
     api_json(api_map_facture($pdo, $stmt->fetch(PDO::FETCH_ASSOC)), 201, 'Facture créée');
+}
+
+if ($method === 'DELETE' && $id) {
+    $exists = $pdo->prepare('SELECT id FROM t_factures WHERE id = ? LIMIT 1');
+    $exists->execute([$id]);
+    if (!$exists->fetch()) {
+        api_error('Facture introuvable', 404);
+    }
+    $pdo->beginTransaction();
+    try {
+        $det = $pdo->prepare('DELETE FROM t_det_factures WHERE idfacture = ?');
+        $det->execute([$id]);
+        $del = $pdo->prepare('DELETE FROM t_factures WHERE id = ?');
+        $del->execute([$id]);
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        api_error('Impossible de supprimer la facture: ' . $e->getMessage(), 500);
+    }
+    api_json(null, 200, 'Facture supprimée');
 }
 
 api_error('Méthode non autorisée', 405);

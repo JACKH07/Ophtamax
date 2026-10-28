@@ -481,7 +481,7 @@ function api_docs_handle(PDO $pdo, string $kind, array $options = []): void
         }
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
-        $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 20)));
+        $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 10)));
         $offset = ($page - 1) * $perPage;
         if ($table === 't_agendas') {
             $count = $pdo->prepare("SELECT COUNT(*) FROM {$table} WHERE kind = ?");

@@ -41,6 +41,14 @@ export async function createFacture(payload: FactureFormData): Promise<Facture> 
   return data.data
 }
 
+export async function deleteFacture(id: string): Promise<void> {
+  if (USE_MOCK) {
+    mockStore.factures.remove(id)
+    return
+  }
+  await apiClient.delete(ENDPOINTS.facturation.factureDetail(id))
+}
+
 export async function fetchCaisseJour() {
   if (USE_MOCK) return mockStore.factures.caisseJour()
   const { data } = await apiClient.get<ApiResponse<{

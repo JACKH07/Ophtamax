@@ -53,7 +53,6 @@ export function ConsultationFormPage() {
     enabled: isEdit,
   })
 
-  const [patientId, setPatientId] = useState(preselectedPatient ?? '')
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [diagnostic, setDiagnostic] = useState('')
   const [examenOd, setExamenOd] = useState<ExamenOeil>(emptyOeil())
@@ -64,7 +63,6 @@ export function ConsultationFormPage() {
 
   useEffect(() => {
     if (!existing) return
-    setPatientId(existing.id_patient)
     setDiagnostic(existing.diagnostic)
     setExamenOd(existing.examen_od)
     setExamenOg(existing.examen_og)
@@ -85,7 +83,6 @@ export function ConsultationFormPage() {
     if (!presetPatient || presetApplied.current) return
     presetApplied.current = true
     setSelectedPatient(presetPatient)
-    setPatientId(presetPatient.id)
     setPatientQuery(`${presetPatient.nom} ${presetPatient.prenom}`.trim())
   }, [presetPatient])
 
@@ -119,7 +116,6 @@ export function ConsultationFormPage() {
   }
 
   const clearPatient = () => {
-    setPatientId('')
     setSelectedPatient(null)
     setPatientQuery('')
     setPatientError('')
@@ -203,7 +199,6 @@ export function ConsultationFormPage() {
                     value={patientQuery}
                     onChange={(e) => {
                       setPatientQuery(e.target.value)
-                      setPatientId('')
                       setSelectedPatient(null)
                       setPatientError('')
                       setSuggestionsOpen(true)
@@ -235,7 +230,6 @@ export function ConsultationFormPage() {
                             type="button"
                             className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
                             onClick={() => {
-                              setPatientId(p.id)
                               setSelectedPatient(p)
                               setPatientQuery(label)
                               setPatientError('')

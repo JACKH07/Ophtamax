@@ -170,6 +170,28 @@
   pointer-events: none;
 }
 
+/* Tableaux d'écran : police un peu plus compacte */
+main table {
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+main table th,
+main table th.text-label-md,
+main table th.text-label-sm {
+  font-size: 9px;
+  letter-spacing: 0.02em;
+}
+
+main table td,
+main table td.text-body-sm,
+main table td.text-label-sm,
+main table .text-body-sm,
+main table .text-label-md {
+  font-size: 10px;
+  line-height: 1.35;
+}
+
 @media print {
   #app-preloader {
     display: none !important;

@@ -11,7 +11,6 @@ import { formatDateFr } from '@/utils/date'
 
 const ligneSchema = z.object({
   libelle: z.string().min(1, 'Libellé obligatoire'),
-  quantite: z.number().min(1),
   prix_unitaire: z.number().min(0),
 })
 
@@ -58,17 +57,14 @@ export function FactureModal({ onClose }: FactureModalProps) {
       date: new Date().toISOString().slice(0, 10),
       statut: 'payee',
       mode_paiement: 'Espèces',
-      lignes: [{ libelle: 'Consultation ophtalmologique', quantite: 1, prix_unitaire: 0 }],
+      lignes: [{ libelle: 'Consultation ophtalmologique', prix_unitaire: 0 }],
     },
   })
 
   const { fields, append, remove } = useFieldArray({ control, name: 'lignes' })
   const lignes = watch('lignes')
   const patientId = watch('patient_id')
-  const total = (lignes ?? []).reduce(
-    (s, l) => s + (Number(l.quantite) || 0) * (Number(l.prix_unitaire) || 0),
-    0,
-  )
+  const total = (lignes ?? []).reduce((s, l) => s + (Number(l.prix_unitaire) || 0), 0)
 
   const mutation = useMutation({
     mutationFn: createFacture,
@@ -84,7 +80,7 @@ export function FactureModal({ onClose }: FactureModalProps) {
       ...values,
       lignes: values.lignes.map((l) => ({
         libelle: l.libelle,
-        quantite: Number(l.quantite),
+        quantite: 1,
         prix_unitaire: Number(l.prix_unitaire),
       })),
     })
@@ -203,7 +199,7 @@ export function FactureModal({ onClose }: FactureModalProps) {
               <label className="text-label-sm text-secondary">Lignes de facture *</label>
               <button
                 type="button"
-                onClick={() => append({ libelle: '', quantite: 1, prix_unitaire: 0 })}
+                onClick={() => append({ libelle: '', prix_unitaire: 0 })}
                 className="flex items-center gap-1 rounded-lg border border-outline-variant px-2 py-1 text-label-sm text-primary hover:bg-surface-container-low"
               >
                 <MaterialIcon name="add" className="text-[16px]" />
@@ -217,14 +213,7 @@ export function FactureModal({ onClose }: FactureModalProps) {
                   <input
                     placeholder="Libellé"
                     {...register(`lignes.${index}.libelle`)}
-                    className="col-span-5 rounded-md border border-outline-variant bg-surface-container-low px-2 py-1.5 text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                  <input
-                    type="number"
-                    min={1}
-                    placeholder="Qté"
-                    {...register(`lignes.${index}.quantite`, { valueAsNumber: true })}
-                    className="col-span-2 rounded-md border border-outline-variant bg-surface-container-low px-2 py-1.5 text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="col-span-7 rounded-md border border-outline-variant bg-surface-container-low px-2 py-1.5 text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                   <input
                     type="number"

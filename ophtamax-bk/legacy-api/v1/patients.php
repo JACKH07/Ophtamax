@@ -19,7 +19,7 @@ if ($method === 'GET' && !$id) {
     $search = trim((string) ($_GET['search'] ?? ''));
     $assurance = trim((string) ($_GET['assurance'] ?? ''));
     $page = max(1, (int) ($_GET['page'] ?? 1));
-    $perPage = min(200, max(1, (int) ($_GET['per_page'] ?? 50)));
+    $perPage = min(200, max(1, (int) ($_GET['per_page'] ?? 10)));
     $offset = ($page - 1) * $perPage;
 
     $where = ['1=1'];

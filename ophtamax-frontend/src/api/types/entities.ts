@@ -99,6 +99,8 @@ export interface Facture {
   patient_id: string
   patient_name: string
   date: string
+  /** Horodatage d'enregistrement / paiement (ISO ou datetime SQL) */
+  created_at?: string
   montant_ht: number
   montant_ttc: number
   statut: 'payee' | 'partielle' | 'impayee'

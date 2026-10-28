@@ -1,6 +1,6 @@
 import type { PageMeta } from '@/api/types/auth'
 
-export const PAGE_SIZE = 20
+export const PAGE_SIZE = 10
 
 export interface PageResult<T> {
   items: T[]

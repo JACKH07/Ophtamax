@@ -11,6 +11,7 @@ import { ConsultationFormPage } from '@/features/consultations/pages/Consultatio
 import { ConsultationsListPage } from '@/features/consultations/pages/ConsultationsListPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { FacturationPage } from '@/features/facturation/pages/FacturationPage'
+import { FacturePrintPage } from '@/features/facturation/pages/FacturePrintPage'
 import { OrdonnanceFormPage } from '@/features/ordonnances/pages/OrdonnanceFormPage'
 import { OrdonnancePrintPage } from '@/features/ordonnances/pages/OrdonnancePrintPage'
 import { OrdonnancesListPage } from '@/features/ordonnances/pages/OrdonnancesListPage'
@@ -89,6 +90,7 @@ export function AppRouter() {
 
             <Route element={<RoleGuard pathPrefix={PATHS.facturation} />}>
               <Route path={PATHS.facturation} element={<FacturationPage />} />
+              <Route path={`${PATHS.facturation}/:id`} element={<FacturePrintPage />} />
             </Route>
 
             <Route element={<RoleGuard pathPrefix={PATHS.statistiques} />}>

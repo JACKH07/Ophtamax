@@ -152,7 +152,7 @@ export function PatientsListPage() {
             )}
           </tbody>
         </table>
-        <Pagination page={page} perPage={data?.perPage ?? 20} total={data?.total ?? 0} onPageChange={setPage} />
+        <Pagination page={page} perPage={data?.perPage ?? 10} total={data?.total ?? 0} onPageChange={setPage} />
       </div>
     </div>
   )

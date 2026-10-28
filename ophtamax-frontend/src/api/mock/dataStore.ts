@@ -195,6 +195,7 @@ export const mockStore = {
         patient_id: data.patient_id,
         patient_name: data.patient_name,
         date: data.date.slice(0, 10),
+        created_at: new Date().toISOString(),
         montant_ht: total,
         montant_ttc: total,
         statut: data.statut,
@@ -203,6 +204,9 @@ export const mockStore = {
       }
       factures = [f, ...factures]
       return f
+    },
+    remove: (id: string) => {
+      factures = factures.filter((f) => f.id !== id)
     },
     caisseJour: () => {
       const today = new Date().toISOString().slice(0, 10)

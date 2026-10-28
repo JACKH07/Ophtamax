@@ -3,12 +3,14 @@ import { useState } from 'react'
 import { getErrorMessage } from '@/api/client'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Pagination } from '@/components/common/Pagination'
 import {
   addReferentiel,
   fetchReferentiel,
   removeReferentiel,
   type ReferentielKind,
 } from '@/features/parametres/services/parametresService'
+import { slicePage } from '@/utils/pagination'
 
 const META: Record<
   ReferentielKind,
@@ -43,11 +45,13 @@ export function ReferentielPage({ kind }: ReferentielPageProps) {
   const meta = META[kind]
   const [code, setCode] = useState('')
   const [libelle, setLibelle] = useState('')
+  const [page, setPage] = useState(1)
 
   const listQuery = useQuery({
     queryKey: ['parametres', kind],
     queryFn: () => fetchReferentiel(kind),
   })
+  const paged = slicePage(listQuery.data ?? [], page)
 
   const addMutation = useMutation({
     mutationFn: () =>
@@ -60,6 +64,7 @@ export function ReferentielPage({ kind }: ReferentielPageProps) {
       queryClient.invalidateQueries({ queryKey: ['referentiel', kind] })
       setCode('')
       setLibelle('')
+      setPage(1)
     },
   })
 
@@ -131,14 +136,14 @@ export function ReferentielPage({ kind }: ReferentielPageProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant">
-            {(listQuery.data ?? []).length === 0 ? (
+            {paged.total === 0 ? (
               <tr>
                 <td colSpan={3} className="px-4 py-8 text-center text-body-sm text-secondary">
                   {meta.emptyLabel} Ajoutez {meta.addLabel} ci-dessus.
                 </td>
               </tr>
             ) : (
-              (listQuery.data ?? []).map((item) => (
+              paged.items.map((item) => (
                 <tr key={item.id} className="hover:bg-surface-container-low/50">
                   <td className="px-4 py-3 font-medium">{item.code}</td>
                   <td className="px-4 py-3">{item.libelle}</td>
@@ -162,6 +167,12 @@ export function ReferentielPage({ kind }: ReferentielPageProps) {
             )}
           </tbody>
         </table>
+        <Pagination
+          page={paged.page}
+          perPage={paged.perPage}
+          total={paged.total}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   )
