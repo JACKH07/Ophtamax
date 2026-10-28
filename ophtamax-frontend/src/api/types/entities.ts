@@ -70,6 +70,7 @@ export interface RendezVous {
 
 export interface RendezVousFormData {
   patient_id: string
+  patient_name?: string
   date_heure: string
   duree_min: number
   medecin_id: string
@@ -141,6 +142,7 @@ export interface PrescriptionExamen {
 
 export interface PrescriptionExamenFormData {
   patient_id: string
+  patient_name?: string
   date: string
   examens: string
   indication: string
@@ -163,6 +165,7 @@ export interface Ordonnance {
 
 export interface OrdonnanceFormData {
   patient_id: string
+  patient_name?: string
   date: string
   contenu: string
   diagnostic: string
@@ -207,6 +210,7 @@ export interface PrescriptionLunettes {
 
 export interface PrescriptionLunettesFormData {
   patient_id: string
+  patient_name?: string
   date: string
   correction: string
   od_sphere: string

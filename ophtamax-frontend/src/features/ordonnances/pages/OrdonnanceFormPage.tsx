@@ -57,7 +57,15 @@ export function OrdonnanceFormPage() {
 
   const mutation = useMutation({
     mutationFn: () => {
-      const payload = { patient_id: patientId, date, contenu, diagnostic, medecin, notes }
+      const payload = {
+        patient_id: patientId,
+        patient_name: patientQuery.trim(),
+        date,
+        contenu,
+        diagnostic,
+        medecin,
+        notes,
+      }
       return isEdit ? updateOrdonnance(id!, payload) : createOrdonnance(payload)
     },
     onSuccess: (item) => {
@@ -85,12 +93,13 @@ export function OrdonnanceFormPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!patientId) {
-            setPatientError('Choisissez un patient dans la liste')
+          if (patientQuery.trim().length < 2) {
+            setPatientError('Saisissez le nom du patient (ou choisissez-en un dans la liste)')
             return
           }
           if (!contenu.trim()) return
           setPatientError('')
+          setSuggestionsOpen(false)
           mutation.mutate()
         }}
         className="flex w-full flex-1 flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
@@ -106,23 +115,19 @@ export function OrdonnanceFormPage() {
               setSuggestionsOpen(true)
             }}
             onFocus={() => setSuggestionsOpen(true)}
-            placeholder="Saisir le nom, le prénom ou le contact"
+            placeholder="Nom du patient (recherche facultative)"
             autoComplete="off"
             className={inputClass}
           />
           {patientError ? (
             <p className="mt-1 text-label-sm text-error">{patientError}</p>
-          ) : patientId ? (
-            <p className="mt-1 text-label-sm text-primary">Patient sélectionné</p>
-          ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
-            <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
           ) : null}
-          {suggestionsOpen && patientQuery.trim().length >= 2 && !patientId && (
+          {suggestionsOpen &&
+            patientQuery.trim().length >= 2 &&
+            !patientId &&
+            (patientsLoading || patientMatches.length > 0) && (
             <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
               {patientsLoading && <li className="px-3 py-2 text-body-md text-secondary">Recherche…</li>}
-              {!patientsLoading && patientMatches.length === 0 && (
-                <li className="px-3 py-2 text-body-md text-secondary">Aucun patient trouvé</li>
-              )}
               {patientMatches.map((p: Patient) => {
                 const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
                 return (

@@ -69,6 +69,9 @@ export function ConsultationFormPage() {
     setConduite(existing.conduite_a_tenir)
     setRdvDate(formatDateFr(existing.prochain_rdv_date))
     setRdvDelai(existing.prochain_rdv_delai || 'Dans 1 mois')
+    if (!existing.id_patient && existing.patient_name) {
+      setPatientQuery(existing.patient_name)
+    }
   }, [existing])
 
   const presetId = existing?.id_patient || (!isEdit ? preselectedPatient : '') || ''
@@ -92,17 +95,27 @@ export function ConsultationFormPage() {
     onSuccess: (c) => {
       queryClient.invalidateQueries({ queryKey: ['consultations'] })
       queryClient.invalidateQueries({ queryKey: ['consultation', c.id] })
-      queryClient.invalidateQueries({ queryKey: ['patient', c.id_patient] })
+      if (c.id_patient) {
+        queryClient.invalidateQueries({ queryKey: ['patient', c.id_patient] })
+      }
       navigate(`${PATHS.consultations}/${c.id}`)
     },
   })
 
+  const resolvedPatientName = () => {
+    if (selectedPatient) {
+      return `${selectedPatient.prenom} ${selectedPatient.nom}`.trim()
+    }
+    return patientQuery.trim()
+  }
+
   const buildPayload = (statut: 'brouillon' | 'terminee'): ConsultationFormData | null => {
-    if (!selectedPatient) return null
+    const name = resolvedPatientName()
+    if (name.length < 2) return null
     return {
-      id_patient: selectedPatient.id,
-      patient_name: `${selectedPatient.prenom} ${selectedPatient.nom}`,
-      dossier_numero: dossierNumero(selectedPatient.id),
+      id_patient: selectedPatient?.id ?? '',
+      patient_name: name,
+      dossier_numero: selectedPatient ? dossierNumero(selectedPatient.id) : '',
       diagnostic,
       examen_od: examenOd,
       examen_og: examenOg,
@@ -122,26 +135,30 @@ export function ConsultationFormPage() {
     setSuggestionsOpen(false)
   }
 
+  const requirePatientName = (): boolean => {
+    const name = resolvedPatientName()
+    if (name.length < 2) {
+      setPatientError('Saisissez le nom du patient (ou choisissez-en un dans la liste)')
+      return false
+    }
+    setPatientError('')
+    return true
+  }
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (!selectedPatient) {
-      setPatientError('Choisissez un patient dans la liste')
-      return
-    }
+    if (!requirePatientName()) return
     const payload = buildPayload('terminee')
     if (!payload) return
-    setPatientError('')
+    setSuggestionsOpen(false)
     mutation.mutate(payload)
   }
 
   const goPrintCompteRendu = () => {
-    if (!selectedPatient) {
-      setPatientError('Choisissez un patient dans la liste')
-      return
-    }
+    if (!requirePatientName()) return
     const payload = buildPayload('terminee')
     if (!payload) return
-    setPatientError('')
+    setSuggestionsOpen(false)
     mutation.mutate(payload, {
       onSuccess: (c) => navigate(`${PATHS.consultations}/${c.id}/documents`),
     })
@@ -173,7 +190,7 @@ export function ConsultationFormPage() {
                     <p className="text-body-md font-semibold text-on-surface">
                       {selectedPatient.prenom} {selectedPatient.nom}
                     </p>
-                    <p className="text-label-sm text-primary">Patient sélectionné</p>
+                    <p className="text-label-sm text-primary">Patient du dossier</p>
                     <p className="text-label-sm text-secondary">
                       {patientAge(selectedPatient.date_nais)} ans · Dossier #{dossierNumero(selectedPatient.id)}
                     </p>
@@ -192,7 +209,7 @@ export function ConsultationFormPage() {
               </div>
             ) : (
               <div className="relative mt-3 max-w-md">
-                <label className="mb-1 block text-label-sm text-on-surface-variant">Patient</label>
+                <label className="mb-1 block text-label-sm text-on-surface-variant">Patient *</label>
                 <div className="relative">
                   <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
                   <input
@@ -204,23 +221,20 @@ export function ConsultationFormPage() {
                       setSuggestionsOpen(true)
                     }}
                     onFocus={() => setSuggestionsOpen(true)}
-                    placeholder="Saisir le nom, le prénom ou le contact"
+                    placeholder="Nom du patient (recherche facultative)"
                     autoComplete="off"
                     className={`${inputClass} pl-10`}
                   />
                 </div>
                 {patientError ? (
                   <p className="mt-1 text-label-sm text-error">{patientError}</p>
-                ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
-                  <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
                 ) : null}
-                {suggestionsOpen && patientQuery.trim().length >= 2 && (
+                {suggestionsOpen &&
+                  patientQuery.trim().length >= 2 &&
+                  (patientsLoading || patientMatches.length > 0) && (
                   <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
                     {patientsLoading && (
                       <li className="px-3 py-2 text-body-md text-secondary">Recherche…</li>
-                    )}
-                    {!patientsLoading && patientMatches.length === 0 && (
-                      <li className="px-3 py-2 text-body-md text-secondary">Aucun patient trouvé</li>
                     )}
                     {patientMatches.map((p) => {
                       const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`

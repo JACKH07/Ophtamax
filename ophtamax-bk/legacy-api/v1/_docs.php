@@ -189,6 +189,7 @@ function api_docs_prepare_body(PDO $pdo, array $body): array
 {
     unset($body['id']);
     $patientId = trim((string) ($body['patient_id'] ?? ''));
+    $patientName = trim((string) ($body['patient_name'] ?? ''));
     if ($patientId !== '') {
         $label = api_patient_label($pdo, $patientId);
         if ($label === '') {
@@ -196,6 +197,9 @@ function api_docs_prepare_body(PDO $pdo, array $body): array
         }
         $body['patient_id'] = $patientId;
         $body['patient_name'] = $label;
+    } elseif ($patientName !== '') {
+        $body['patient_id'] = '';
+        $body['patient_name'] = $patientName;
     }
     $medecinId = trim((string) ($body['medecin_id'] ?? ''));
     if ($medecinId !== '') {

@@ -4,7 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
-import { createRendezVous, updateRendezVous } from '@/features/agenda/services/agendaService'
+import {
+  createRendezVous,
+  deleteRendezVous,
+  updateRendezVous,
+} from '@/features/agenda/services/agendaService'
 import { fetchPatients } from '@/features/patients/services/patientService'
 import { fetchUsers } from '@/features/utilisateurs/services/userService'
 import { formatDateFr } from '@/utils/date'
@@ -12,13 +16,26 @@ import type { RendezVous } from '@/api/types/entities'
 
 const DEFAULT_DUREE_MIN = 30
 
-const schema = z.object({
-  patient_id: z.string().min(1, 'Sélectionnez un patient'),
-  medecin_id: z.string().min(1, 'Sélectionnez un médecin'),
-  date_heure: z.string().min(1, 'Date et heure obligatoires'),
-  motif: z.string().min(2, 'Motif obligatoire'),
-  statut: z.enum(['planifie', 'en_attente', 'en_consultation', 'termine', 'absent']),
-})
+const schema = z
+  .object({
+    patient_id: z.string().optional().default(''),
+    patient_name: z.string().optional().default(''),
+    medecin_id: z.string().min(1, 'Sélectionnez un médecin'),
+    date_heure: z.string().min(1, 'Date et heure obligatoires'),
+    motif: z.string().min(2, 'Motif obligatoire'),
+    statut: z.enum(['planifie', 'en_attente', 'en_consultation', 'termine', 'absent']),
+  })
+  .superRefine((values, ctx) => {
+    const name = (values.patient_name ?? '').trim()
+    const id = (values.patient_id ?? '').trim()
+    if (!id && name.length < 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['patient_name'],
+        message: 'Saisissez le nom du patient (ou choisissez-en un dans la liste)',
+      })
+    }
+  })
 
 type FormValues = z.infer<typeof schema>
 
@@ -35,7 +52,14 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
 
   const { data: users = [] } = useQuery({ queryKey: ['users'], queryFn: fetchUsers })
   const medecins = users.filter((u) => u.id_role === 'OPHT')
-  const medecinOptions = medecins.length > 0 ? medecins : users
+  const medecinOptions =
+    medecins.length > 0
+      ? medecins
+      : users.filter(
+          (u) =>
+            u.id_role !== 'ADMIN' &&
+            String(u.login_user ?? '').toLowerCase() !== 'admin',
+        )
 
   const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
     queryKey: ['patients-search', patientQuery],
@@ -54,6 +78,7 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
     resolver: zodResolver(schema),
     defaultValues: {
       patient_id: rdv?.patient_id ?? '',
+      patient_name: rdv?.patient_name ?? '',
       medecin_id: rdv?.medecin_id ?? (medecinOptions[0]?.id ?? ''),
       date_heure: rdv?.date_heure
         ? rdv.date_heure.slice(0, 16)
@@ -66,6 +91,7 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
   useEffect(() => {
     reset({
       patient_id: rdv?.patient_id ?? '',
+      patient_name: rdv?.patient_name ?? '',
       medecin_id: rdv?.medecin_id ?? (medecinOptions[0]?.id ?? ''),
       date_heure: rdv?.date_heure
         ? rdv.date_heure.slice(0, 16)
@@ -78,8 +104,14 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
 
   const mutation = useMutation({
     mutationFn: (values: FormValues) => {
+      const name = (values.patient_name || patientQuery).trim()
       const payload = {
-        ...values,
+        patient_id: values.patient_id?.trim() || '',
+        patient_name: name,
+        medecin_id: values.medecin_id,
+        date_heure: values.date_heure,
+        motif: values.motif,
+        statut: values.statut,
         duree_min: rdv?.duree_min ?? DEFAULT_DUREE_MIN,
         notes: '',
       }
@@ -91,6 +123,18 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
       onClose()
     },
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteRendezVous(rdv!.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['agenda'] })
+      queryClient.invalidateQueries({ queryKey: ['file-attente'] })
+      onClose()
+    },
+  })
+
+  const selectedId = watch('patient_id')
+  const busy = isSubmitting || mutation.isPending || deleteMutation.isPending
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -108,34 +152,46 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit((values) => mutation.mutate(values))} className="space-y-4 px-6 py-5">
+        <form
+          onSubmit={handleSubmit((values) => {
+            setValue('patient_name', patientQuery.trim(), { shouldValidate: true })
+            mutation.mutate({
+              ...values,
+              patient_name: patientQuery.trim(),
+            })
+          })}
+          className="space-y-4 px-6 py-5"
+        >
           <div className="relative">
             <label className="mb-1 block text-label-sm text-secondary">Patient *</label>
             <input type="hidden" {...register('patient_id')} />
+            <input type="hidden" {...register('patient_name')} />
             <input
               value={patientQuery}
               onChange={(e) => {
-                setPatientQuery(e.target.value)
+                const value = e.target.value
+                setPatientQuery(value)
                 setValue('patient_id', '', { shouldValidate: true })
+                setValue('patient_name', value, { shouldValidate: true })
                 setSuggestionsOpen(true)
               }}
               onFocus={() => setSuggestionsOpen(true)}
-              placeholder="Saisir le nom, le prénom ou le contact"
+              onBlur={() => {
+                setValue('patient_name', patientQuery.trim(), { shouldValidate: true })
+              }}
+              placeholder="Nom du patient (recherche facultative)"
               autoComplete="off"
               className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            {watch('patient_id') ? (
-              <p className="mt-1 text-label-sm text-primary">Patient sélectionné</p>
-            ) : null}
-            {errors.patient_id && (
-              <p className="mt-1 text-label-sm text-error">{errors.patient_id.message}</p>
+            {errors.patient_name && (
+              <p className="mt-1 text-label-sm text-error">{errors.patient_name.message}</p>
             )}
-            {suggestionsOpen && patientQuery.trim().length >= 2 && !watch('patient_id') && (
+            {suggestionsOpen &&
+              patientQuery.trim().length >= 2 &&
+              !selectedId &&
+              (patientsLoading || patientMatches.length > 0) && (
               <ul className="absolute z-20 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
                 {patientsLoading && <li className="px-3 py-2 text-body-sm text-secondary">Recherche…</li>}
-                {!patientsLoading && patientMatches.length === 0 && (
-                  <li className="px-3 py-2 text-body-sm text-secondary">Aucun patient trouvé</li>
-                )}
                 {patientMatches.map((p) => {
                   const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
                   return (
@@ -145,6 +201,7 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
                         className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
                         onClick={() => {
                           setValue('patient_id', p.id, { shouldValidate: true })
+                          setValue('patient_name', label, { shouldValidate: true })
                           setPatientQuery(label)
                           setSuggestionsOpen(false)
                         }}
@@ -167,11 +224,14 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
               {...register('medecin_id')}
               className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              {medecinOptions.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {`${u.prenoms} ${u.nom}`.trim() || u.fonction || u.login_user}
-                </option>
-              ))}
+              {medecinOptions.map((u) => {
+                const label = `${u.nom} ${u.prenoms}`.trim() || u.fonction || 'Médecin'
+                return (
+                  <option key={u.id} value={u.id}>
+                    {label}
+                  </option>
+                )
+              })}
             </select>
           </div>
 
@@ -216,26 +276,49 @@ export function RdvModal({ rdv, defaultDate, onClose }: RdvModalProps) {
             </div>
           )}
 
-          {mutation.isError && (
-            <p className="text-label-sm text-error">Erreur lors de la sauvegarde.</p>
+          {(mutation.isError || deleteMutation.isError) && (
+            <p className="text-label-sm text-error">
+              {deleteMutation.isError
+                ? 'Erreur lors de la suppression.'
+                : 'Erreur lors de la sauvegarde.'}
+            </p>
           )}
 
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg border border-outline-variant px-4 py-2 text-label-md text-secondary hover:bg-surface-container-low"
-            >
-              Annuler
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || mutation.isPending}
-              className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-label-md text-on-primary hover:bg-primary/90 disabled:opacity-50"
-            >
-              <MaterialIcon name="save" className="text-[16px]" />
-              {rdv ? 'Enregistrer' : 'Créer le RDV'}
-            </button>
+          <div className="flex items-center justify-between gap-3 pt-2">
+            {rdv ? (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  if (window.confirm('Supprimer ce rendez-vous ?')) {
+                    deleteMutation.mutate()
+                  }
+                }}
+                className="flex items-center gap-2 rounded-lg border border-error/30 px-4 py-2 text-label-md text-error hover:bg-error/5 disabled:opacity-50"
+              >
+                <MaterialIcon name="delete" className="text-[16px]" />
+                {deleteMutation.isPending ? 'Suppression…' : 'Supprimer'}
+              </button>
+            ) : (
+              <span />
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg border border-outline-variant px-4 py-2 text-label-md text-secondary hover:bg-surface-container-low"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={busy}
+                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-label-md text-on-primary hover:bg-primary/90 disabled:opacity-50"
+              >
+                <MaterialIcon name="save" className="text-[16px]" />
+                {rdv ? 'Enregistrer' : 'Créer le RDV'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

@@ -33,10 +33,12 @@ export async function createPrescriptionLunettes(
   data: PrescriptionLunettesFormData,
 ): Promise<PrescriptionLunettes> {
   if (USE_MOCK) {
-    const patient = mockStore.patients.get(data.patient_id)
+    const patient = data.patient_id ? mockStore.patients.get(data.patient_id) : undefined
     return mockStore.prescriptionsLunettes.create({
       ...data,
-      patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
+      patient_name:
+        (data.patient_name ?? '').trim() ||
+        (patient ? `${patient.nom} ${patient.prenom}` : 'Patient'),
     })
   }
   const { data: created } = await apiClient.post<ApiResponse<PrescriptionLunettes>>(
@@ -51,10 +53,12 @@ export async function updatePrescriptionLunettes(
   data: PrescriptionLunettesFormData,
 ): Promise<PrescriptionLunettes> {
   if (USE_MOCK) {
-    const patient = mockStore.patients.get(data.patient_id)
+    const patient = data.patient_id ? mockStore.patients.get(data.patient_id) : undefined
     return mockStore.prescriptionsLunettes.update(id, {
       ...data,
-      patient_name: patient ? `${patient.nom} ${patient.prenom}` : 'Patient inconnu',
+      patient_name:
+        (data.patient_name ?? '').trim() ||
+        (patient ? `${patient.nom} ${patient.prenom}` : undefined),
     })
   }
   const { data: updated } = await apiClient.put<ApiResponse<PrescriptionLunettes>>(

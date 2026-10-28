@@ -8,6 +8,7 @@ $id = api_route_id();
 
 if ($method === 'GET' && !$id) {
     $patientId = trim((string) ($_GET['patient_id'] ?? ''));
+    $q = trim((string) ($_GET['q'] ?? $_GET['search'] ?? ''));
     $from = trim((string) ($_GET['from'] ?? ''));
     $to = trim((string) ($_GET['to'] ?? ''));
     $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -19,6 +20,13 @@ if ($method === 'GET' && !$id) {
     if ($patientId !== '') {
         $where[] = 'idpatients = ?';
         $params[] = $patientId;
+    }
+    if ($q !== '') {
+        $like = '%' . $q . '%';
+        $where[] = '(nom_prenoms_pat LIKE ? OR diagnostic LIKE ? OR idpatients LIKE ?)';
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
     }
     if ($from !== '') {
         $where[] = 'DATE(datecons) >= ?';
@@ -57,12 +65,15 @@ if ($method === 'GET' && $id) {
 if ($method === 'POST' && !$id) {
     $body = api_body();
     $patientId = trim((string) ($body['id_patient'] ?? ''));
-    if ($patientId === '') {
-        api_error('id_patient requis', 422);
-    }
-    $patientName = (string) ($body['patient_name'] ?? '');
-    if ($patientName === '') {
-        $patientName = api_patient_label($pdo, $patientId);
+    $patientName = trim((string) ($body['patient_name'] ?? ''));
+    if ($patientId !== '') {
+        $label = api_patient_label($pdo, $patientId);
+        if ($label === '') {
+            api_error('Patient introuvable', 422);
+        }
+        $patientName = $label;
+    } elseif (mb_strlen($patientName) < 2) {
+        api_error('Saisissez le nom du patient (ou choisissez-en un dans la liste)', 422);
     }
     $newId = api_new_id();
     $now = date('Y-m-d H:i:s');

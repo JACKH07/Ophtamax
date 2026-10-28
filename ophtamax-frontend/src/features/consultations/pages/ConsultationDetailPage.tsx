@@ -56,16 +56,22 @@ export function ConsultationDetailPage() {
     <div className="flex flex-col gap-stack-lg">
       <PageHeader
         title={`Consultation — ${c.patient_name}`}
-        subtitle={`${formatDateTimeFr(c.datecons)} · Dossier #${c.dossier_numero}`}
+        subtitle={
+          c.dossier_numero
+            ? `${formatDateTimeFr(c.datecons)} · Dossier #${c.dossier_numero}`
+            : formatDateTimeFr(c.datecons)
+        }
         actions={
           <div className="flex flex-wrap gap-2">
-            <Link
-              to={`${PATHS.patients}/${c.id_patient}`}
-              className="flex items-center gap-2 rounded-lg border border-outline-variant px-4 py-2 text-label-md text-secondary hover:bg-surface-container-low"
-            >
-              <MaterialIcon name="person" className="text-[18px]" />
-              Fiche patient
-            </Link>
+            {c.id_patient ? (
+              <Link
+                to={`${PATHS.patients}/${c.id_patient}`}
+                className="flex items-center gap-2 rounded-lg border border-outline-variant px-4 py-2 text-label-md text-secondary hover:bg-surface-container-low"
+              >
+                <MaterialIcon name="person" className="text-[18px]" />
+                Fiche patient
+              </Link>
+            ) : null}
             {can('consultations.write') && (
               <Link
                 to={`${PATHS.consultations}/${c.id}/modifier`}

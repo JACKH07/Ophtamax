@@ -11,11 +11,17 @@ import type {
 } from '@/api/types/entities'
 
 function resolveNames(data: RendezVousFormData): { patient_name: string; medecin: string } {
-  const patient = mockStore.patients.get(data.patient_id)
+  if (data.patient_id) {
+    const patient = mockStore.patients.get(data.patient_id)
+    if (patient) {
+      return {
+        patient_name: `${patient.nom} ${patient.prenom}`.trim() || `Patient ${data.patient_id}`,
+        medecin: '',
+      }
+    }
+  }
   return {
-    patient_name: patient
-      ? `${patient.nom} ${patient.prenom}`.trim() || `Patient ${data.patient_id}`
-      : 'Patient inconnu',
+    patient_name: (data.patient_name ?? '').trim() || 'Patient',
     medecin: '',
   }
 }

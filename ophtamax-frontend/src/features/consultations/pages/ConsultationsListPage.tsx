@@ -16,10 +16,11 @@ import { formatDateFr } from '@/utils/date'
 export function ConsultationsListPage() {
   const { can } = usePermissions()
   const queryClient = useQueryClient()
+  const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const { data, isLoading } = useQuery({
-    queryKey: ['consultations', page],
-    queryFn: () => fetchConsultations(page),
+    queryKey: ['consultations', search, page],
+    queryFn: () => fetchConsultations(page, undefined, search),
   })
   const consultations = data?.items ?? []
 
@@ -46,6 +47,31 @@ export function ConsultationsListPage() {
         }
       />
 
+      <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 shadow-sm">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div className="md:col-span-2">
+            <label className="mb-1 block text-label-sm text-on-surface-variant">
+              Recherche de patient
+            </label>
+            <div className="relative">
+              <MaterialIcon
+                name="search"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+              />
+              <input
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setPage(1)
+                }}
+                placeholder="Nom du patient, diagnostic…"
+                className="w-full rounded-lg border border-outline-variant bg-surface py-2 pl-10 pr-4 text-body-md focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm">
         <table className="w-full border-collapse text-left">
           <thead className="border-b border-outline-variant bg-surface-container-low">
@@ -68,22 +94,32 @@ export function ConsultationsListPage() {
             ) : consultations.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-secondary">
-                  Aucune consultation —{' '}
-                  <Link to={PATHS.consultationNouvelle} className="text-primary hover:underline">
-                    créer la première
-                  </Link>
+                  {search.trim()
+                    ? 'Aucune consultation pour cette recherche'
+                    : (
+                      <>
+                        Aucune consultation —{' '}
+                        <Link to={PATHS.consultationNouvelle} className="text-primary hover:underline">
+                          créer la première
+                        </Link>
+                      </>
+                    )}
                 </td>
               </tr>
             ) : (
               consultations.map((c) => (
                 <tr key={c.id} className="hover:bg-surface-container-low/50">
                   <td className="px-4 py-3">
-                    <Link
-                      to={`${PATHS.patients}/${c.id_patient}`}
-                      className="font-medium text-on-surface hover:text-primary"
-                    >
-                      {c.patient_name}
-                    </Link>
+                    {c.id_patient ? (
+                      <Link
+                        to={`${PATHS.patients}/${c.id_patient}`}
+                        className="font-medium text-on-surface hover:text-primary"
+                      >
+                        {c.patient_name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-on-surface">{c.patient_name}</span>
+                    )}
                     <p className="text-label-sm text-secondary line-clamp-1">
                       {c.diagnostic || 'Consultation'}
                     </p>

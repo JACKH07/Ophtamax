@@ -41,7 +41,10 @@ export function FileAttenteWidget() {
   const mutation = useMutation({
     mutationFn: ({ id, statut }: { id: string; statut: StatutFileAttente }) =>
       updateFileAttenteStatut(id, statut),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['file-attente'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['file-attente'] })
+      queryClient.invalidateQueries({ queryKey: ['agenda'] })
+    },
   })
 
   const actifs = file.filter((f) => f.statut !== 'termine' && f.statut !== 'absent')
@@ -167,7 +170,11 @@ function FileAttenteRow({ item, position, onAction }: FileAttenteRowProps) {
           </button>
         )}
         <Link
-          to={`${PATHS.consultations}/nouvelle?patient=${item.patient_id}`}
+          to={
+            item.patient_id
+              ? `${PATHS.consultations}/nouvelle?patient=${item.patient_id}`
+              : PATHS.consultations + '/nouvelle'
+          }
           className="flex items-center gap-1.5 rounded-lg border border-outline-variant px-3 py-1.5 text-label-sm text-secondary hover:bg-surface-container-low"
         >
           <MaterialIcon name="description" className="text-[14px]" />

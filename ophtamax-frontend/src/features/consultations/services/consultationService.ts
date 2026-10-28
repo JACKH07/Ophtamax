@@ -5,10 +5,25 @@ import type { ApiResponse } from '@/api/types/auth'
 import type { Consultation, ExamenOeil } from '@/api/types/entities'
 import { PAGE_SIZE, pageFromResponse, slicePage, type PageResult } from '@/utils/pagination'
 
-export async function fetchConsultations(page = 1, perPage = PAGE_SIZE): Promise<PageResult<Consultation>> {
-  if (USE_MOCK) return slicePage(mockStore.consultations.list(), page, perPage)
+export async function fetchConsultations(
+  page = 1,
+  perPage = PAGE_SIZE,
+  search = '',
+): Promise<PageResult<Consultation>> {
+  if (USE_MOCK) {
+    const q = search.trim().toLowerCase()
+    const list = mockStore.consultations.list().filter((c) => {
+      if (!q) return true
+      return (
+        c.patient_name.toLowerCase().includes(q) ||
+        (c.diagnostic ?? '').toLowerCase().includes(q) ||
+        (c.dossier_numero ?? '').toLowerCase().includes(q)
+      )
+    })
+    return slicePage(list, page, perPage)
+  }
   const { data } = await apiClient.get<ApiResponse<Consultation[]>>(ENDPOINTS.consultations.list, {
-    params: { page, per_page: perPage },
+    params: { page, per_page: perPage, q: search.trim() || undefined },
   })
   return pageFromResponse(data, page, perPage)
 }

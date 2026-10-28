@@ -436,7 +436,7 @@ function api_map_consultation(array $row): array
         'id' => $id,
         'id_patient' => $patientId,
         'patient_name' => (string) ($row['nom_prenoms_pat'] ?? ''),
-        'dossier_numero' => 'D-' . substr($patientId, 0, 8),
+        'dossier_numero' => $patientId !== '' ? 'D-' . substr($patientId, 0, 8) : '',
         'datecons' => (string) ($row['datecons'] ?? ''),
         'diagnostic' => (string) ($row['diagnostic'] ?? ''),
         'examen_od' => array_merge(api_empty_oeil(), $od),

@@ -15,12 +15,20 @@ export type AvatarTone = 'primary' | 'secondary' | 'surface' | 'muted'
 
 export interface WaitingQueueItem {
   id: string
+  patient_id?: string
   patient_name: string
   reason: string
+  motif?: string
   time: string
+  date_heure?: string
   status: WaitingStatus
+  statut_rdv?: string
   practitioner: string
+  medecin?: string
+  notes?: string
+  duree_min?: number
   avatar_tone: AvatarTone
+  source?: string
 }
 
 export interface UpcomingSlot {

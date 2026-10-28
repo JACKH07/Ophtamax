@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import type { Patient } from '@/api/types/entities'
 import { MaterialIcon } from '@/components/common/MaterialIcon'
 import { PageHeader } from '@/components/common/PageHeader'
 import { fetchReferentiel } from '@/features/parametres/services/parametresService'
@@ -29,7 +28,6 @@ export function PrescriptionExamenFormPage() {
   const [patientQuery, setPatientQuery] = useState('')
   const [suggestionsOpen, setSuggestionsOpen] = useState(false)
   const [patientError, setPatientError] = useState('')
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
 
   const { data: patientMatches = [], isFetching: patientsLoading } = useQuery({
     queryKey: ['patients-search', patientQuery],
@@ -67,6 +65,7 @@ export function PrescriptionExamenFormPage() {
     mutationFn: () => {
       const payload = {
         patient_id: patientId,
+        patient_name: patientQuery.trim(),
         date,
         examens,
         indication: diagnostic,
@@ -110,12 +109,13 @@ export function PrescriptionExamenFormPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!patientId) {
-            setPatientError('Choisissez un patient dans la liste')
+          if (patientQuery.trim().length < 2) {
+            setPatientError('Saisissez le nom du patient (ou choisissez-en un dans la liste)')
             return
           }
           if (!examens.trim()) return
           setPatientError('')
+          setSuggestionsOpen(false)
           mutation.mutate()
         }}
         className="flex w-full flex-1 flex-col gap-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm"
@@ -141,39 +141,25 @@ export function PrescriptionExamenFormPage() {
               onChange={(e) => {
                 setPatientQuery(e.target.value)
                 setPatientId('')
-                setSelectedPatient(null)
                 setPatientError('')
                 setSuggestionsOpen(true)
               }}
               onFocus={() => setSuggestionsOpen(true)}
-              placeholder="Saisir le nom du patient"
+              placeholder="Nom du patient (recherche facultative)"
               autoComplete="off"
               className={`${inputClass} pl-10`}
             />
           </div>
           {patientError ? (
             <p className="mt-1 text-label-sm text-error">{patientError}</p>
-          ) : patientId ? (
-            <p className="mt-1 text-label-sm text-primary">
-              Patient sélectionné
-              {selectedPatient
-                ? ` · ${selectedPatient.sexe === 'M' ? 'Masculin' : 'Féminin'}${
-                    selectedPatient.date_nais
-                      ? ` · Né(e) le ${formatDateFr(selectedPatient.date_nais)}`
-                      : ''
-                  }`
-                : ''}
-            </p>
-          ) : patientQuery.trim().length > 0 && patientQuery.trim().length < 2 ? (
-            <p className="mt-1 text-label-sm text-secondary">Saisissez au moins 2 caractères</p>
           ) : null}
-          {suggestionsOpen && patientQuery.trim().length >= 2 && !patientId && (
+          {suggestionsOpen &&
+            patientQuery.trim().length >= 2 &&
+            !patientId &&
+            (patientsLoading || patientMatches.length > 0) && (
             <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-md">
               {patientsLoading && (
                 <li className="px-3 py-2 text-body-md text-secondary">Recherche…</li>
-              )}
-              {!patientsLoading && patientMatches.length === 0 && (
-                <li className="px-3 py-2 text-body-md text-secondary">Aucun patient trouvé</li>
               )}
               {patientMatches.map((p) => {
                 const label = `${p.nom} ${p.prenom}`.trim() || `Patient ${p.id}`
@@ -184,7 +170,6 @@ export function PrescriptionExamenFormPage() {
                       className="flex w-full flex-col px-3 py-2 text-left hover:bg-surface-container"
                       onClick={() => {
                         setPatientId(p.id)
-                        setSelectedPatient(p)
                         setPatientQuery(label)
                         setPatientError('')
                         setSuggestionsOpen(false)
