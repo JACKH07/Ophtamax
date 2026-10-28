@@ -534,8 +534,12 @@ CREATE TABLE `t_det_factures` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `idfacture` varchar(255) NOT NULL DEFAULT '',
+  `lignelibelle` varchar(255) NOT NULL DEFAULT '',
+  `quantite` varchar(32) NOT NULL DEFAULT '1',
+  `prixunitaire` decimal(15,2) NOT NULL DEFAULT 0.00,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -544,6 +548,7 @@ CREATE TABLE `t_det_factures` (
 
 LOCK TABLES `t_det_factures` WRITE;
 /*!40000 ALTER TABLE `t_det_factures` DISABLE KEYS */;
+INSERT INTO `t_det_factures` VALUES (3,'2026-10-28 10:48:14','2026-10-28 10:48:14','4','Consultation ophtalmologique','1',50000.00);
 /*!40000 ALTER TABLE `t_det_factures` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -585,13 +590,13 @@ CREATE TABLE `t_factures` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `idpatients` varchar(255) NOT NULL,
   `date_fact` date NOT NULL,
-  `modepaiement` varchar(255) NOT NULL,
-  `montantfact` decimal(15,2) NOT NULL,
-  `statut` varchar(255) NOT NULL,
+  `modepaiement` varchar(255) NOT NULL DEFAULT '',
+  `montantfact` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `statut` varchar(32) NOT NULL DEFAULT 'impayee',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -600,6 +605,7 @@ CREATE TABLE `t_factures` (
 
 LOCK TABLES `t_factures` WRITE;
 /*!40000 ALTER TABLE `t_factures` DISABLE KEYS */;
+INSERT INTO `t_factures` VALUES (4,'6ded07f2ade6378d02e98c5c5f22dc6c6ff67e68','2026-10-28','CB',50000.00,'payee','2026-10-28 10:48:14','2026-10-28 10:48:14');
 /*!40000 ALTER TABLE `t_factures` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -891,7 +897,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('bc3defe5a9611b115800682e542e16697c13005c','Admin','admin@ophtamax.local','admin','d033e22ae348aeb5660fc2140aec35850c4da997','Admin','','ADMIN','Administrateur','M','1990-01-01',NULL,'d033e22ae348aeb5660fc2140aec35850c4da997',NULL,'2026-10-27 16:53:00','2026-10-27 16:53:00'),('ea96ecee9549648bb541abcfef92962825d7c39b','KAHYDARA KAHYDARA','krotoum49@gmail.com','nkahydara','8cb2237d0679ca88db6464eac60da96345513964','KAHYDARA','KAHYDARA','ADMIN','Administrateur','A','1980-09-03',NULL,'8cb2237d0679ca88db6464eac60da96345513964',NULL,'2026-10-27 16:53:00','2026-10-27 16:53:00');
+INSERT INTO `users` VALUES ('bc3defe5a9611b115800682e542e16697c13005c','Admin','admin@ophtamax.local','admin','d033e22ae348aeb5660fc2140aec35850c4da997','Admin','','ADMIN','Administrateur','M','1990-01-01',NULL,'d033e22ae348aeb5660fc2140aec35850c4da997',NULL,'2026-10-27 16:53:00','2026-10-27 16:53:00'),('ea96ecee9549648bb541abcfef92962825d7c39b','KAHYDARA KAHYDARA','krotoum49@gmail.com','nkahydara','8cb2237d0679ca88db6464eac60da96345513964','KAHYDARA','KAHYDARA','ASS','Assistante','A','1980-09-03',NULL,'8cb2237d0679ca88db6464eac60da96345513964',NULL,'2026-10-27 16:53:00','2026-10-27 16:53:00');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -904,4 +910,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-28  9:19:41
+-- Dump completed on 2026-10-28 12:44:07
