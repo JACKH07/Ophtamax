@@ -105,7 +105,11 @@ function api_permissions_for_role(string $role): array
         ],
         'SEC' => ['patients.create', 'patients.edit', 'caisse.access'],
         'OPHT' => ['consultations.write', 'ordonnance.print'],
-        'ASS' => ['consultations.write'],
+        'ASS' => [
+            'patients.create', 'patients.edit',
+            'consultations.write', 'ordonnance.print',
+            'facturation.write', 'caisse.access',
+        ],
         'COMPTA' => ['facturation.write', 'caisse.access'],
     ];
     return $all[$role] ?? [];
