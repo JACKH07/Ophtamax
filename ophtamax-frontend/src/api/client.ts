@@ -21,9 +21,8 @@ export function getAuthToken(): string | null {
 }
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = authToken ?? sessionStorage.getItem('ophtamax_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  if (authToken) {
+    config.headers.Authorization = `Bearer ${authToken}`
   }
   return config
 })
@@ -32,8 +31,14 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401 && !USE_MOCK) {
-      sessionStorage.removeItem('ophtamax_token')
       authToken = null
+      try {
+        sessionStorage.removeItem('ophtamax-auth')
+        localStorage.removeItem('ophtamax-auth')
+        sessionStorage.removeItem('ophtamax_token')
+      } catch {
+        // ignore
+      }
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login'
       }

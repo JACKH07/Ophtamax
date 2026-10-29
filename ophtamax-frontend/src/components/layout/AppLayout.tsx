@@ -1,8 +1,11 @@
 import { Outlet } from 'react-router-dom'
+import { useSessionTimeout } from '@/hooks/useSessionTimeout'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 
 export function AppLayout() {
+  useSessionTimeout(true)
+
   return (
     <div className="h-screen overflow-hidden bg-background font-sans text-on-surface antialiased print:h-auto print:overflow-visible">
       <div className="no-print">

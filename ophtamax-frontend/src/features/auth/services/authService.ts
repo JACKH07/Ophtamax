@@ -1,4 +1,4 @@
-import { apiClient } from '@/api/client'
+import { apiClient, getAuthToken } from '@/api/client'
 import { ENDPOINTS, USE_MOCK } from '@/api/endpoints'
 import { mockLogin, mockMe } from '@/api/mock/authMock'
 import type { ApiResponse, AuthResponse } from '@/api/types/auth'
@@ -28,7 +28,7 @@ export async function logout(): Promise<void> {
 
 export async function fetchMe(): Promise<AuthResponse> {
   if (USE_MOCK) {
-    const token = sessionStorage.getItem('ophtamax_token')
+    const token = getAuthToken()
     if (!token) throw new Error('Non authentifié')
     const result = mockMe(token)
     if (!result) throw new Error('Session invalide')
