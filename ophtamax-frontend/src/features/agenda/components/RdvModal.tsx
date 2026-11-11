@@ -18,16 +18,16 @@ const DEFAULT_DUREE_MIN = 30
 
 const schema = z
   .object({
-    patient_id: z.string().optional().default(''),
-    patient_name: z.string().optional().default(''),
+    patient_id: z.string(),
+    patient_name: z.string(),
     medecin_id: z.string().min(1, 'Sélectionnez un médecin'),
     date_heure: z.string().min(1, 'Date et heure obligatoires'),
     motif: z.string().min(2, 'Motif obligatoire'),
     statut: z.enum(['planifie', 'en_attente', 'en_consultation', 'termine', 'absent']),
   })
   .superRefine((values, ctx) => {
-    const name = (values.patient_name ?? '').trim()
-    const id = (values.patient_id ?? '').trim()
+    const name = values.patient_name.trim()
+    const id = values.patient_id.trim()
     if (!id && name.length < 2) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
